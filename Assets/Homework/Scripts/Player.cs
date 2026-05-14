@@ -21,7 +21,7 @@ namespace Netologia.Homework
 		private void Update()
 		{
 			if (!_ready) return;
-			if (Input.GetKey(KeyCode.Space))
+			if (Input.GetKeyDown(KeyCode.Space))
 			{
 				StartCoroutine(Reloader());
 				_ball.isKinematic = false;
@@ -41,7 +41,7 @@ namespace Netologia.Homework
 		private void Spawn()
 		{
 			_ball = Instantiate(_ballPrefab, transform);
-			_ball.isKinematic = true;
+            _ball.isKinematic = true;
 			_ready = true;
 		}
 

@@ -6,16 +6,16 @@ public class Rotator : MonoBehaviour
 {
     [SerializeField]
     private Vector3 _rotate = new Vector3(0f, 75f, 0f);
-    private Rigidbody _rigidBody;
+    private Rigidbody _rigidbody;
 
     void Start()
     {
-        _rigidBody = GetComponent<Rigidbody>();
-        if (_rigidBody == null)
+        _rigidbody = GetComponent<Rigidbody>();
+        if (_rigidbody == null)
         {
             return;
         }
-        _rigidBody.isKinematic = true;
+        _rigidbody.isKinematic = true;
         StartCoroutine(Rotate());
     }
 
@@ -23,7 +23,7 @@ public class Rotator : MonoBehaviour
     {
         while (true)
         {
-            _rigidBody.MoveRotation(_rigidBody.rotation *
+            _rigidbody.MoveRotation(_rigidbody.rotation *
             Quaternion.Euler(_rotate * Time.fixedDeltaTime));
 
             yield return new WaitForFixedUpdate();
