@@ -12,6 +12,6 @@ public class SceneController : MonoBehaviour
 
     public void OpenGameScene()
     {
-        SceneManager.LoadScene(1, LoadSceneMode.Additive);
+        SceneManager.LoadScene(0, LoadSceneMode.Additive);
     }
 }

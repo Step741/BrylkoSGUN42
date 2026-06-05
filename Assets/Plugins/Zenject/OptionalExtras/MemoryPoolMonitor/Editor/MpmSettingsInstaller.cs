@@ -1,18 +1,25 @@
 using UnityEngine;
-using UnityEditor;
-using Zenject;
 
-namespace Zenject.MemoryPoolMonitor
+namespace GamePrototype
 {
-    [CreateAssetMenu(fileName = "MpmSettingsInstaller", menuName = "Installers/MpmSettingsInstaller")]
-    public class MpmSettingsInstaller : ScriptableObjectInstaller<MpmSettingsInstaller>
+    [CreateAssetMenu(
+        fileName = "New CellPaletteSettings",menuName = "Settings/CellPaletteSettings",order = 52)]
+    public class CellPaletteSettings : ScriptableObject
     {
-        public MpmView.Settings MpmView;
-        public MpmView.Settings MpmViewDark;
+        [field: SerializeField, Space(20f)]
+        [field: Tooltip("Клетка под выбранным юнитом")]
+        public Material SelectCell { get; private set; }
 
-        public override void InstallBindings()
-        {
-            Container.BindInstance(EditorGUIUtility.isProSkin ? MpmViewDark : MpmView);
-        }
+        [field: SerializeField]
+        [field: Tooltip("Клетка доступная для передвижения")]
+        public Material MoveCell { get; private set; }
+
+        [field: SerializeField]
+        [field: Tooltip("Клетка доступная для атаки")]
+        public Material AttackCell { get; private set; }
+
+        [field: SerializeField]
+        [field: Tooltip("Клетка доступная и для атаки и для движения")]
+        public Material MoveAndAttackCell { get; private set; }
     }
 }

@@ -18,8 +18,6 @@ namespace Zenject.MemoryPoolMonitor
 
         public override void InstallBindings()
         {
-            MpmSettingsInstaller.InstallFromResource(Container);
-
             Container.BindInstance(this);
             Container.BindInterfacesTo<MpmView>().AsSingle();
         }
