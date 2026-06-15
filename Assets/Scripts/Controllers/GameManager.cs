@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public event Action<Team> OnGameEnd;
     public event Action<Team> OnTeamChange;
 
+    [Header("Main Settings")]
     [SerializeField] 
     private Vector2Int _boardSize;
 
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] 
     private UIManager _uiManager;
 
+    [Header("Additional Settings")]
     [SerializeField] 
     private Board _board;
 

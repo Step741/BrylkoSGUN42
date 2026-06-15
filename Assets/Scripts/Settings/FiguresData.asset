@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 204484bd09e1cc64795b469e9290f187, type: 3}
   m_Name: FiguresData
   m_EditorClassIdentifier: 
-  _whiteCheckerPrefab: {fileID: 0}
-  _whiteKingPrefab: {fileID: 0}
-  _blackCheckerPrefab: {fileID: 0}
-  _blackKingPrefab: {fileID: 0}
+  _whiteCheckerPrefab: {fileID: 8798076482721216444, guid: 2b0e9feed06aec640be1183bd66c060a, type: 3}
+  _whiteKingPrefab: {fileID: 4404753731706741038, guid: 0f0fdc357224e64459560167d634dcf9, type: 3}
+  _blackCheckerPrefab: {fileID: 8586411784378175909, guid: 25e930b1d27208e4a818d011ea2bfe0b, type: 3}
+  _blackKingPrefab: {fileID: 266316398709776458, guid: b9567b0dcd00b60489c9d8d54bc94740, type: 3}

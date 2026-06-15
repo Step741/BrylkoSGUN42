@@ -1,12 +1,15 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Restart : MonoBehaviour
 {
-    [SerializeField] 
+    public event System.Action OnFillComplete;
+
+    [SerializeField]
     private GameObject _restartPanel;
 
-    [SerializeField] 
+    [SerializeField]
     private Image _fill;
 
     private Coroutine _fillCoroutine;
@@ -32,6 +35,7 @@ public class Restart : MonoBehaviour
     public void StartFillPanel(float time)
     {
         IsEnd = false;
+        _fill.fillAmount = 0f;
 
         if (_fillCoroutine != null)
         {
@@ -46,24 +50,31 @@ public class Restart : MonoBehaviour
         if (_fillCoroutine != null)
         {
             StopCoroutine(_fillCoroutine);
+            _fillCoroutine = null;
         }
 
-        _fill.fillAmount = 0;
+        IsEnd = false;
+        _fill.fillAmount = 0f;
     }
 
-    private System.Collections.IEnumerator FillPanel(float time)
+    private IEnumerator FillPanel(float time)
     {
-        float fillAmount = 0;
+        float fillAmount = 0f;
 
-        while (_fill.fillAmount < 1)
+        while (fillAmount < 1f)
         {
-            _fill.fillAmount = fillAmount;
-
-            yield return new WaitForEndOfFrame();
             fillAmount += Time.deltaTime / time;
+
+            _fill.fillAmount = Mathf.Clamp01(fillAmount);
+
+            yield return null;
         }
+
+        _fill.fillAmount = 1f;
 
         IsEnd = true;
         _fillCoroutine = null;
+
+        OnFillComplete?.Invoke();
     }
 }

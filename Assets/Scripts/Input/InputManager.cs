@@ -4,7 +4,7 @@ using Zenject;
 
 public class InputManager : MonoBehaviour
 {
-    [SerializeField] 
+    [SerializeField]
     private Restart _restart;
 
     [Inject]
@@ -15,8 +15,15 @@ public class InputManager : MonoBehaviour
         _controls.Game.Restart.Enable();
 
         _controls.Game.Restart.started += Restart_started;
-        _controls.Game.Restart.performed += Restart_performed;
         _controls.Game.Restart.canceled += Restart_canceled;
+
+        _restart.OnFillComplete += RestartScene;
+    }
+
+    private void Restart_started(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        _restart.ShowPanel();
+        _restart.StartFillPanel(2f);
     }
 
     private void Restart_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -25,25 +32,17 @@ public class InputManager : MonoBehaviour
         _restart.StopFillPanel();
     }
 
-    private void Restart_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void RestartScene()
     {
-        if (_restart.IsEnd)
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-    }
-
-    private void Restart_started(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        _restart.ShowPanel();
-        _restart.StartFillPanel(2);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void OnDestroy()
     {
         _controls.Game.Restart.started -= Restart_started;
-        _controls.Game.Restart.performed -= Restart_performed;
         _controls.Game.Restart.canceled -= Restart_canceled;
+
+        _restart.OnFillComplete -= RestartScene;
 
         _controls.Game.Restart.Disable();
     }

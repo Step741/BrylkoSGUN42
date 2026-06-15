@@ -67,15 +67,29 @@ namespace Utils
 
         public void MoveFigure(Vector2Int oldPosition, Vector2Int newPosition)
         {
-            if (IsPositionCorrect(oldPosition) == false)
+            if (!IsPositionCorrect(oldPosition))
             {
-                Debug.LogError($"Old position is not correct!");
+                Debug.LogError("Old position is not correct!");
                 return;
             }
 
-            if (IsPositionCorrect(newPosition) == false)
+            if (!IsPositionCorrect(newPosition))
             {
                 Debug.LogError("New position is not correct!");
+                return;
+            }
+
+            Figure figure = GetFigureByPosition(oldPosition);
+
+            if (figure == null)
+            {
+                Debug.LogError($"No figure at position {oldPosition}");
+                return;
+            }
+
+            if (GetFigureByPosition(newPosition) != null)
+            {
+                Debug.LogError($"Target position {newPosition} is occupied");
                 return;
             }
 
@@ -84,7 +98,15 @@ namespace Utils
 
             OnMoveFigure?.Invoke(oldPosition, newPosition);
 
-            if (newPosition.x == 0 || newPosition.x == Size.x - 1)
+            Figure movedFigure = GetFigureByPosition(newPosition);
+
+            if (movedFigure.Team == Team.White &&
+                newPosition.x == 0)
+            {
+                ChangeToKing(newPosition);
+            }
+            else if (movedFigure.Team == Team.Black &&
+                     newPosition.x == Size.x - 1)
             {
                 ChangeToKing(newPosition);
             }
@@ -101,12 +123,15 @@ namespace Utils
 
         public void DeleteFigure(Vector2Int position)
         {
-            if (IsPositionCorrect(position) == false)
-            {
+            if (!IsPositionCorrect(position))
                 return;
-            }
 
-            switch (_board[position.x, position.y].Team)
+            Figure figure = _board[position.x, position.y];
+
+            if (figure == null)
+                return;
+
+            switch (figure.Team)
             {
                 case Team.White:
                     WhiteCheckersCount--;
@@ -115,24 +140,28 @@ namespace Utils
                 case Team.Black:
                     BlackCheckersCount--;
                     break;
-
-                default:
-                    break;
             }
 
             _board[position.x, position.y] = null;
+
             OnDeleteFigure?.Invoke(position);
+
             ShowBoardConsole();
         }
 
         public void ChangeToKing(Vector2Int position)
         {
-            if (IsPositionCorrect(position) == false)
-            {
+            if (!IsPositionCorrect(position))
                 return;
-            }
 
             Figure figure = GetFigureByPosition(position);
+
+            if (figure == null)
+                return;
+
+            if (figure.Type == FigureType.King)
+                return;
+
             figure.Type = FigureType.King;
 
             OnChangeToKing?.Invoke(position, figure);
@@ -145,15 +174,10 @@ namespace Utils
 
         public bool IsPositionCorrect(Vector2Int position)
         {
-            if (position.x < 0
-                || position.x >= Size.x
-                || position.y < 0
-                || position.y >= Size.y)
-            {
-                return false;
-            }
-
-            return true;
+            return position.x >= 0
+                && position.x < Size.x
+                && position.y >= 0
+                && position.y < Size.y;
         }
 
         private void Fill(string[] figures)

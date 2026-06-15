@@ -23,7 +23,6 @@ public class VisualManager : MonoBehaviour
         board.OnDeleteFigure += Board_OnDeleteFigure;
         board.OnChangeToKing += Board_OnChangeToKing;
 
-        // Создание фигур
         _figures = new Transform[board.Size.x, board.Size.y];
 
         for (int x = 0; x < board.Size.x; x++)
@@ -59,7 +58,11 @@ public class VisualManager : MonoBehaviour
 
     private void Board_OnDeleteFigure(Vector2Int position)
     {
-        Destroy(_figures[position.x, position.y].gameObject);
+        if (_figures[position.x, position.y] != null)
+        {
+            Destroy(_figures[position.x, position.y].gameObject);
+            _figures[position.x, position.y] = null;
+        }
     }
 
     private void Board_OnMoveFigure(Vector2Int oldPosition, Vector2Int newPosition)
