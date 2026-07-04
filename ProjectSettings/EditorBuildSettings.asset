@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/MainScene.unity
     guid: 69a0605be4510dc43b3c8fec612e6a14
   - enabled: 1
-    path: Assets/Scenes/GameScene.unity
+    path: Assets/Scenes/TopDown.unity
     guid: 2e6e8f65d2e5c1e41b2c6bd98bb65465
   m_configObjects: {}
