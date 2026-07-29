@@ -5,10 +5,16 @@ using Zenject;
 
 public class MainInstaller : MonoInstaller
 {
+    [SerializeField]
+    private LayerMask collectibleLayer;
+
     public override void InstallBindings()
     {
         Container.Bind<SingleController>().AsSingle();
         Container.BindInterfacesTo<MultiplayerController>().AsSingle();
+
+        Container.BindInstance(collectibleLayer).WithId("CollectibleLayer");
+        Container.Bind<IItemFinder>().To<ItemFinder>().AsSingle();
     }
 }
 
