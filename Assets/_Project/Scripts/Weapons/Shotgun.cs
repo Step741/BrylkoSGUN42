@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -27,6 +28,12 @@ public class Shotgun : WeaponBase
     private Camera playerCamera;
 
     private float nextFireTime;
+
+    // Цели, которые уже были оглушены
+    // текущим выстрелом.
+    private readonly HashSet<IStunnable>
+        stunnedTargets =
+            new HashSet<IStunnable>();
 
     [Inject]
     private void Construct(Camera playerCamera)
@@ -72,9 +79,12 @@ public class Shotgun : WeaponBase
         muzzleFlash?.Play();
 
         // Shoot Sound
-        if (audioSource != null && shootSound != null)
+        if (audioSource != null &&
+            shootSound != null)
         {
-            audioSource.PlayOneShot(shootSound);
+            audioSource.PlayOneShot(
+                shootSound
+            );
         }
 
         // Weapon Recoil
@@ -84,7 +94,12 @@ public class Shotgun : WeaponBase
         cameraController?.AddRecoil();
 
         nextFireTime =
-            Time.time + 1f / config.FireRate;
+            Time.time +
+            1f / config.FireRate;
+
+        // Новая цель оглушения
+        // для текущего выстрела.
+        stunnedTargets.Clear();
 
         FirePellets();
 
@@ -93,30 +108,38 @@ public class Shotgun : WeaponBase
 
     private void FirePellets()
     {
-        for (int i = 0; i < config.Pellets; i++)
+        for (int i = 0;
+             i < config.Pellets;
+             i++)
         {
             Vector3 direction =
                 GetPelletDirection();
 
-            Ray ray = new Ray(
-                playerCamera.transform.position,
-                direction
-            );
+            Ray ray =
+                new Ray(
+                    playerCamera.transform.position,
+                    direction
+                );
 
             if (Physics.Raycast(
-                ray,
-                out RaycastHit hit,
-                config.Range,
-                hitMask,
-                QueryTriggerInteraction.Ignore))
+                    ray,
+                    out RaycastHit hit,
+                    config.Range,
+                    hitMask,
+                    QueryTriggerInteraction.Ignore))
             {
                 ApplyPelletDamage(hit);
-                ApplyKnockback(hit, direction);
+
+                ApplyKnockback(
+                    hit,
+                    direction
+                );
             }
 
             Debug.DrawRay(
                 ray.origin,
-                ray.direction * config.Range,
+                ray.direction *
+                config.Range,
                 Color.red,
                 1f
             );
@@ -146,19 +169,40 @@ public class Shotgun : WeaponBase
         RaycastHit hit)
     {
         IDamageable damageable =
-            hit.collider.GetComponentInParent<IDamageable>();
+            hit.collider.GetComponentInParent<
+                IDamageable
+            >();
 
         if (damageable == null)
             return;
 
         float distanceMultiplier =
-            GetDamageMultiplier(hit.distance);
+            GetDamageMultiplier(
+                hit.distance
+            );
 
         float damage =
             config.Damage *
             distanceMultiplier;
 
-        damageable.TakeDamage(damage);
+        damageable.TakeDamage(
+            damage
+        );
+
+        // ==========================================
+        // STUN
+        // ==========================================
+
+        IStunnable stunnable =
+            hit.collider.GetComponentInParent<
+                IStunnable
+            >();
+
+        if (stunnable != null &&
+            stunnedTargets.Add(stunnable))
+        {
+            stunnable.Stun();
+        }
     }
 
     private float GetDamageMultiplier(
@@ -166,7 +210,8 @@ public class Shotgun : WeaponBase
     {
         float normalizedDistance =
             Mathf.Clamp01(
-                distance / config.Range
+                distance /
+                config.Range
             );
 
         return Mathf.Lerp(
@@ -181,7 +226,9 @@ public class Shotgun : WeaponBase
         Vector3 direction)
     {
         Rigidbody targetRigidbody =
-            hit.collider.GetComponentInParent<Rigidbody>();
+            hit.collider.GetComponentInParent<
+                Rigidbody
+            >();
 
         if (targetRigidbody == null)
             return;
@@ -196,7 +243,8 @@ public class Shotgun : WeaponBase
     public override void Reload()
     {
         int missingAmmo =
-            config.MagazineSize - currentAmmo;
+            config.MagazineSize -
+            currentAmmo;
 
         if (missingAmmo <= 0)
             return;
@@ -216,7 +264,8 @@ public class Shotgun : WeaponBase
         NotifyAmmoChanged();
 
         Debug.Log(
-            $"Shotgun reload: {currentAmmo}/{reserveAmmo}"
+            $"Shotgun reload: " +
+            $"{currentAmmo}/{reserveAmmo}"
         );
     }
 }

@@ -1,0 +1,84 @@
+using UnityEngine;
+
+public class ShooterAlertState : EnemyState
+{
+    private readonly EnemyShooter shooter;
+
+    public ShooterAlertState(Enemy enemy)
+        : base(enemy)
+    {
+        shooter = enemy.GetComponent<EnemyShooter>();
+    }
+
+    public override void Enter()
+    {
+        if (shooter == null)
+        {
+            Debug.LogError(
+                $"[{enemy.name}] ShooterAlertState: EnemyShooter is missing."
+            );
+
+            return;
+        }
+
+        if (enemy.Vision == null)
+        {
+            Debug.LogError(
+                $"[{enemy.name}] ShooterAlertState: EnemyVision is missing."
+            );
+
+            return;
+        }
+
+        Debug.Log(
+            $"[{enemy.name}] State: Alert"
+        );
+    }
+
+    public override void Tick()
+    {
+        if (shooter == null)
+            return;
+
+        if (enemy.Vision == null)
+            return;
+
+        Transform player = enemy.Vision.Player;
+
+        if (player == null)
+        {
+            shooter.StopMoving();
+            return;
+        }
+
+        float distance =
+            Vector3.Distance(
+                shooter.transform.position,
+                player.position
+            );
+
+        if (distance > shooter.AttackDistance)
+        {
+            if (shooter.Agent != null &&
+                shooter.Agent.isOnNavMesh)
+            {
+                shooter.Agent.isStopped = false;
+                shooter.Agent.SetDestination(player.position);
+            }
+
+            return;
+        }
+
+        shooter.StopMoving();
+
+        enemy.StateMachine.ChangeState(
+            new ShooterCombatState(enemy)
+        );
+    }
+
+    public override void Exit()
+    {
+        if (shooter != null)
+            shooter.StopMoving();
+    }
+}

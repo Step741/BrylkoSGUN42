@@ -262,6 +262,14 @@ public class GrenadeProjectile : MonoBehaviour
                 finalDamage
             );
 
+            IStunnable stunnable =
+                targetCollider.GetComponentInParent<IStunnable>();
+
+                if (stunnable != null)
+                {
+                    stunnable.Stun();
+                }
+
 
             // --------------------------------------------------
             // Взрывная сила

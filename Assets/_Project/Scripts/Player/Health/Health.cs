@@ -25,16 +25,42 @@ public class Health : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
+        Debug.Log(
+            $"[HEALTH] {name} получил урон: {damage}"
+        );
+
         if (IsDead)
+        {
+            Debug.Log(
+                $"[HEALTH] {name} уже мёртв"
+            );
             return;
+        }
 
         if (damage <= 0f)
+        {
+            Debug.Log(
+                $"[HEALTH] {name}: урон <= 0"
+            );
             return;
+        }
 
         currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        currentHealth =
+            Mathf.Clamp(
+                currentHealth,
+                0f,
+                maxHealth
+            );
 
-        HealthChanged?.Invoke(currentHealth, maxHealth);
+        Debug.Log(
+            $"[HEALTH] {name}: HP = {currentHealth}/{maxHealth}"
+        );
+
+        HealthChanged?.Invoke(
+            currentHealth,
+            maxHealth
+        );
 
         if (currentHealth <= 0f)
         {
