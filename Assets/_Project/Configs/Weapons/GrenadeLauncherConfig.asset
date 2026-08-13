@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb4a26c64d68b04eb956f364b216eef, type: 3}
+  m_Name: GrenadeLauncherConfig
+  m_EditorClassIdentifier: 
+  weaponName: Grenade Launcher
+  damage: 80
+  fireRate: 1
+  magazineSize: 1
+  reserveAmmo: 6
+  infiniteAmmo: 0
+  range: 35
+  spread: 7
+  maxSpread: 7
+  spreadIncreasePerShot: 0
+  spreadRecoverySpeed: 0
+  pellets: 10
+  minDamageMultiplier: 0.25
+  maxDamageMultiplier: 1
+  knockbackForce: 4
+  projectilePrefab: {fileID: 4640734999919491806, guid: 710c3266785eabf48a546bfed8ed91ca, type: 3}
+  projectileSpeed: 20
+  projectileLifetime: 8
+  explosionDamage: 80
+  explosionRadius: 5
+  explosionForce: 700
+  explosionUpwardModifier: 0.5
+  maxExplosionTargets: 32
+  explosionTargetMask:
+    serializedVersion: 2
+    m_Bits: 768
+  explosionObstacleMask:
+    serializedVersion: 2
+    m_Bits: 192
+  explosionVfxPrefab: {fileID: 3608092664407492344, guid: 938025650a43dee459fb24fb9aff815f, type: 3}
+  explosionSound: {fileID: 8300000, guid: 3a3dac916cbc0934d825fdf731b5281b, type: 3}
+  explosionVfxLifetime: 2
+  recoil: 4

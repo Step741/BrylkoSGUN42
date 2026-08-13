@@ -10,7 +10,9 @@ public interface IInputService
     InputAction Aim { get; }
     InputAction Fire { get; }
     InputAction Reload { get; }
+
     InputAction SwitchWeapon { get; }
+    InputAction SelectWeapon { get; }
 
     InputAction Pause { get; }
     InputAction Submit { get; }

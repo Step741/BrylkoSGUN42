@@ -52,6 +52,27 @@ public class PlayerAnimationController : MonoBehaviour
 
     private float previousHealth;
 
+    private static readonly int ShootHash =
+        Animator.StringToHash("Shoot");
+
+    private static readonly int ShootRifleHash =
+        Animator.StringToHash("ShootRifle");
+
+    private static readonly int ShootShotgunHash =
+        Animator.StringToHash("ShootShotgun");
+
+    private static readonly int ShootGrenadeHash =
+    Animator.StringToHash("ShootGrenade");
+
+    private static readonly int ShootRailgunHash =
+    Animator.StringToHash("ShootRailgun");
+
+    private static readonly int KatanaAttackHash =
+    Animator.StringToHash("KatanaAttack");
+
+    private static readonly int ReloadHash =
+        Animator.StringToHash("Reload");
+
     [Inject]
     private void Construct(IInputService inputService)
     {
@@ -102,7 +123,7 @@ public class PlayerAnimationController : MonoBehaviour
     {
         // Если здоровье уменьшилось —
         // проигрываем Hit Reaction.
-        //
+
         // При смерти реакцию урона не запускаем,
         // потому что должна проигрываться Death.
         if (currentHealth < previousHealth &&
@@ -223,5 +244,40 @@ public class PlayerAnimationController : MonoBehaviour
             JumpHash,
             false
         );
+    }
+
+    public void PlayShoot()
+    {
+        animator.SetTrigger(ShootHash);
+    }
+
+    public void PlayRifleShoot()
+    {
+        animator.SetTrigger(ShootRifleHash);
+    }
+
+    public void PlayShotgunShoot()
+    {
+        animator.SetTrigger(ShootShotgunHash);
+    }
+
+    public void PlayGrenadeShoot()
+    {
+        animator.SetTrigger(ShootGrenadeHash);
+    }
+
+    public void PlayRailgunShoot()
+    {
+        animator.SetTrigger(ShootRailgunHash);
+    }
+
+    public void PlayKatanaAttack()
+    {
+        animator.SetTrigger(KatanaAttackHash);
+    }
+
+    public void PlayReload()
+    {
+        animator.SetTrigger(ReloadHash);
     }
 }

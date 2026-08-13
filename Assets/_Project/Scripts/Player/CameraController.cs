@@ -28,12 +28,25 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float maxVerticalAngle = 60f;
 
+    [Header("Camera Recoil")]
+    [SerializeField]
+    private float recoilAmount = 0.6f;
+
+    [SerializeField]
+    private float recoilReturnSpeed = 10f;
+
+    [SerializeField]
+    private float recoilSnappiness = 20f;
+
     private IInputService inputService;
 
     private float horizontalAngle;
     private float verticalAngle;
 
     private bool wasAiming;
+
+    private float currentRecoil;
+    private float targetRecoil;
 
     [Inject]
     private void Construct(IInputService inputService)
@@ -61,6 +74,7 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         RotateCamera();
+        UpdateRecoil();
     }
 
     private void RotateCamera()
@@ -84,9 +98,6 @@ public class CameraController : MonoBehaviour
             verticalSensitivity *
             sensitivityMultiplier;
 
-        // Входим в ADS.
-        // Переносим текущий горизонтальный угол
-        // камеры на Player, чтобы камера не прыгнула.
         if (isAiming && !wasAiming)
         {
             EnterADS();
@@ -94,35 +105,17 @@ public class CameraController : MonoBehaviour
 
         if (isAiming)
         {
-            // В ADS горизонтальный поворот
-            // выполняет сам Player.
             RotatePlayer(
                 lookInput.x *
                 currentHorizontalSensitivity
             );
 
-            // Вертикаль по-прежнему принадлежит камере.
             verticalAngle -=
                 lookInput.y *
                 currentVerticalSensitivity;
-
-            verticalAngle =
-                Mathf.Clamp(
-                    verticalAngle,
-                    minVerticalAngle,
-                    maxVerticalAngle
-                );
-
-            cameraFollow.localRotation =
-                Quaternion.Euler(
-                    verticalAngle,
-                    0f,
-                    0f
-                );
         }
         else
         {
-            // Обычный режим камеры.
             horizontalAngle +=
                 lookInput.x *
                 currentHorizontalSensitivity;
@@ -130,23 +123,58 @@ public class CameraController : MonoBehaviour
             verticalAngle -=
                 lookInput.y *
                 currentVerticalSensitivity;
-
-            verticalAngle =
-                Mathf.Clamp(
-                    verticalAngle,
-                    minVerticalAngle,
-                    maxVerticalAngle
-                );
-
-            cameraFollow.localRotation =
-                Quaternion.Euler(
-                    verticalAngle,
-                    horizontalAngle,
-                    0f
-                );
         }
 
+        verticalAngle =
+            Mathf.Clamp(
+                verticalAngle,
+                minVerticalAngle,
+                maxVerticalAngle
+            );
+
+        // Добавляем recoil поверх обычного вертикального взгляда.
+        float recoilOffset =
+            currentRecoil;
+
+        cameraFollow.localRotation =
+            Quaternion.Euler(
+                verticalAngle - recoilOffset,
+                isAiming ? 0f : horizontalAngle,
+                0f
+            );
+
         wasAiming = isAiming;
+    }
+
+    private void UpdateRecoil()
+    {
+        targetRecoil =
+            Mathf.MoveTowards(
+                targetRecoil,
+                0f,
+                recoilReturnSpeed *
+                Time.deltaTime
+            );
+
+        currentRecoil =
+            Mathf.Lerp(
+                currentRecoil,
+                targetRecoil,
+                recoilSnappiness *
+                Time.deltaTime
+            );
+    }
+
+    public void AddRecoil()
+    {
+        targetRecoil += recoilAmount;
+
+        targetRecoil =
+            Mathf.Clamp(
+                targetRecoil,
+                0f,
+                10f
+            );
     }
 
     private void EnterADS()
@@ -154,14 +182,12 @@ public class CameraController : MonoBehaviour
         if (playerTransform == null)
             return;
 
-        // Получаем текущий мировой Y-угол камеры.
         float playerYaw =
             playerTransform.eulerAngles.y;
 
         float cameraWorldYaw =
             playerYaw + horizontalAngle;
 
-        // Переносим направление камеры на Player.
         playerTransform.rotation =
             Quaternion.Euler(
                 0f,
@@ -169,8 +195,6 @@ public class CameraController : MonoBehaviour
                 0f
             );
 
-        // Теперь CameraFollow смотрит прямо
-        // относительно Player.
         horizontalAngle = 0f;
     }
 
