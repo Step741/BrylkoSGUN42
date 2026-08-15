@@ -58,5 +58,5 @@ MonoBehaviour:
   katanaMaxTargets: 1
   katanaAttackMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 1280
   recoil: 4

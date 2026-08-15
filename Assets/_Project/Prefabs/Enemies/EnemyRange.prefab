@@ -172,11 +172,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 263b111d435b3f047bb853d94e8bef02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 30
+  viewRadius: 20
   viewAngle: 120
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 193
+    m_Bits: 192
   showGizmos: 1
 --- !u!195 &2773724162097781152
 NavMeshAgent:
@@ -218,8 +218,8 @@ MonoBehaviour:
   - {fileID: 1951562587167022723}
   patrolPointTolerance: 0.5
   waitAtPoint: 1
-  attackDistance: 20
-  attackDamage: 15
+  attackDistance: 15
+  attackDamage: 10
   attackCooldown: 1
   coverPoints: []
   lowHealthThreshold: 30

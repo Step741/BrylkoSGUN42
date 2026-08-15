@@ -51,5 +51,12 @@ MonoBehaviour:
   railgunBeamDuration: 0.08
   railgunHitMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 1280
+  katanaAttackRange: 2
+  katanaAttackRadius: 1.2
+  katanaAttackCooldown: 0.8
+  katanaMaxTargets: 1
+  katanaAttackMask:
+    serializedVersion: 2
+    m_Bits: 0
   recoil: 4

@@ -30,6 +30,9 @@ public class InputService : IInputService, IInitializable, IDisposable
     public InputAction Reload =>
         inputActions.Player.Reload;
 
+    public InputAction Interact => 
+        inputActions.Player.Interact;
+
     public InputAction SwitchWeapon =>
         inputActions.Player.SwitchWeapon;
 

@@ -37,11 +37,26 @@ MonoBehaviour:
   maxExplosionTargets: 32
   explosionTargetMask:
     serializedVersion: 2
-    m_Bits: 768
+    m_Bits: 1792
   explosionObstacleMask:
     serializedVersion: 2
     m_Bits: 192
   explosionVfxPrefab: {fileID: 3608092664407492344, guid: 938025650a43dee459fb24fb9aff815f, type: 3}
   explosionSound: {fileID: 8300000, guid: 3a3dac916cbc0934d825fdf731b5281b, type: 3}
   explosionVfxLifetime: 2
+  railgunMaxTargets: 3
+  railgunHeatPerShot: 25
+  railgunMaxHeat: 100
+  railgunChargeTime: 2
+  railgunBeamDuration: 0.08
+  railgunHitMask:
+    serializedVersion: 2
+    m_Bits: 0
+  katanaAttackRange: 2
+  katanaAttackRadius: 1.2
+  katanaAttackCooldown: 0.8
+  katanaMaxTargets: 1
+  katanaAttackMask:
+    serializedVersion: 2
+    m_Bits: 0
   recoil: 4
