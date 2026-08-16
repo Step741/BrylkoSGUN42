@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +9,6 @@ public class HealthBarUI : MonoBehaviour
 
     [SerializeField]
     private Slider healthSlider;
-
-    [SerializeField]
-    private TMP_Text healthText;
 
     private void OnEnable()
     {
@@ -62,13 +58,6 @@ public class HealthBarUI : MonoBehaviour
         {
             healthSlider.maxValue = maxHealth;
             healthSlider.value = currentHealth;
-        }
-
-        if (healthText != null)
-        {
-            healthText.text =
-                $"{Mathf.CeilToInt(currentHealth)} / " +
-                $"{Mathf.CeilToInt(maxHealth)}";
         }
     }
 }

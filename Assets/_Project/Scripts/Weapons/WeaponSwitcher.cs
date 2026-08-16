@@ -9,8 +9,13 @@ public class WeaponSwitcher : MonoBehaviour
     [SerializeField]
     private WeaponBase[] weapons;
 
+    [Header("Start")]
     [SerializeField]
     private int startWeaponIndex = 0;
+
+    [Header("Unlocked Weapons")]
+    [SerializeField]
+    private bool[] unlockedWeapons;
 
     private IInputService inputService;
 
@@ -24,29 +29,43 @@ public class WeaponSwitcher : MonoBehaviour
 
     public event Action<WeaponBase> CurrentWeaponChanged;
 
+
     [Inject]
     private void Construct(IInputService inputService)
     {
         this.inputService = inputService;
     }
 
+
     private void Awake()
     {
         if (weapons == null || weapons.Length == 0)
         {
             Debug.LogError(
-                "WeaponSwitcher: Weapons array is empty."
+                "WeaponSwitcher: Weapons array is empty.",
+                this
             );
 
             return;
         }
 
+        // Приводим массив разблокировки
+        // в соответствие с количеством оружия.
+        if (unlockedWeapons == null ||
+            unlockedWeapons.Length != weapons.Length)
+        {
+            unlockedWeapons =
+                new bool[weapons.Length];
+        }
+
+        // Проверяем оружие.
         for (int i = 0; i < weapons.Length; i++)
         {
             if (weapons[i] == null)
             {
                 Debug.LogError(
-                    $"WeaponSwitcher: Weapon at index {i} is missing."
+                    $"WeaponSwitcher: Weapon at index {i} is missing.",
+                    this
                 );
 
                 continue;
@@ -54,7 +73,21 @@ public class WeaponSwitcher : MonoBehaviour
 
             weapons[i].Unequip();
         }
+
+        // Первые два оружия доступны с начала.
+        if (weapons.Length > 0)
+            unlockedWeapons[0] = true;
+
+        if (weapons.Length > 1)
+            unlockedWeapons[1] = true;
+
+        // Проверяем стартовое оружие.
+        if (!IsWeaponUnlocked(startWeaponIndex))
+        {
+            startWeaponIndex = FindFirstUnlockedWeapon();
+        }
     }
+
 
     private void OnEnable()
     {
@@ -64,6 +97,7 @@ public class WeaponSwitcher : MonoBehaviour
         }
     }
 
+
     private void Start()
     {
         EquipWeapon(startWeaponIndex);
@@ -71,15 +105,22 @@ public class WeaponSwitcher : MonoBehaviour
         SubscribeToInput();
     }
 
+
     private void OnDisable()
     {
         UnsubscribeFromInput();
     }
 
+
     private void Update()
     {
         HandleMouseWheel();
     }
+
+
+    // =========================================================
+    // INPUT
+    // =========================================================
 
     private void SubscribeToInput()
     {
@@ -93,6 +134,7 @@ public class WeaponSwitcher : MonoBehaviour
             OnSelectWeapon;
     }
 
+
     private void UnsubscribeFromInput()
     {
         if (inputService == null)
@@ -101,6 +143,7 @@ public class WeaponSwitcher : MonoBehaviour
         inputService.SelectWeapon.performed -=
             OnSelectWeapon;
     }
+
 
     private void OnSelectWeapon(
         InputAction.CallbackContext context)
@@ -136,10 +179,15 @@ public class WeaponSwitcher : MonoBehaviour
         }
     }
 
+
     private void HandleMouseWheel()
     {
+        if (inputService == null)
+            return;
+
         float scroll =
-            inputService.SwitchWeapon.ReadValue<float>();
+            inputService.SwitchWeapon
+                .ReadValue<float>();
 
         if (Mathf.Approximately(scroll, 0f))
             return;
@@ -154,34 +202,42 @@ public class WeaponSwitcher : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // SWITCHING
+    // =========================================================
+
     public void SwitchToNextWeapon()
     {
-        if (weapons.Length <= 1)
+        if (weapons == null ||
+            weapons.Length <= 1)
             return;
 
         int nextIndex =
-            (currentWeaponIndex + 1) %
-            weapons.Length;
+            FindNextUnlockedWeapon(
+                currentWeaponIndex
+            );
 
-        EquipWeapon(nextIndex);
+        if (nextIndex >= 0)
+            EquipWeapon(nextIndex);
     }
+
 
     public void SwitchToPreviousWeapon()
     {
-        if (weapons.Length <= 1)
+        if (weapons == null ||
+            weapons.Length <= 1)
             return;
 
         int previousIndex =
-            currentWeaponIndex - 1;
+            FindPreviousUnlockedWeapon(
+                currentWeaponIndex
+            );
 
-        if (previousIndex < 0)
-        {
-            previousIndex =
-                weapons.Length - 1;
-        }
-
-        EquipWeapon(previousIndex);
+        if (previousIndex >= 0)
+            EquipWeapon(previousIndex);
     }
+
 
     public void EquipWeapon(int index)
     {
@@ -189,6 +245,15 @@ public class WeaponSwitcher : MonoBehaviour
             index < 0 ||
             index >= weapons.Length)
         {
+            return;
+        }
+
+        if (!IsWeaponUnlocked(index))
+        {
+            Debug.Log(
+                $"WeaponSwitcher: Weapon {index} is locked."
+            );
+
             return;
         }
 
@@ -208,7 +273,8 @@ public class WeaponSwitcher : MonoBehaviour
         if (newWeapon == null)
         {
             Debug.LogError(
-                $"WeaponSwitcher: Weapon at index {index} is missing."
+                $"WeaponSwitcher: Weapon at index {index} is missing.",
+                this
             );
 
             currentWeaponIndex = -1;
@@ -220,5 +286,138 @@ public class WeaponSwitcher : MonoBehaviour
         CurrentWeaponChanged?.Invoke(
             newWeapon
         );
+    }
+
+
+    // =========================================================
+    // UNLOCK
+    // =========================================================
+
+    public bool IsWeaponUnlocked(int index)
+    {
+        if (weapons == null ||
+            index < 0 ||
+            index >= weapons.Length)
+            return false;
+
+        if (unlockedWeapons == null ||
+            index >= unlockedWeapons.Length)
+            return false;
+
+        return unlockedWeapons[index];
+    }
+
+
+    public bool UnlockWeapon(int index)
+    {
+        if (weapons == null ||
+            index < 0 ||
+            index >= weapons.Length)
+        {
+            return false;
+        }
+
+        if (weapons[index] == null)
+        {
+            Debug.LogWarning(
+                $"WeaponSwitcher: Cannot unlock missing weapon at index {index}."
+            );
+
+            return false;
+        }
+
+        if (unlockedWeapons[index])
+            return false;
+
+        unlockedWeapons[index] = true;
+
+        Debug.Log(
+            $"WeaponSwitcher: Unlocked weapon {index}: " +
+            $"{weapons[index].name}"
+        );
+
+        return true;
+    }
+
+
+    public WeaponBase GetWeapon(int index)
+    {
+        if (weapons == null ||
+            index < 0 ||
+            index >= weapons.Length)
+            return null;
+
+        return weapons[index];
+    }
+
+
+    // =========================================================
+    // FIND NEXT / PREVIOUS UNLOCKED
+    // =========================================================
+
+    private int FindNextUnlockedWeapon(
+        int currentIndex)
+    {
+        if (weapons == null ||
+            weapons.Length == 0)
+            return -1;
+
+        for (int step = 1;
+             step <= weapons.Length;
+             step++)
+        {
+            int index =
+                (currentIndex + step) %
+                weapons.Length;
+
+            if (IsWeaponUnlocked(index))
+                return index;
+        }
+
+        return -1;
+    }
+
+
+    private int FindPreviousUnlockedWeapon(
+        int currentIndex)
+    {
+        if (weapons == null ||
+            weapons.Length == 0)
+            return -1;
+
+        for (int step = 1;
+             step <= weapons.Length;
+             step++)
+        {
+            int index =
+                currentIndex - step;
+
+            if (index < 0)
+            {
+                index += weapons.Length;
+            }
+
+            if (IsWeaponUnlocked(index))
+                return index;
+        }
+
+        return -1;
+    }
+
+
+    private int FindFirstUnlockedWeapon()
+    {
+        if (weapons == null)
+            return -1;
+
+        for (int i = 0;
+             i < weapons.Length;
+             i++)
+        {
+            if (IsWeaponUnlocked(i))
+                return i;
+        }
+
+        return -1;
     }
 }

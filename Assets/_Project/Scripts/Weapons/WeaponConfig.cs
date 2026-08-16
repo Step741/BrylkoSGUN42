@@ -23,6 +23,9 @@ public class WeaponConfig : ScriptableObject
     private int magazineSize = 12;
 
     [SerializeField]
+    private int maxReserveAmmo = 120;
+
+    [SerializeField]
     private int reserveAmmo = 60;
 
     [SerializeField]
@@ -137,6 +140,11 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private float recoil = 1f;
 
+
+    // =========================
+    // PUBLIC PROPERTIES
+    // =========================
+
     public string WeaponName =>
         weaponName;
 
@@ -146,14 +154,27 @@ public class WeaponConfig : ScriptableObject
     public float FireRate =>
         fireRate;
 
+
+    // =========================
+    // AMMO
+    // =========================
+
     public int MagazineSize =>
         magazineSize;
 
     public int ReserveAmmo =>
         reserveAmmo;
 
+    public int MaxReserveAmmo =>
+        maxReserveAmmo;
+
     public bool InfiniteAmmo =>
         infiniteAmmo;
+
+
+    // =========================
+    // BALLISTICS
+    // =========================
 
     public float Range =>
         range;
@@ -170,6 +191,11 @@ public class WeaponConfig : ScriptableObject
     public float SpreadRecoverySpeed =>
         spreadRecoverySpeed;
 
+
+    // =========================
+    // SHOTGUN
+    // =========================
+
     public int Pellets =>
         pellets;
 
@@ -181,6 +207,11 @@ public class WeaponConfig : ScriptableObject
 
     public float KnockbackForce =>
         knockbackForce;
+
+
+    // =========================
+    // GRENADE LAUNCHER
+    // =========================
 
     public GameObject ProjectilePrefab =>
         projectilePrefab;
@@ -212,8 +243,13 @@ public class WeaponConfig : ScriptableObject
     public LayerMask ExplosionObstacleMask =>
         explosionObstacleMask;
 
+
+    // =========================
+    // EXPLOSION EFFECTS
+    // =========================
+
     public GameObject ExplosionVfxPrefab =>
-    explosionVfxPrefab;
+        explosionVfxPrefab;
 
     public AudioClip ExplosionSound =>
         explosionSound;
@@ -221,8 +257,13 @@ public class WeaponConfig : ScriptableObject
     public float ExplosionVfxLifetime =>
         explosionVfxLifetime;
 
+
+    // =========================
+    // RAILGUN
+    // =========================
+
     public int RailgunMaxTargets =>
-    railgunMaxTargets;
+        railgunMaxTargets;
 
     public float RailgunHeatPerShot =>
         railgunHeatPerShot;
@@ -239,8 +280,13 @@ public class WeaponConfig : ScriptableObject
     public LayerMask RailgunHitMask =>
         railgunHitMask;
 
+
+    // =========================
+    // KATANA
+    // =========================
+
     public float KatanaAttackRange =>
-    katanaAttackRange;
+        katanaAttackRange;
 
     public float KatanaAttackRadius =>
         katanaAttackRadius;
@@ -253,6 +299,11 @@ public class WeaponConfig : ScriptableObject
 
     public LayerMask KatanaAttackMask =>
         katanaAttackMask;
+
+
+    // =========================
+    // RECOIL
+    // =========================
 
     public float Recoil =>
         recoil;

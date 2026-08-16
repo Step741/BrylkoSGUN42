@@ -58,6 +58,8 @@ public class InputService : IInputService, IInitializable, IDisposable
     public void EnablePlayerInput()
     {
         inputActions.UI.Disable();
+        inputActions.UI.Pause.Enable();
+
         inputActions.Player.Enable();
     }
 

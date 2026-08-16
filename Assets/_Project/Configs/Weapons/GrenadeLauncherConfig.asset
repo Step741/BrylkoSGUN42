@@ -16,7 +16,8 @@ MonoBehaviour:
   damage: 80
   fireRate: 1
   magazineSize: 1
-  reserveAmmo: 6
+  maxReserveAmmo: 6
+  reserveAmmo: 1
   infiniteAmmo: 0
   range: 35
   spread: 7

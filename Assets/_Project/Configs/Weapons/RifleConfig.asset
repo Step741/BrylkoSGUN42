@@ -16,11 +16,48 @@ MonoBehaviour:
   damage: 15
   fireRate: 10
   magazineSize: 30
-  reserveAmmo: 90
+  maxReserveAmmo: 90
+  reserveAmmo: 30
   infiniteAmmo: 0
   range: 100
   spread: 2
   maxSpread: 5
   spreadIncreasePerShot: 0.35
   spreadRecoverySpeed: 2
+  pellets: 10
+  minDamageMultiplier: 0.25
+  maxDamageMultiplier: 1
+  knockbackForce: 4
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 20
+  projectileLifetime: 8
+  explosionDamage: 80
+  explosionRadius: 5
+  explosionForce: 700
+  explosionUpwardModifier: 0.5
+  maxExplosionTargets: 32
+  explosionTargetMask:
+    serializedVersion: 2
+    m_Bits: 0
+  explosionObstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  explosionVfxPrefab: {fileID: 0}
+  explosionSound: {fileID: 0}
+  explosionVfxLifetime: 2
+  railgunMaxTargets: 3
+  railgunHeatPerShot: 25
+  railgunMaxHeat: 100
+  railgunChargeTime: 2
+  railgunBeamDuration: 0.08
+  railgunHitMask:
+    serializedVersion: 2
+    m_Bits: 0
+  katanaAttackRange: 2
+  katanaAttackRadius: 1.2
+  katanaAttackCooldown: 0.8
+  katanaMaxTargets: 1
+  katanaAttackMask:
+    serializedVersion: 2
+    m_Bits: 0
   recoil: 0.7
