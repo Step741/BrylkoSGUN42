@@ -218,12 +218,16 @@ public class EnemyShooter : MonoBehaviour
         Transform bestPoint = null;
         float bestDistance = Mathf.Infinity;
 
+        NavMeshPath path = new NavMeshPath();
+
         foreach (Transform point in coverPoints)
         {
             if (point == null)
                 continue;
 
-            NavMeshPath path = new NavMeshPath();
+            // ==========================================
+            // 1. Проверяем доступность точки по NavMesh
+            // ==========================================
 
             if (!NavMesh.CalculatePath(
                     transform.position,
@@ -237,10 +241,23 @@ public class EnemyShooter : MonoBehaviour
             if (path.status != NavMeshPathStatus.PathComplete)
                 continue;
 
+            // ==========================================
+            // 2. Проверяем, действительно ли точка
+            // находится за укрытием относительно игрока
+            // ==========================================
+
+            if (!IsCoverPointProtected(point))
+                continue;
+
+            // ==========================================
+            // 3. Выбираем ближайшее подходящее укрытие
+            // ==========================================
+
             float distance =
                 Vector3.Distance(
                     transform.position,
-                    point.position);
+                    point.position
+                );
 
             if (distance < bestDistance)
             {
@@ -250,6 +267,46 @@ public class EnemyShooter : MonoBehaviour
         }
 
         return bestPoint;
+    }
+
+    private bool IsCoverPointProtected(
+    Transform coverPoint)
+    {
+        if (coverPoint == null)
+            return false;
+
+        if (Enemy == null ||
+            Enemy.Vision == null)
+        {
+            return false;
+        }
+
+        Transform player = Enemy.Vision.Player;
+
+        if (player == null)
+            return false;
+
+        Vector3 origin = coverPoint.position;
+        Vector3 direction =
+            player.position - origin;
+
+        float distance = direction.magnitude;
+
+        if (distance <= 0.01f)
+            return false;
+
+        direction.Normalize();
+
+        // Если луч из точки укрытия к игроку
+        // упирается в препятствие —
+        // точка действительно защищена.
+        return Physics.Raycast(
+            origin,
+            direction,
+            distance,
+            Enemy.Vision.ObstacleMask,
+            QueryTriggerInteraction.Ignore
+        );
     }
 
     public void MoveToCover(Transform coverPoint)

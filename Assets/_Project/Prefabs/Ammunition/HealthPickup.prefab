@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1746784017226644355}
   - component: {fileID: 1143042750421640857}
   - component: {fileID: 4299440393987741975}
+  - component: {fileID: -1325066009321741443}
   m_Layer: 0
   m_Name: HealthPickup
   m_TagString: Untagged
@@ -48,6 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickupAnimator: {fileID: 1143042750421640857}
+  pickupFeedback: {fileID: -1325066009321741443}
   playerLayer:
     serializedVersion: 2
     m_Bits: 512
@@ -67,7 +69,6 @@ MonoBehaviour:
   rotationDuration: 3
   floatHeight: 0.15
   floatDuration: 1.2
-  moveDuration: 0.2
   scaleDuration: 0.1
 --- !u!65 &4299440393987741975
 BoxCollider:
@@ -90,6 +91,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.2845144, y: 0.8055136, z: 1.2381768}
   m_Center: {x: -0.0029034615, y: 0.053723693, z: 0.0058162212}
+--- !u!114 &-1325066009321741443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6139562120175744533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96dfb0849d8c6e64e86fdbaaaab68f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickupSound: {fileID: 8300000, guid: 5e66be1375dff7a42b628c476ea920ae, type: 3}
+  volume: 0.6
+  soundPitch: 1
+  pickupEffect: {fileID: 19800004, guid: 30b4cc2728d8cec499fad63ba93785a4, type: 3}
+  effectLifetime: 0.5
 --- !u!1001 &7131293127862359528
 PrefabInstance:
   m_ObjectHideFlags: 0

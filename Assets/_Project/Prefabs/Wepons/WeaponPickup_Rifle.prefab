@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1290143727626798030}
   - component: {fileID: 8369031471995222543}
   - component: {fileID: 5695809110903440553}
+  - component: {fileID: -5093887175729398050}
   m_Layer: 0
   m_Name: WeaponPickup_Rifle
   m_TagString: Untagged
@@ -48,10 +49,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickupAnimator: {fileID: 8369031471995222543}
+  pickupFeedback: {fileID: -5093887175729398050}
   playerLayer:
     serializedVersion: 2
     m_Bits: 512
   weaponType: 0
+  duplicateAmmoAmount: 30
   weaponSwitcher: {fileID: 0}
 --- !u!114 &8369031471995222543
 MonoBehaviour:
@@ -68,7 +71,6 @@ MonoBehaviour:
   rotationDuration: 3
   floatHeight: 0.15
   floatDuration: 1.2
-  moveDuration: 0.2
   scaleDuration: 0.1
 --- !u!65 &5695809110903440553
 BoxCollider:
@@ -91,6 +93,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.8074398, y: 1.2653186, z: 0.40149117}
   m_Center: {x: -0.7188277, y: 0.052446723, z: -0.0030851364}
+--- !u!114 &-5093887175729398050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1097183752839125971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96dfb0849d8c6e64e86fdbaaaab68f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickupSound: {fileID: 8300000, guid: 5e66be1375dff7a42b628c476ea920ae, type: 3}
+  volume: 0.6
+  soundPitch: 1
+  pickupEffect: {fileID: 19800004, guid: 30b4cc2728d8cec499fad63ba93785a4, type: 3}
+  effectLifetime: 0.5
 --- !u!1 &2146269796530721450
 GameObject:
   m_ObjectHideFlags: 0

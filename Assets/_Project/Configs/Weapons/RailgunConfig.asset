@@ -16,6 +16,7 @@ MonoBehaviour:
   damage: 100
   fireRate: 1
   magazineSize: 1
+  maxReserveAmmo: 120
   reserveAmmo: 4
   infiniteAmmo: 0
   range: 100
@@ -51,7 +52,7 @@ MonoBehaviour:
   railgunBeamDuration: 0.08
   railgunHitMask:
     serializedVersion: 2
-    m_Bits: 1280
+    m_Bits: 1472
   katanaAttackRange: 2
   katanaAttackRadius: 1.2
   katanaAttackCooldown: 0.8

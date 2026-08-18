@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e067365ecf8f7848a1e8eca278b3fb1, type: 3}
+  m_Name: CrateDropConfig
+  m_EditorClassIdentifier: 
+  drops:
+  - pickupType: 1
+    chance: 25
+  - pickupType: 2
+    chance: 10
+  - pickupType: 3
+    chance: 10
+  - pickupType: 4
+    chance: 5
+  - pickupType: 5
+    chance: 5
+  - pickupType: 6
+    chance: 5
+  - pickupType: 7
+    chance: 5
+  - pickupType: 8
+    chance: 5
+  - pickupType: 0
+    chance: 30

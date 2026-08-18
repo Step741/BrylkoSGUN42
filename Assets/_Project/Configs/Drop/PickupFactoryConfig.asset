@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf941d0af568aa4fafc1fd84f8fa606, type: 3}
+  m_Name: PickupFactoryConfig
+  m_EditorClassIdentifier: 
+  healthPickupPrefab: {fileID: 6139562120175744533, guid: e34b6ba38f9b42c4ba1f7f4fbfb15d7e, type: 3}
+  rifleAmmoPrefab: {fileID: 6298095754208796404, guid: 775c6294cc6fc294daeb75bba0823c66, type: 3}
+  shotgunAmmoPrefab: {fileID: 3672484516007434990, guid: 8434d57e532045544b499655828de48b, type: 3}
+  grenadeLauncherAmmoPrefab: {fileID: 3815488458460246066, guid: ba224fc5a309ec449bba377ac590cc34, type: 3}
+  riflePickupPrefab: {fileID: 1097183752839125971, guid: dd47da28dedad85498f6d3a2692a3485, type: 3}
+  shotgunPickupPrefab: {fileID: 2921740884087444467, guid: 767b30a1967cdb1479f98b458cfab064, type: 3}
+  grenadeLauncherPickupPrefab: {fileID: 6121715617399678823, guid: c92a4a31485267142bfe7f46ec6125f4, type: 3}
+  railgunPickupPrefab: {fileID: 9102697800999066503, guid: 4f73834b8605a814182b921cc76b5a16, type: 3}

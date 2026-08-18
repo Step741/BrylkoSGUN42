@@ -156,6 +156,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destructionPrefab: {fileID: 8286082642232545264, guid: a7f357a6d818b6e4bb069bedfbd703d3, type: 3}
   debrisLifetime: 5
+  dropConfig: {fileID: 11400000, guid: 5977e714fb8b439499ed6c487deec5c5, type: 2}
 --- !u!114 &7351235799004248071
 MonoBehaviour:
   m_ObjectHideFlags: 0

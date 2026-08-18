@@ -3,45 +3,179 @@ using UnityEngine;
 public class KeyCardPickup : MonoBehaviour, IPickable
 {
     [Header("Laser Barriers")]
-    [SerializeField] private LaserBarrier[] _laserBarriers;
+    [SerializeField]
+    private LaserBarrier[] laserBarriers;
+
 
     [Header("Gas")]
-    [SerializeField] private GasDamageZone _gasDamageZone;
+    [SerializeField]
+    private GasDamageZone[] gasZones;
+
+
+    [Header("Feedback")]
+    [SerializeField]
+    private PickupFeedback pickupFeedback;
+
 
     [Header("Interaction")]
-    [SerializeField] private LayerMask _playerLayer;
+    [SerializeField]
+    private LayerMask playerLayer;
 
-    private bool _isPickedUp;
+
+    private bool isPickedUp;
+
+
+    // =========================================================
+    // TRIGGER PICKUP
+    // =========================================================
 
     private void OnTriggerEnter(Collider other)
     {
-        if (_isPickedUp)
+        if (isPickedUp)
             return;
 
-        if ((_playerLayer.value & (1 << other.gameObject.layer)) == 0)
+
+        if (!IsPlayer(other.gameObject.layer))
             return;
+
 
         PickUp();
     }
 
+
+    // =========================================================
+    // PICKUP
+    // =========================================================
+
     public void PickUp()
     {
-        if (_isPickedUp)
+        if (isPickedUp)
             return;
 
-        _isPickedUp = true;
 
-        // Отключаем лазерные барьеры
-        foreach (LaserBarrier barrier in _laserBarriers)
+        PlayerInventory inventory =
+            FindPlayerInventory();
+
+
+        if (inventory == null)
         {
-            if (barrier != null)
-                barrier.DisableBarrier();
+            Debug.LogWarning(
+                $"[{name}] PlayerInventory not found."
+            );
+
+            return;
         }
 
+
+        // -----------------------------------------------------
+        // Уже есть карта?
+        // -----------------------------------------------------
+
+        if (!inventory.TryAddKeyCard())
+        {
+            // Карта уже есть.
+            // Предмет остаётся на месте.
+
+            return;
+        }
+
+
+        isPickedUp = true;
+
+
+        // -----------------------------------------------------
+        // FEEDBACK
+        // -----------------------------------------------------
+
+        if (pickupFeedback != null)
+        {
+            pickupFeedback.Play();
+        }
+
+
+        // -----------------------------------------------------
+        // Отключаем лазерные барьеры
+        // -----------------------------------------------------
+
+        if (laserBarriers != null)
+        {
+            foreach (LaserBarrier barrier in laserBarriers)
+            {
+                if (barrier != null)
+                {
+                    barrier.DisableBarrier();
+                }
+            }
+        }
+
+
+        // -----------------------------------------------------
         // Активируем газ
-        if (_gasDamageZone != null)
-            _gasDamageZone.ActivateGas();
+        // -----------------------------------------------------
+
+        if (gasZones != null)
+        {
+            foreach (GasDamageZone gasZone in gasZones)
+            {
+                if (gasZone != null)
+                {
+                    gasZone.ActivateGas();
+                }
+            }
+        }
+
+
+        Debug.Log(
+            $"[{name}] Key card picked up."
+        );
+
 
         Destroy(gameObject);
+    }
+
+
+    // =========================================================
+    // PLAYER
+    // =========================================================
+
+    private PlayerInventory FindPlayerInventory()
+    {
+        Collider[] colliders =
+            Physics.OverlapSphere(
+                transform.position,
+                1.5f,
+                playerLayer,
+                QueryTriggerInteraction.Ignore
+            );
+
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider == null)
+                continue;
+
+
+            PlayerInventory inventory =
+                collider.GetComponentInParent<PlayerInventory>();
+
+
+            if (inventory != null)
+                return inventory;
+        }
+
+
+        return null;
+    }
+
+
+    // =========================================================
+    // LAYER
+    // =========================================================
+
+    private bool IsPlayer(int layer)
+    {
+        return
+            (playerLayer.value &
+            (1 << layer)) != 0;
     }
 }

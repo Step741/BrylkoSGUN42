@@ -6,16 +6,27 @@ public abstract class PickupBase : MonoBehaviour, IPickable
     [SerializeField]
     private PickupAnimator pickupAnimator;
 
+    [SerializeField]
+    private PickupFeedback pickupFeedback;
+
+
     [Header("Player")]
     [SerializeField]
     private LayerMask playerLayer;
+
 
     private bool isPickedUp;
 
     private Transform pickupPlayer;
 
+
     protected Transform PickupPlayer =>
         pickupPlayer;
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     protected virtual void Awake()
     {
@@ -24,19 +35,29 @@ public abstract class PickupBase : MonoBehaviour, IPickable
             pickupAnimator =
                 GetComponentInChildren<PickupAnimator>();
         }
+
+        if (pickupFeedback == null)
+        {
+            pickupFeedback =
+                GetComponentInChildren<PickupFeedback>();
+        }
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
         if (isPickedUp)
             return;
 
+
         // Проверяем слой самого коллайдера игрока.
         if (!IsPlayer(other.gameObject.layer))
             return;
 
+
         // ВАЖНО:
         // Не используем other.transform.root.
+        //
         // После поездки на лифте Player становится
         // дочерним объектом платформы.
         //
@@ -44,42 +65,68 @@ public abstract class PickupBase : MonoBehaviour, IPickable
         //
         // Нам нужен непосредственно Transform,
         // который вошёл в триггер.
+
         Transform player =
             other.transform;
 
+
         TryPickUp(player);
     }
+
 
     public void PickUp()
     {
         if (isPickedUp)
             return;
 
+
         Transform player =
             FindPlayerTransform();
+
 
         if (player == null)
             return;
 
+
         TryPickUp(player);
     }
+
+
+    // =========================================================
+    // PICKUP
+    // =========================================================
 
     private void TryPickUp(Transform player)
     {
         if (isPickedUp)
             return;
 
+
         if (player == null)
             return;
 
-        // Проверяем, можно ли подобрать объект,
+
+        // Проверяем, можно ли подобрать объект
         // ДО запуска анимации.
         if (!CanPickup(player))
             return;
 
+
         isPickedUp = true;
 
         pickupPlayer = player;
+
+
+        // =====================================================
+        // SUCCESS FEEDBACK
+        // =====================================================
+
+        pickupFeedback?.Play();
+
+
+        // =====================================================
+        // PICKUP ANIMATION
+        // =====================================================
 
         if (pickupAnimator == null)
         {
@@ -87,11 +134,17 @@ public abstract class PickupBase : MonoBehaviour, IPickable
             return;
         }
 
+
         pickupAnimator.PlayPickupAnimation(
             player,
             CompletePickup
         );
     }
+
+
+    // =========================================================
+    // COMPLETE
+    // =========================================================
 
     private void CompletePickup()
     {
@@ -100,33 +153,54 @@ public abstract class PickupBase : MonoBehaviour, IPickable
         Destroy(gameObject);
     }
 
+
+    // =========================================================
+    // CAN PICKUP
+    // =========================================================
+
     /// <summary>
     /// Проверяет, можно ли подобрать объект.
     /// По умолчанию любой Pickup можно подобрать.
     /// </summary>
-    protected virtual bool CanPickup(Transform player)
+    protected virtual bool CanPickup(
+        Transform player)
     {
         return true;
     }
 
+
+    // =========================================================
+    // APPLY
+    // =========================================================
+
     protected abstract void ApplyPickup();
+
+
+    // =========================================================
+    // PLAYER
+    // =========================================================
 
     private bool IsPlayer(int layer)
     {
         return
-            (playerLayer.value & (1 << layer)) != 0;
+            (playerLayer.value &
+            (1 << layer)) != 0;
     }
+
 
     private Transform FindPlayerTransform()
     {
         Collider collider =
             GetComponent<Collider>();
 
+
         if (collider == null)
             return null;
 
+
         // Если сам Pickup находится в триггере
         // и рядом находится Player, ищем его.
+
         Collider[] colliders =
             Physics.OverlapSphere(
                 collider.bounds.center,
@@ -134,14 +208,21 @@ public abstract class PickupBase : MonoBehaviour, IPickable
                 playerLayer
             );
 
+
         if (colliders == null ||
             colliders.Length == 0)
         {
             return null;
         }
 
+
         return colliders[0].transform;
     }
+
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
 
     private void OnDisable()
     {

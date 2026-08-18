@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4417882048645072669}
   - component: {fileID: 8870058525447610160}
   - component: {fileID: 9003185897740756275}
+  - component: {fileID: -7291303101450155880}
   m_Layer: 0
   m_Name: WeaponPickup_Railgun
   m_TagString: Untagged
@@ -48,10 +49,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickupAnimator: {fileID: 8870058525447610160}
+  pickupFeedback: {fileID: -7291303101450155880}
   playerLayer:
     serializedVersion: 2
     m_Bits: 512
   weaponType: 3
+  duplicateAmmoAmount: 0
   weaponSwitcher: {fileID: 0}
 --- !u!114 &8870058525447610160
 MonoBehaviour:
@@ -68,7 +71,6 @@ MonoBehaviour:
   rotationDuration: 3
   floatHeight: 0.15
   floatDuration: 1.2
-  moveDuration: 0.2
   scaleDuration: 0.1
 --- !u!65 &9003185897740756275
 BoxCollider:
@@ -91,6 +93,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.4207993, y: 1.1322386, z: 0.48610926}
   m_Center: {x: 1.6182823, y: 0.43487203, z: 0.19744277}
+--- !u!114 &-7291303101450155880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9102697800999066503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96dfb0849d8c6e64e86fdbaaaab68f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickupSound: {fileID: 8300000, guid: 5e66be1375dff7a42b628c476ea920ae, type: 3}
+  volume: 0.6
+  soundPitch: 1
+  pickupEffect: {fileID: 19800004, guid: 30b4cc2728d8cec499fad63ba93785a4, type: 3}
+  effectLifetime: 0.5
 --- !u!1001 &659951091835366210
 PrefabInstance:
   m_ObjectHideFlags: 0

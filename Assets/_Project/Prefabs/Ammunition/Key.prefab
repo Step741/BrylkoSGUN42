@@ -212,6 +212,7 @@ GameObject:
   - component: {fileID: 4024874032752594953}
   - component: {fileID: 2267344537657990685}
   - component: {fileID: 8682705572596909161}
+  - component: {fileID: 2709548119045898019}
   m_Layer: 0
   m_Name: Key
   m_TagString: Untagged
@@ -247,10 +248,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fae9d94dfea1d94db592eb8f0a031d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _laserBarriers:
+  laserBarriers:
   - {fileID: 0}
-  _gasDamageZone: {fileID: 0}
-  _playerLayer:
+  playerLayer:
     serializedVersion: 2
     m_Bits: 512
 --- !u!135 &2267344537657990685
@@ -289,8 +289,24 @@ MonoBehaviour:
   rotationDuration: 3
   floatHeight: 0.15
   floatDuration: 1.2
-  moveDuration: 0.2
   scaleDuration: 0.1
+--- !u!114 &2709548119045898019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7004870330290618728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96dfb0849d8c6e64e86fdbaaaab68f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickupSound: {fileID: 8300000, guid: 5e66be1375dff7a42b628c476ea920ae, type: 3}
+  volume: 0.6
+  soundPitch: 1
+  pickupEffect: {fileID: 19800004, guid: 30b4cc2728d8cec499fad63ba93785a4, type: 3}
+  effectLifetime: 0.5
 --- !u!1 &9211544048074167804
 GameObject:
   m_ObjectHideFlags: 0

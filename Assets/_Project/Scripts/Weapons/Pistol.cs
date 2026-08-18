@@ -79,12 +79,15 @@ public class Pistol : WeaponBase
         );
 
         if (Physics.Raycast(
-            ray,
-            out RaycastHit hit,
-            config.Range,
-            hitMask,
-            QueryTriggerInteraction.Ignore))
+    ray,
+    out RaycastHit hit,
+    config.Range,
+    hitMask,
+    QueryTriggerInteraction.Ignore))
         {
+            // Surface Impact
+            SurfaceImpactUtility.ProcessHit(hit);
+
             IDamageable damageable =
                 hit.collider.GetComponentInParent<IDamageable>();
 

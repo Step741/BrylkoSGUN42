@@ -9,6 +9,11 @@ public class GameInstaller : MonoInstaller
     [SerializeField]
     private Transform playerTransform;
 
+    [Header("Pickups")]
+    [SerializeField]
+    private PickupFactoryConfig pickupFactoryConfig;
+
+
     public override void InstallBindings()
     {
         // ==========================================
@@ -47,5 +52,24 @@ public class GameInstaller : MonoInstaller
             .Bind<IEnemyFactory>()
             .To<EnemyFactory>()
             .AsSingle();
+
+
+        // ==========================================
+        // PICKUP FACTORY
+        // ==========================================
+
+        Container
+            .Bind<PickupFactoryConfig>()
+            .FromInstance(pickupFactoryConfig)
+            .AsSingle();
+
+        Container
+            .Bind<IPickupFactory>()
+            .To<PickupFactory>()
+            .AsSingle();
+
+        Container
+            .Bind<DropTable>()
+            .AsTransient();
     }
 }

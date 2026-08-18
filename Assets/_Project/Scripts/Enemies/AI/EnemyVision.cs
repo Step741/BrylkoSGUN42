@@ -106,4 +106,5 @@ public class EnemyVision : MonoBehaviour
     public float ViewRadius => viewRadius;
     public float ViewAngle => viewAngle;
     public Transform Player => player;
+    public LayerMask ObstacleMask => obstacleMask;
 }

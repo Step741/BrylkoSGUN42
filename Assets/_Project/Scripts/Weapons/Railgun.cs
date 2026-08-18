@@ -201,6 +201,9 @@ public class Railgun : WeaponBase
             if (hit.collider == null)
                 continue;
 
+            // Surface Impact
+            SurfaceImpactUtility.ProcessHit(hit);
+
             IDamageable damageable =
                 hit.collider.GetComponentInParent<
                     IDamageable

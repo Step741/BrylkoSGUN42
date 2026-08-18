@@ -128,6 +128,8 @@ public class Shotgun : WeaponBase
                     hitMask,
                     QueryTriggerInteraction.Ignore))
             {
+                SurfaceImpactUtility.ProcessHit(hit);
+
                 ApplyPelletDamage(hit);
 
                 ApplyKnockback(

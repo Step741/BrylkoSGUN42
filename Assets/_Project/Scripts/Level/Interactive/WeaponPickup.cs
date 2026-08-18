@@ -14,10 +14,19 @@ public class WeaponPickup : PickupBase
     [SerializeField]
     private WeaponType weaponType;
 
+    [Header("Duplicate Pickup")]
+    [Tooltip("Количество патронов, которое добавляется при повторном подборе оружия.")]
+    [SerializeField]
+    private int duplicateAmmoAmount = 30;
+
     [Header("Player")]
     [SerializeField]
     private WeaponSwitcher weaponSwitcher;
 
+
+    // =========================================================
+    // CAN PICKUP
+    // =========================================================
 
     protected override bool CanPickup(Transform player)
     {
@@ -39,21 +48,57 @@ public class WeaponPickup : PickupBase
         if (weaponIndex < 0)
             return false;
 
-        // Уже подобрано.
-        if (switcher.IsWeaponUnlocked(
-                weaponIndex))
+
+        // =====================================================
+        // FIRST PICKUP
+        // =====================================================
+
+        if (!switcher.IsWeaponUnlocked(weaponIndex))
         {
+            return true;
+        }
+
+
+        // =====================================================
+        // DUPLICATE PICKUP
+        // =====================================================
+
+        WeaponBase weapon =
+            switcher.GetWeapon(weaponIndex);
+
+        if (weapon == null)
+        {
+            Debug.LogWarning(
+                $"[{name}] Weapon at index {weaponIndex} not found."
+            );
+
             return false;
         }
 
-        return true;
+
+        // Бесконечные патроны — повторный подбор не нужен.
+        if (weapon.InfiniteAmmo)
+            return false;
+
+
+        // Запас уже максимальный.
+        if (weapon.ReserveAmmo >= weapon.MaxReserveAmmo)
+            return false;
+
+
+        return duplicateAmmoAmount > 0;
     }
 
+
+    // =========================================================
+    // APPLY PICKUP
+    // =========================================================
 
     protected override void ApplyPickup()
     {
         if (PickupPlayer == null)
             return;
+
 
         WeaponSwitcher switcher =
             FindWeaponSwitcher(PickupPlayer);
@@ -67,55 +112,116 @@ public class WeaponPickup : PickupBase
             return;
         }
 
+
         int weaponIndex =
             GetWeaponIndex();
 
         if (weaponIndex < 0)
             return;
 
-        bool unlocked =
-            switcher.UnlockWeapon(
-                weaponIndex
+
+        // =====================================================
+        // FIRST PICKUP
+        // =====================================================
+
+        if (!switcher.IsWeaponUnlocked(weaponIndex))
+        {
+            bool unlocked =
+                switcher.UnlockWeapon(weaponIndex);
+
+            if (!unlocked)
+                return;
+
+
+            // После первого подбора сразу экипируем оружие.
+            switcher.EquipWeapon(weaponIndex);
+
+            Debug.Log(
+                $"[{name}] Weapon picked up: {weaponType}"
             );
 
-        if (!unlocked)
+            return;
+        }
+
+
+        // =====================================================
+        // DUPLICATE PICKUP → AMMO
+        // =====================================================
+
+        WeaponBase weapon =
+            switcher.GetWeapon(weaponIndex);
+
+        if (weapon == null)
+        {
+            Debug.LogWarning(
+                $"[{name}] Weapon at index {weaponIndex} not found."
+            );
+
+            return;
+        }
+
+
+        if (weapon.InfiniteAmmo)
             return;
 
-        // После подбора сразу экипируем оружие.
-        switcher.EquipWeapon(
-            weaponIndex
+
+        int oldReserve =
+            weapon.ReserveAmmo;
+
+
+        weapon.AddReserveAmmo(
+            duplicateAmmoAmount
         );
 
+
+        int addedAmmo =
+            weapon.ReserveAmmo - oldReserve;
+
+
         Debug.Log(
-            $"[{name}] Weapon picked up: " +
-            $"{weaponType}"
+            $"[{name}] Duplicate weapon pickup: " +
+            $"{weaponType} → +{addedAmmo} ammo. " +
+            $"Reserve: {weapon.ReserveAmmo}/{weapon.MaxReserveAmmo}"
         );
     }
 
+
+    // =========================================================
+    // FIND WEAPON SWITCHER
+    // =========================================================
 
     private WeaponSwitcher FindWeaponSwitcher(
         Transform player)
     {
+        // Если ссылка задана вручную — используем её.
         if (weaponSwitcher != null)
             return weaponSwitcher;
+
 
         if (player == null)
             return null;
 
+
         WeaponSwitcher switcher =
             player.GetComponent<WeaponSwitcher>();
+
 
         if (switcher == null)
         {
             switcher =
-                player.GetComponentInChildren<
-                    WeaponSwitcher
-                >(true);
+                player.GetComponentInChildren<WeaponSwitcher>(
+                    true
+                );
         }
+
 
         return switcher;
     }
 
+
+    // =========================================================
+    // WEAPON INDEX
+    // =========================================================
 
     private int GetWeaponIndex()
     {
@@ -133,6 +239,7 @@ public class WeaponPickup : PickupBase
             case WeaponType.Railgun:
                 return 5;
         }
+
 
         return -1;
     }

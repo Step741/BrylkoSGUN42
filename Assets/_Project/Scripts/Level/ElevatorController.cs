@@ -1,3 +1,4 @@
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 
@@ -9,6 +10,9 @@ public class ElevatorController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float height = 8f;
     [SerializeField] private float moveDuration = 3f;
+
+    [Header("Return")]
+    [SerializeField] private float returnDelay = 5f;
 
     [Header("Player")]
     [SerializeField] private Transform player;
@@ -23,6 +27,8 @@ public class ElevatorController : MonoBehaviour
     private bool isMoving;
     private bool isAtTop;
 
+    private Coroutine returnCoroutine;
+
     private void Awake()
     {
         if (platform == null)
@@ -32,13 +38,16 @@ public class ElevatorController : MonoBehaviour
         }
 
         bottomPosition = platform.position;
-
         topPosition = bottomPosition + Vector3.up * height;
     }
 
     public void SetPlayer(Transform target)
     {
         player = target;
+
+        // Если игрок снова зашёл на платформу,
+        // отменяем уже запланированный возврат.
+        CancelReturn();
     }
 
     public void ClearPlayer(Transform target)
@@ -62,6 +71,8 @@ public class ElevatorController : MonoBehaviour
     {
         isMoving = true;
 
+        CancelReturn();
+
         platform.DOKill();
 
         if (audioSource != null && moveSound != null)
@@ -82,6 +93,8 @@ public class ElevatorController : MonoBehaviour
             {
                 isMoving = false;
                 isAtTop = true;
+
+                StartReturnTimer();
             });
     }
 
@@ -95,13 +108,13 @@ public class ElevatorController : MonoBehaviour
 
         isMoving = true;
 
+        CancelReturn();
+
         platform.DOKill();
 
-        if (player != null)
-        {
-            player.SetParent(null);
-            player = null;
-        }
+        // Если игрок всё ещё на платформе,
+        // оставляем его дочерним объектом.
+        // Он поедет вниз вместе с лифтом.
 
         platform
             .DOMove(bottomPosition, moveDuration)
@@ -111,7 +124,38 @@ public class ElevatorController : MonoBehaviour
             {
                 isMoving = false;
                 isAtTop = false;
+
+                if (player != null)
+                {
+                    player.SetParent(null);
+                    player = null;
+                }
             });
+    }
+
+    private void StartReturnTimer()
+    {
+        CancelReturn();
+
+        returnCoroutine = StartCoroutine(ReturnAfterDelay());
+    }
+
+    private IEnumerator ReturnAfterDelay()
+    {
+        yield return new WaitForSeconds(returnDelay);
+
+        returnCoroutine = null;
+
+        ReturnDown();
+    }
+
+    private void CancelReturn()
+    {
+        if (returnCoroutine != null)
+        {
+            StopCoroutine(returnCoroutine);
+            returnCoroutine = null;
+        }
     }
 
     public bool IsMoving()
