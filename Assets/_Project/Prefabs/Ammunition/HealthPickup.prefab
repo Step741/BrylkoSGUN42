@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 1143042750421640857}
   - component: {fileID: 4299440393987741975}
   - component: {fileID: -1325066009321741443}
+  - component: {fileID: 7542616100321750081}
+  - component: {fileID: -4386886252753207802}
   m_Layer: 0
   m_Name: HealthPickup
   m_TagString: Untagged
@@ -108,6 +110,37 @@ MonoBehaviour:
   soundPitch: 1
   pickupEffect: {fileID: 19800004, guid: 30b4cc2728d8cec499fad63ba93785a4, type: 3}
   effectLifetime: 0.5
+--- !u!114 &7542616100321750081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6139562120175744533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a81b8560af625b54db652949565f3fd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerType: 3
+  icon: {fileID: 21300000, guid: 03c80213aa631744ab1d94af06b59b0c, type: 3}
+  showOutsideRadius: 0
+  clampToEdge: 0
+  visible: 1
+--- !u!114 &-4386886252753207802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6139562120175744533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210a25f82d27d674997ce7072fc602fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: 03c80213aa631744ab1d94af06b59b0c, type: 3}
+  visible: 1
 --- !u!1001 &7131293127862359528
 PrefabInstance:
   m_ObjectHideFlags: 0

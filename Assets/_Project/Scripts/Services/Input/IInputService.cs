@@ -16,6 +16,7 @@ public interface IInputService
     InputAction SelectWeapon { get; }
 
     InputAction Pause { get; }
+    InputAction Map { get; }
     InputAction Submit { get; }
 
     void EnablePlayerInput();

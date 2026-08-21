@@ -213,6 +213,8 @@ GameObject:
   - component: {fileID: 2267344537657990685}
   - component: {fileID: 8682705572596909161}
   - component: {fileID: 2709548119045898019}
+  - component: {fileID: 4673774850203468202}
+  - component: {fileID: 2719870669246376933}
   m_Layer: 0
   m_Name: Key
   m_TagString: Untagged
@@ -250,6 +252,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   laserBarriers:
   - {fileID: 0}
+  gasZones:
+  - {fileID: 0}
+  pickupFeedback: {fileID: 2709548119045898019}
   playerLayer:
     serializedVersion: 2
     m_Bits: 512
@@ -307,6 +312,37 @@ MonoBehaviour:
   soundPitch: 1
   pickupEffect: {fileID: 19800004, guid: 30b4cc2728d8cec499fad63ba93785a4, type: 3}
   effectLifetime: 0.5
+--- !u!114 &4673774850203468202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7004870330290618728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a81b8560af625b54db652949565f3fd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerType: 2
+  icon: {fileID: 21300000, guid: 64eff7d55c8b8c543acaaaac0be13b2c, type: 3}
+  showOutsideRadius: 1
+  clampToEdge: 1
+  visible: 1
+--- !u!114 &2719870669246376933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7004870330290618728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210a25f82d27d674997ce7072fc602fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: 64eff7d55c8b8c543acaaaac0be13b2c, type: 3}
+  visible: 1
 --- !u!1 &9211544048074167804
 GameObject:
   m_ObjectHideFlags: 0

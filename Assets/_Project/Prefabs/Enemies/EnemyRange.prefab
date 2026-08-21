@@ -52,6 +52,9 @@ GameObject:
   - component: {fileID: 4166961170115767081}
   - component: {fileID: 453301297818429136}
   - component: {fileID: 7590211343123277536}
+  - component: {fileID: 7994875431021505402}
+  - component: {fileID: 8963361340408921396}
+  - component: {fileID: 4596968800151630214}
   m_Layer: 8
   m_Name: EnemyShooter
   m_TagString: Untagged
@@ -257,6 +260,54 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 50
+--- !u!114 &7994875431021505402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1994324162709570518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a81b8560af625b54db652949565f3fd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerType: 0
+  icon: {fileID: 21300000, guid: 8c1354af7daaa5748a85d0d40e988905, type: 3}
+  showOutsideRadius: 0
+  clampToEdge: 0
+  visible: 1
+--- !u!114 &8963361340408921396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1994324162709570518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4a2ac05908b8d42b5e11200241b475, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minimapMarker: {fileID: 7994875431021505402}
+  fullscreenMapMarker: {fileID: 4596968800151630214}
+  enemyVision: {fileID: 4071083873135277333}
+  health: {fileID: 7590211343123277536}
+  hideDelay: 2
+--- !u!114 &4596968800151630214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1994324162709570518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210a25f82d27d674997ce7072fc602fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: 8c1354af7daaa5748a85d0d40e988905, type: 3}
+  visible: 1
 --- !u!1 &2326635793567646833
 GameObject:
   m_ObjectHideFlags: 0

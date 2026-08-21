@@ -42,6 +42,9 @@ public class InputService : IInputService, IInitializable, IDisposable
     public InputAction Pause =>
         inputActions.UI.Pause;
 
+    public InputAction Map =>
+        inputActions.UI.Map;
+
     public InputAction Submit =>
         inputActions.UI.Submit;
 
