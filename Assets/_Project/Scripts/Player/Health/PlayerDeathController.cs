@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerDeathController : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private Health health;
 
@@ -21,17 +22,31 @@ public class PlayerDeathController : MonoBehaviour
     [SerializeField]
     private ADSController adsController;
 
+    [Header("HUD")]
+
+    [SerializeField]
+    private GameObject hud;
+
+    [Header("Disable On Death")]
+
+    [SerializeField]
+    private MonoBehaviour[] componentsToDisable;
+
     [Header("Animation")]
+
     [SerializeField]
     private string deathTrigger = "Death";
 
+
     private bool isDead;
+
 
     private void Awake()
     {
         if (health == null)
         {
-            health = GetComponent<Health>();
+            health =
+                GetComponent<Health>();
         }
 
         if (characterController == null)
@@ -47,21 +62,26 @@ public class PlayerDeathController : MonoBehaviour
         }
     }
 
+
     private void OnEnable()
     {
         if (health != null)
         {
-            health.Died += HandleDeath;
+            health.Died +=
+                HandleDeath;
         }
     }
+
 
     private void OnDisable()
     {
         if (health != null)
         {
-            health.Died -= HandleDeath;
+            health.Died -=
+                HandleDeath;
         }
     }
+
 
     private void HandleDeath()
     {
@@ -70,35 +90,77 @@ public class PlayerDeathController : MonoBehaviour
 
         isDead = true;
 
+
+        // Скрываем весь HUD.
+        if (hud != null)
+        {
+            hud.SetActive(
+                false
+            );
+        }
+
+
         // Отключаем управление персонажем.
         if (playerController != null)
         {
-            playerController.enabled = false;
+            playerController.enabled =
+                false;
         }
 
-        //Отключаем камеру
+
+        // Отключаем управление камерой.
         if (cameraController != null)
         {
-            cameraController.enabled = false;
+            cameraController.enabled =
+                false;
         }
 
+
+        // Отключаем ADS.
         if (adsController != null)
         {
-            adsController.enabled = false;
+            adsController.enabled =
+                false;
         }
+
+
+        // Отключаем стрельбу, катану,
+        // смену оружия и другие действия.
+        if (componentsToDisable != null)
+        {
+            foreach (
+                MonoBehaviour component
+                in componentsToDisable
+            )
+            {
+                if (component != null)
+                {
+                    component.enabled =
+                        false;
+                }
+            }
+        }
+
 
         // Запускаем Death-анимацию.
         if (animator != null)
         {
-            animator.SetTrigger(deathTrigger);
+            animator.SetTrigger(
+                deathTrigger
+            );
         }
+
 
         // Освобождаем курсор.
         Cursor.lockState =
             CursorLockMode.None;
 
-        Cursor.visible = true;
+        Cursor.visible =
+            true;
 
-        Debug.Log("PLAYER DIED");
+
+        Debug.Log(
+            "PLAYER DIED"
+        );
     }
 }

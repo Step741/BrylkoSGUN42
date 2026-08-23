@@ -4,30 +4,42 @@ using Zenject;
 public class WeaponController : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private WeaponSwitcher weaponSwitcher;
 
     [SerializeField]
     private PlayerAnimationController playerAnimationController;
 
+    [SerializeField]
+    private DynamicCrosshair dynamicCrosshair;
+
+
     private IInputService inputService;
 
+
     [Inject]
-    private void Construct(IInputService inputService)
+    private void Construct(
+        IInputService inputService)
     {
-        this.inputService = inputService;
+        this.inputService =
+            inputService;
     }
+
 
     private void Update()
     {
         HandleFire();
+
         HandleReload();
     }
+
 
     private void HandleFire()
     {
         if (weaponSwitcher == null)
             return;
+
 
         WeaponBase currentWeapon =
             weaponSwitcher.CurrentWeapon;
@@ -35,28 +47,37 @@ public class WeaponController : MonoBehaviour
         if (currentWeapon == null)
             return;
 
+
         bool firePressed =
             inputService.Fire.WasPressedThisFrame();
 
         bool fireHeld =
             inputService.Fire.IsPressed();
 
-        // Автомат стреляет при удержании ЛКМ.
-        // Остальные виды оружия — один выстрел
-        // на одно нажатие.
+
         bool shouldShoot =
             currentWeapon is Rifle
                 ? fireHeld
                 : firePressed;
 
+
         if (!shouldShoot)
             return;
+
 
         bool shot =
             currentWeapon.Shoot();
 
+
         if (!shot)
             return;
+
+
+        // Добавляем визуальный разброс прицела
+        // только после успешного выстрела.
+        dynamicCrosshair
+            ?.AddFireSpread();
+
 
         if (currentWeapon is Rifle)
         {
@@ -68,23 +89,21 @@ public class WeaponController : MonoBehaviour
             playerAnimationController
                 ?.PlayShotgunShoot();
         }
-
         else if (currentWeapon is GrenadeLauncher)
         {
-            playerAnimationController?.PlayGrenadeShoot();
+            playerAnimationController
+                ?.PlayGrenadeShoot();
         }
-
         else if (currentWeapon is Railgun)
         {
-            playerAnimationController?.PlayRailgunShoot();
+            playerAnimationController
+                ?.PlayRailgunShoot();
         }
-
         else if (currentWeapon is Katana)
         {
             playerAnimationController
                 ?.PlayKatanaAttack();
         }
-
         else
         {
             playerAnimationController
@@ -92,10 +111,12 @@ public class WeaponController : MonoBehaviour
         }
     }
 
+
     private void HandleReload()
     {
         if (weaponSwitcher == null)
             return;
+
 
         WeaponBase currentWeapon =
             weaponSwitcher.CurrentWeapon;
@@ -103,60 +124,84 @@ public class WeaponController : MonoBehaviour
         if (currentWeapon == null)
             return;
 
+
         bool reloadPressed =
-            inputService.Reload.WasPressedThisFrame();
+            inputService.Reload
+                .WasPressedThisFrame();
+
 
         if (!reloadPressed)
             return;
 
+
         if (!currentWeapon.CanReload)
             return;
 
+
         currentWeapon.Reload();
+
 
         playerAnimationController
             ?.PlayReload();
     }
+
 
     public void OnGrenadeFireAnimationEvent()
     {
         if (weaponSwitcher == null)
             return;
 
+
         WeaponBase currentWeapon =
             weaponSwitcher.CurrentWeapon;
 
-        if (currentWeapon is GrenadeLauncher grenadeLauncher)
+
+        if (
+            currentWeapon is
+            GrenadeLauncher grenadeLauncher)
         {
-            grenadeLauncher.FireProjectile();
+            grenadeLauncher
+                .FireProjectile();
         }
     }
+
 
     public void OnRailgunFireAnimationEvent()
     {
         if (weaponSwitcher == null)
             return;
 
+
         WeaponBase currentWeapon =
             weaponSwitcher.CurrentWeapon;
 
-        if (currentWeapon is Railgun railgun)
+
+        if (
+            currentWeapon is
+            Railgun railgun)
         {
-            railgun.FireRailgun();
+            railgun
+                .FireRailgun();
         }
     }
+
 
     public void OnKatanaAttackAnimationEvent()
     {
         if (weaponSwitcher == null)
             return;
 
+
         WeaponBase currentWeapon =
             weaponSwitcher.CurrentWeapon;
 
-        if (currentWeapon is Katana katana)
+
+        if (
+            currentWeapon is
+            Katana katana)
         {
-            katana.Attack();
+            katana
+                .Attack();
         }
     }
 }

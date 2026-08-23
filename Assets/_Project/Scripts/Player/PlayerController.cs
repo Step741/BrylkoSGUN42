@@ -4,6 +4,7 @@ using Zenject;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
+
     [SerializeField]
     private float moveSpeed = 5f;
 
@@ -16,7 +17,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform visual;
 
+
     [Header("Jump & Gravity")]
+
     [SerializeField]
     private float gravity = -20f;
 
@@ -29,7 +32,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private LayerMask groundLayer;
 
+
     [Header("Crouch")]
+
     [SerializeField]
     private float crouchSpeed = 2.5f;
 
@@ -42,9 +47,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private LayerMask obstacleLayer;
 
+
     private CharacterController characterController;
     private IInputService inputService;
-
     private Transform cameraTransform;
 
     private float verticalVelocity;
@@ -54,6 +59,22 @@ public class PlayerController : MonoBehaviour
 
     private bool isCrouching;
     private bool isSprinting;
+    private bool isMoving;
+    private bool isGrounded;
+
+
+    // =========================
+    // PUBLIC STATES
+    // =========================
+
+    public bool IsMoving => isMoving;
+
+    public bool IsSprinting => isSprinting;
+
+    public bool IsCrouching => isCrouching;
+
+    public bool IsGrounded => isGrounded;
+
 
     [Inject]
     private void Construct(
@@ -64,13 +85,12 @@ public class PlayerController : MonoBehaviour
         cameraTransform = mainCamera.transform;
     }
 
+
     private void Awake()
     {
         characterController =
             GetComponent<CharacterController>();
 
-        // Запоминаем исходные параметры
-        // стоящего персонажа.
         standingHeight =
             characterController.height;
 
@@ -78,64 +98,104 @@ public class PlayerController : MonoBehaviour
             characterController.center;
     }
 
+
     private void Update()
     {
-        // Обновляем состояние приседания.
+        // =========================
+        // CROUCH
+        // =========================
+
         UpdateCrouch();
 
-        // Плавно изменяем высоту CharacterController.
         UpdateCharacterHeight();
 
-        // Получаем направление движения
-        // относительно камеры.
+
+        // =========================
+        // MOVEMENT INPUT
+        // =========================
+
         Vector3 movement =
             GetMovement();
 
-        // Обрабатываем прыжок и гравитацию.
+
+        // Определяем движение сразу
+        // по фактическому направлению,
+        // а не через velocity после Move().
+        isMoving =
+            movement.sqrMagnitude > 0.0001f;
+
+
+        // =========================
+        // GROUND
+        // =========================
+
+        isGrounded =
+            CheckGrounded();
+
+
+        // =========================
+        // GRAVITY & JUMP
+        // =========================
+
         ApplyGravity();
 
-        // Sprint недоступен во время приседания.
+
+        // =========================
+        // SPRINT
+        // =========================
+
         isSprinting =
+            isMoving &&
             !isCrouching &&
-            inputService.Sprint.IsPressed() &&
-            movement.sqrMagnitude > 0.01f;
+            inputService.Sprint.IsPressed();
+
+
+        // =========================
+        // SPEED
+        // =========================
 
         float currentSpeed;
 
         if (isCrouching)
         {
-            currentSpeed = crouchSpeed;
+            currentSpeed =
+                crouchSpeed;
         }
         else if (isSprinting)
         {
-            currentSpeed = sprintSpeed;
+            currentSpeed =
+                sprintSpeed;
         }
         else
         {
-            currentSpeed = moveSpeed;
+            currentSpeed =
+                moveSpeed;
         }
+
+
+        // =========================
+        // MOVE
+        // =========================
+
+        Vector3 horizontalMovement =
+            movement;
 
         movement *= currentSpeed;
 
         movement.y =
             verticalVelocity;
 
+
         characterController.Move(
             movement *
             Time.deltaTime
         );
 
-        Vector3 horizontalMovement =
-            movement;
 
-        horizontalMovement.y = 0f;
+        // =========================
+        // VISUAL ROTATION
+        // =========================
 
-        // В обычном режиме Visual смотрит
-        // в сторону движения.
-        //
-        // В ADS Player уже смотрит туда же,
-        // куда смотрит камера, поэтому Visual
-        // не должен самостоятельно разворачиваться.
         if (!inputService.Aim.IsPressed())
         {
             RotateVisual(
@@ -148,10 +208,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     private Vector3 GetMovement()
     {
         Vector2 input =
             inputService.Move.ReadValue<Vector2>();
+
 
         Vector3 cameraForward =
             cameraTransform.forward;
@@ -159,15 +221,19 @@ public class PlayerController : MonoBehaviour
         Vector3 cameraRight =
             cameraTransform.right;
 
+
         cameraForward.y = 0f;
         cameraRight.y = 0f;
+
 
         cameraForward.Normalize();
         cameraRight.Normalize();
 
+
         Vector3 moveDirection =
             cameraForward * input.y +
             cameraRight * input.x;
+
 
         return Vector3.ClampMagnitude(
             moveDirection,
@@ -175,16 +241,17 @@ public class PlayerController : MonoBehaviour
         );
     }
 
+
     private void ApplyGravity()
     {
-        bool isGrounded =
-            IsGrounded();
-
-        if (isGrounded &&
+        if (
+            isGrounded &&
             verticalVelocity < 0f)
         {
-            verticalVelocity = -2f;
+            verticalVelocity =
+                -2f;
         }
+
 
         if (
             inputService.Jump.WasPressedThisFrame() &&
@@ -198,24 +265,32 @@ public class PlayerController : MonoBehaviour
                 );
         }
 
+
         verticalVelocity +=
             gravity *
             Time.deltaTime;
     }
 
+
     private void UpdateCrouch()
     {
-        if (inputService.Crouch.IsPressed())
+        if (
+            inputService.Crouch.IsPressed())
         {
-            isCrouching = true;
+            isCrouching =
+                true;
+
             return;
         }
 
+
         if (CanStandUp())
         {
-            isCrouching = false;
+            isCrouching =
+                false;
         }
     }
+
 
     private void UpdateCharacterHeight()
     {
@@ -224,7 +299,7 @@ public class PlayerController : MonoBehaviour
                 ? crouchHeight
                 : standingHeight;
 
-        // Плавно меняем высоту.
+
         float newHeight =
             Mathf.MoveTowards(
                 characterController.height,
@@ -233,26 +308,20 @@ public class PlayerController : MonoBehaviour
                 Time.deltaTime
             );
 
+
         characterController.height =
             newHeight;
 
-        // Сохраняем нижнюю точку капсулы.
-        //
-        // Исходная нижняя точка:
-        // standingCenter.y - standingHeight / 2
-        //
-        // Поэтому при изменении высоты
-        // центр автоматически смещается так,
-        // чтобы низ капсулы оставался на месте.
+
         float bottomY =
             standingCenter.y -
-            standingHeight *
-            0.5f;
+            standingHeight * 0.5f;
+
 
         float targetCenterY =
             bottomY +
-            newHeight *
-            0.5f;
+            newHeight * 0.5f;
+
 
         Vector3 center =
             characterController.center;
@@ -264,20 +333,24 @@ public class PlayerController : MonoBehaviour
             center;
     }
 
+
     private bool CanStandUp()
     {
         float radius =
             characterController.radius;
+
 
         Vector3 bottom =
             transform.position +
             Vector3.up *
             (radius + 0.01f);
 
+
         Vector3 top =
             transform.position +
             Vector3.up *
             (standingHeight - radius);
+
 
         return !Physics.CheckCapsule(
             bottom,
@@ -288,17 +361,23 @@ public class PlayerController : MonoBehaviour
         );
     }
 
+
     private void RotateVisual(
         Vector3 moveDirection)
     {
-        if (moveDirection.sqrMagnitude <
+        if (
+            moveDirection.sqrMagnitude <
             0.01f)
+        {
             return;
+        }
+
 
         Quaternion targetRotation =
             Quaternion.LookRotation(
                 moveDirection
             );
+
 
         visual.rotation =
             Quaternion.Slerp(
@@ -309,15 +388,13 @@ public class PlayerController : MonoBehaviour
             );
     }
 
+
     private void AlignVisualWithPlayer()
     {
         if (visual == null)
             return;
 
-        // Visual находится внутри Player,
-        // поэтому локальный нулевой поворот
-        // означает, что модель смотрит
-        // в направлении Player.
+
         visual.localRotation =
             Quaternion.Slerp(
                 visual.localRotation,
@@ -327,18 +404,23 @@ public class PlayerController : MonoBehaviour
             );
     }
 
-    private bool IsGrounded()
+
+    private bool CheckGrounded()
     {
-        float sphereRadius = 0.2f;
+        float sphereRadius =
+            0.2f;
+
 
         Vector3 origin =
             transform.position +
             Vector3.up *
             (sphereRadius + 0.05f);
 
+
         float castDistance =
             sphereRadius +
             groundCheckDistance;
+
 
         return Physics.SphereCast(
             origin,
@@ -351,22 +433,28 @@ public class PlayerController : MonoBehaviour
         );
     }
 
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color =
             Color.yellow;
 
-        float sphereRadius = 0.2f;
+
+        float sphereRadius =
+            0.2f;
+
 
         Vector3 origin =
             transform.position +
             Vector3.up *
             (sphereRadius + 0.05f);
 
+
         Gizmos.DrawWireSphere(
             origin,
             sphereRadius
         );
+
 
         Gizmos.DrawLine(
             origin,

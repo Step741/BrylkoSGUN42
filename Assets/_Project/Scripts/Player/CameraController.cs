@@ -10,6 +10,7 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private Transform playerTransform;
 
+
     [Header("Sensitivity")]
     [SerializeField]
     private float horizontalSensitivity = 0.08f;
@@ -17,9 +18,11 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float verticalSensitivity = 0.06f;
 
+
     [Header("ADS Sensitivity")]
     [SerializeField]
     private float adsSensitivityMultiplier = 0.5f;
+
 
     [Header("Vertical Limits")]
     [SerializeField]
@@ -27,6 +30,7 @@ public class CameraController : MonoBehaviour
 
     [SerializeField]
     private float maxVerticalAngle = 60f;
+
 
     [Header("Camera Recoil")]
     [SerializeField]
@@ -38,70 +42,209 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float recoilSnappiness = 20f;
 
+
+    // =========================
+    // SETTINGS
+    // =========================
+
+    private const string MouseSensitivityKey =
+        "MouseSensitivity";
+
+    private const string InvertYAxisKey =
+        "InvertYAxis";
+
+    private const float MinMouseSensitivity =
+        0.1f;
+
+    private const float MaxMouseSensitivity =
+        5f;
+
+    private const float DefaultMouseSensitivity =
+        2f;
+
+
+    private float settingsSensitivity =
+        DefaultMouseSensitivity;
+
+    private bool invertYAxis;
+
+
+    // =========================
+    // REFERENCES
+    // =========================
+
     private IInputService inputService;
+
+
+    // =========================
+    // CAMERA STATE
+    // =========================
 
     private float horizontalAngle;
     private float verticalAngle;
 
     private bool wasAiming;
 
+
+    // =========================
+    // RECOIL
+    // =========================
+
     private float currentRecoil;
     private float targetRecoil;
 
+
     [Inject]
-    private void Construct(IInputService inputService)
+    private void Construct(
+        IInputService inputService)
     {
         this.inputService = inputService;
     }
 
+
     private void Start()
     {
+        LoadSettings();
+
+
         Vector3 currentRotation =
             cameraFollow.localEulerAngles;
+
 
         horizontalAngle =
             currentRotation.y;
 
+
         verticalAngle =
-            NormalizeAngle(currentRotation.x);
+            NormalizeAngle(
+                currentRotation.x
+            );
+
 
         Cursor.lockState =
             CursorLockMode.Locked;
 
-        Cursor.visible = false;
+        Cursor.visible =
+            false;
     }
+
 
     private void Update()
     {
+        UpdateSettings();
+
         RotateCamera();
+
         UpdateRecoil();
     }
+
+
+    // =========================
+    // SETTINGS
+    // =========================
+
+    private void LoadSettings()
+    {
+        settingsSensitivity =
+            Mathf.Clamp(
+                PlayerPrefs.GetFloat(
+                    MouseSensitivityKey,
+                    DefaultMouseSensitivity
+                ),
+                MinMouseSensitivity,
+                MaxMouseSensitivity
+            );
+
+
+        PlayerPrefs.SetFloat(
+            MouseSensitivityKey,
+            settingsSensitivity
+        );
+
+
+        PlayerPrefs.Save();
+
+
+        invertYAxis =
+            PlayerPrefs.GetInt(
+                InvertYAxisKey,
+                0
+            ) == 1;
+
+
+        Debug.Log(
+            "MOUSE SENSITIVITY: " +
+            settingsSensitivity
+        );
+    }
+
+
+    private void UpdateSettings()
+    {
+        settingsSensitivity =
+            Mathf.Clamp(
+                PlayerPrefs.GetFloat(
+                    MouseSensitivityKey,
+                    DefaultMouseSensitivity
+                ),
+                MinMouseSensitivity,
+                MaxMouseSensitivity
+            );
+
+
+        invertYAxis =
+            PlayerPrefs.GetInt(
+                InvertYAxisKey,
+                0
+            ) == 1;
+    }
+
+
+    // =========================
+    // CAMERA ROTATION
+    // =========================
 
     private void RotateCamera()
     {
         Vector2 lookInput =
             inputService.Look.ReadValue<Vector2>();
 
+
         bool isAiming =
             inputService.Aim.IsPressed();
+
 
         float sensitivityMultiplier =
             isAiming
                 ? adsSensitivityMultiplier
                 : 1f;
 
+
         float currentHorizontalSensitivity =
             horizontalSensitivity *
+            settingsSensitivity *
             sensitivityMultiplier;
+
 
         float currentVerticalSensitivity =
             verticalSensitivity *
+            settingsSensitivity *
             sensitivityMultiplier;
 
-        if (isAiming && !wasAiming)
+
+        float verticalInputMultiplier =
+            invertYAxis
+                ? -1f
+                : 1f;
+
+
+        if (
+            isAiming &&
+            !wasAiming)
         {
             EnterADS();
         }
+
 
         if (isAiming)
         {
@@ -110,9 +253,11 @@ public class CameraController : MonoBehaviour
                 currentHorizontalSensitivity
             );
 
+
             verticalAngle -=
                 lookInput.y *
-                currentVerticalSensitivity;
+                currentVerticalSensitivity *
+                verticalInputMultiplier;
         }
         else
         {
@@ -120,10 +265,13 @@ public class CameraController : MonoBehaviour
                 lookInput.x *
                 currentHorizontalSensitivity;
 
+
             verticalAngle -=
                 lookInput.y *
-                currentVerticalSensitivity;
+                currentVerticalSensitivity *
+                verticalInputMultiplier;
         }
+
 
         verticalAngle =
             Mathf.Clamp(
@@ -132,19 +280,32 @@ public class CameraController : MonoBehaviour
                 maxVerticalAngle
             );
 
-        // Добавляем recoil поверх обычного вертикального взгляда.
+
         float recoilOffset =
             currentRecoil;
 
+
         cameraFollow.localRotation =
             Quaternion.Euler(
-                verticalAngle - recoilOffset,
-                isAiming ? 0f : horizontalAngle,
+                verticalAngle -
+                recoilOffset,
+
+                isAiming
+                    ? 0f
+                    : horizontalAngle,
+
                 0f
             );
 
-        wasAiming = isAiming;
+
+        wasAiming =
+            isAiming;
     }
+
+
+    // =========================
+    // RECOIL
+    // =========================
 
     private void UpdateRecoil()
     {
@@ -156,6 +317,7 @@ public class CameraController : MonoBehaviour
                 Time.deltaTime
             );
 
+
         currentRecoil =
             Mathf.Lerp(
                 currentRecoil,
@@ -165,9 +327,12 @@ public class CameraController : MonoBehaviour
             );
     }
 
+
     public void AddRecoil()
     {
-        targetRecoil += recoilAmount;
+        targetRecoil +=
+            recoilAmount;
+
 
         targetRecoil =
             Mathf.Clamp(
@@ -177,16 +342,25 @@ public class CameraController : MonoBehaviour
             );
     }
 
+
+    // =========================
+    // ADS
+    // =========================
+
     private void EnterADS()
     {
         if (playerTransform == null)
             return;
 
+
         float playerYaw =
             playerTransform.eulerAngles.y;
 
+
         float cameraWorldYaw =
-            playerYaw + horizontalAngle;
+            playerYaw +
+            horizontalAngle;
+
 
         playerTransform.rotation =
             Quaternion.Euler(
@@ -195,13 +369,18 @@ public class CameraController : MonoBehaviour
                 0f
             );
 
-        horizontalAngle = 0f;
+
+        horizontalAngle =
+            0f;
     }
 
-    private void RotatePlayer(float rotation)
+
+    private void RotatePlayer(
+        float rotation)
     {
         if (playerTransform == null)
             return;
+
 
         playerTransform.Rotate(
             Vector3.up,
@@ -210,10 +389,13 @@ public class CameraController : MonoBehaviour
         );
     }
 
-    private float NormalizeAngle(float angle)
+
+    private float NormalizeAngle(
+        float angle)
     {
         if (angle > 180f)
             angle -= 360f;
+
 
         return angle;
     }

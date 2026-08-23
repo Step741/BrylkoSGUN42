@@ -184,7 +184,8 @@ public class ShooterCombatState : EnemyState
         float distance =
             Vector3.Distance(
                 shooterPosition,
-                playerPosition);
+                playerPosition
+            );
 
         // ------------------------------------------
         // Время полёта снаряда.
@@ -195,7 +196,8 @@ public class ShooterCombatState : EnemyState
         float projectileSpeed =
             Mathf.Max(
                 shooter.ProjectileSpeed,
-                0.01f);
+                0.01f
+            );
 
         float flightTime =
             distance /
@@ -253,9 +255,28 @@ public class ShooterCombatState : EnemyState
 
             if (damageable != null)
             {
-                damageable.TakeDamage(
-                    shooter.AttackDamage
-                );
+                // ==================================
+                // Если цель имеет Health,
+                // передаём также позицию источника
+                // урона для DamageDirectionIndicator.
+                // ==================================
+
+                Health health =
+                    hit.collider.GetComponentInParent<Health>();
+
+                if (health != null)
+                {
+                    health.TakeDamage(
+                        shooter.AttackDamage,
+                        shooter.transform.position
+                    );
+                }
+                else
+                {
+                    damageable.TakeDamage(
+                        shooter.AttackDamage
+                    );
+                }
 
                 Debug.Log(
                     $"[{enemy.name}] " +

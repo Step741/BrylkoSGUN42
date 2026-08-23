@@ -7,6 +7,7 @@ public class MinimapController : MonoBehaviour
 
 
     [Header("References")]
+
     [SerializeField]
     private Camera minimapCamera;
 
@@ -15,6 +16,14 @@ public class MinimapController : MonoBehaviour
 
     [SerializeField]
     private MinimapMarkerPool markerPool;
+
+
+    [Header("Minimap Camera Settings")]
+
+    [SerializeField]
+    [Tooltip("Размер области обзора миникарты. Работает только для Orthographic Camera.")]
+    [Min(0.1f)]
+    private float minimapViewSize = 20f;
 
 
     private readonly List<MinimapMarker> markers =
@@ -38,12 +47,41 @@ public class MinimapController : MonoBehaviour
     private void Awake()
     {
         instance = this;
+
+        ApplyCameraSettings();
+    }
+
+
+    private void OnValidate()
+    {
+        ApplyCameraSettings();
     }
 
 
     private void LateUpdate()
     {
         UpdateMarkers();
+    }
+
+
+    // =========================================================
+    // CAMERA SETTINGS
+    // =========================================================
+
+    private void ApplyCameraSettings()
+    {
+        if (minimapCamera == null)
+            return;
+
+
+        if (!minimapCamera.orthographic)
+        {
+            return;
+        }
+
+
+        minimapCamera.orthographicSize =
+            minimapViewSize;
     }
 
 

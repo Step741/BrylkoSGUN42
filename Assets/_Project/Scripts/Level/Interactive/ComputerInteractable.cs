@@ -10,14 +10,14 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
     [SerializeField]
     private string noKeyCardText = "NEED KEY CARD";
 
-    [SerializeField]
-    private string activatedText = "ACCESS GRANTED";
 
     [Header("Player")]
     [SerializeField]
     private PlayerInventory playerInventory;
 
+
     private bool isActivated;
+
 
     public event Action Activated;
 
@@ -31,6 +31,7 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
         if (isActivated)
             return;
 
+
         if (playerInventory == null)
         {
             Debug.LogWarning(
@@ -40,6 +41,7 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
 
             return;
         }
+
 
         // Нет ключ-карты.
         if (!playerInventory.HasKeyCard)
@@ -51,9 +53,11 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
             return;
         }
 
+
         // Пытаемся забрать карту из инвентаря.
         if (!playerInventory.TryRemoveKeyCard())
             return;
+
 
         Activate();
     }
@@ -68,11 +72,14 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
         if (isActivated)
             return;
 
+
         isActivated = true;
+
 
         Debug.Log(
             $"[{name}] Computer activated."
         );
+
 
         Activated?.Invoke();
     }
@@ -84,14 +91,19 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
 
     public string GetInteractionText()
     {
+        // После активации компьютера
+        // больше ничего не показываем.
         if (isActivated)
-            return activatedText;
+            return string.Empty;
+
 
         if (playerInventory == null)
             return noKeyCardText;
 
+
         if (!playerInventory.HasKeyCard)
             return noKeyCardText;
+
 
         return interactionText;
     }

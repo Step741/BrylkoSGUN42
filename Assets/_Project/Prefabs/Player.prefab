@@ -5705,7 +5705,6 @@ GameObject:
   - component: {fileID: 1109172088498570243}
   - component: {fileID: 5883553928362177384}
   - component: {fileID: 3981128596575488485}
-  - component: {fileID: 8782723860216219254}
   - component: {fileID: 2379423553517657081}
   - component: {fileID: 1159668740129683025}
   - component: {fileID: 4200236518998456767}
@@ -5865,20 +5864,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
---- !u!114 &8782723860216219254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 533969625965426633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20ff18391906bd340815701d75ba6d4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: {fileID: 3981128596575488485}
-  damage: 25
 --- !u!114 &2379423553517657081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5897,6 +5882,11 @@ MonoBehaviour:
   playerController: {fileID: 4979886292622008709}
   cameraController: {fileID: 1860033161316853450}
   adsController: {fileID: 5883553928362177384}
+  crosshair: {fileID: 0}
+  componentsToDisable:
+  - {fileID: 1159668740129683025}
+  - {fileID: 4200236518998456767}
+  - {fileID: 4979886292622008709}
   deathTrigger: Death
 --- !u!114 &1159668740129683025
 MonoBehaviour:
@@ -5912,6 +5902,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponSwitcher: {fileID: 4200236518998456767}
   playerAnimationController: {fileID: 1109172088498570243}
+  dynamicCrosshair: {fileID: 0}
 --- !u!114 &4200236518998456767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5926,11 +5917,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapons:
   - {fileID: 6687645479539407738}
+  - {fileID: 4073180190693768104}
   - {fileID: 4980195249137858088}
   - {fileID: 4172812030030232682}
   - {fileID: 349931598815328814}
   - {fileID: 456928307823619671}
-  - {fileID: 4073180190693768104}
   startWeaponIndex: 0
   unlockedWeapons: 
 --- !u!114 &5801350572012087406
@@ -12415,7 +12406,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2081640242489557483}
   - component: {fileID: 5856646109679931911}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Ch03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23558,7 +23549,7 @@ MonoBehaviour:
   config: {fileID: 11400000, guid: ae8ecb7f8a88d7141a35fc508ac7e993, type: 2}
   hitMask:
     serializedVersion: 2
-    m_Bits: 448
+    m_Bits: 1472
   muzzleFlash: {fileID: 4589178281936611862}
   audioSource: {fileID: 2424852906567645293}
   shootSound: {fileID: 8300000, guid: d967e4face0ce1741bc2aa727b5bcd60, type: 3}
@@ -29299,7 +29290,7 @@ MonoBehaviour:
   config: {fileID: 11400000, guid: e4cb256b699c9d742909166ce32c738d, type: 2}
   hitMask:
     serializedVersion: 2
-    m_Bits: 448
+    m_Bits: 1472
   muzzleFlash: {fileID: 2964553444750249151}
   audioSource: {fileID: 3977298310713526541}
   shootSound: {fileID: 8300000, guid: a4af8e4a9b333c440aa277cda7a78276, type: 3}
@@ -29488,7 +29479,7 @@ MonoBehaviour:
   config: {fileID: 11400000, guid: a313e4ee8d2f58b4e88cd94d5b7d4dc2, type: 2}
   hitMask:
     serializedVersion: 2
-    m_Bits: 448
+    m_Bits: 1472
   muzzleFlash: {fileID: 7919816221108215579}
   audioSource: {fileID: 7393786231056342681}
   shootSound: {fileID: 8300000, guid: 3ff0bc4828c92ef4985b7af350d3fe52, type: 3}

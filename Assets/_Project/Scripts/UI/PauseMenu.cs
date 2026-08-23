@@ -1,15 +1,20 @@
 using DG.Tweening;
-using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Zenject;
 
 public class PauseMenu : MonoBehaviour
 {
+    // =========================================================
+    // MENU
+    // =========================================================
+
     [Header("Menu")]
+
     [SerializeField]
     private GameObject menuRoot;
 
@@ -19,7 +24,23 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private RectTransform menuPanel;
 
+
+    // =========================================================
+    // TITLE
+    // =========================================================
+
+    [Header("Title")]
+
+    [SerializeField]
+    private RectTransform pausedTitle;
+
+
+    // =========================================================
+    // MENU BUTTONS
+    // =========================================================
+
     [Header("Menu Buttons")]
+
     [SerializeField]
     private Button continueButton;
 
@@ -29,37 +50,91 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private Button settingsButton;
 
+    [FormerlySerializedAs("quitButton")]
     [SerializeField]
-    private Button quitButton;
+    private Button mainMenuButton;
+
+
+    // =========================================================
+    // SETTINGS
+    // =========================================================
 
     [Header("Settings")]
+
     [SerializeField]
     private GameObject settingsRoot;
 
     [SerializeField]
-    private Slider volumeSlider;
+    private CanvasGroup settingsCanvasGroup;
 
     [SerializeField]
-    private TMP_Text volumeText;
+    private RectTransform settingsPanel;
 
     [SerializeField]
     private Button backButton;
 
-    [Header("Animation")]
+
+    // =========================================================
+    // SCENE
+    // =========================================================
+
+    [Header("Scene")]
+
+    [SerializeField]
+    private string mainMenuSceneName = "MainMenu";
+
+
+    // =========================================================
+    // ANIMATION
+    // =========================================================
+
+    [Header("Animation - Menu")]
+
     [SerializeField]
     private float fadeDuration = 0.2f;
 
     [SerializeField]
-    private float scaleDuration = 0.25f;
+    private float panelDuration = 0.3f;
+
+    [SerializeField]
+    private float titleDuration = 0.4f;
+
+    [SerializeField]
+    private float buttonDuration = 0.22f;
+
+    [SerializeField]
+    private float buttonDelay = 0.07f;
 
     [SerializeField]
     private float hiddenScale = 0.92f;
 
+    [SerializeField]
+    private float titleStartScale = 0.75f;
+
+    [SerializeField]
+    private float buttonStartScale = 0.85f;
+
+
+    [Header("Animation - Settings")]
+
+    [SerializeField]
+    private float settingsFadeDuration = 0.2f;
+
+    [SerializeField]
+    private float settingsScaleDuration = 0.3f;
+
+
+    // =========================================================
+    // STATE
+    // =========================================================
 
     private IInputService inputService;
 
     private bool isOpen;
     private bool isSettingsOpen;
+
+    private Sequence menuSequence;
+    private Sequence settingsSequence;
 
     private Tween fadeTween;
     private Tween scaleTween;
@@ -70,13 +145,15 @@ public class PauseMenu : MonoBehaviour
     // =========================================================
 
     [Inject]
-    private void Construct(IInputService inputService)
+    private void Construct(
+        IInputService inputService)
     {
         this.inputService = inputService;
 
         if (this.inputService != null)
         {
-            this.inputService.Pause.performed += OnPausePerformed;
+            this.inputService.Pause.performed +=
+                OnPausePerformed;
         }
     }
 
@@ -97,11 +174,13 @@ public class PauseMenu : MonoBehaviour
             return;
         }
 
+
         if (menuCanvasGroup == null)
         {
             menuCanvasGroup =
                 menuRoot.GetComponent<CanvasGroup>();
         }
+
 
         if (menuCanvasGroup == null)
         {
@@ -113,14 +192,64 @@ public class PauseMenu : MonoBehaviour
             return;
         }
 
-        LoadVolume();
+
+        // -----------------------------------------------------
+        // SETTINGS CANVAS GROUP
+        // -----------------------------------------------------
+
+        if (settingsRoot != null &&
+            settingsCanvasGroup == null)
+        {
+            settingsCanvasGroup =
+                settingsRoot.GetComponent<CanvasGroup>();
+        }
+
+
+        // -----------------------------------------------------
+        // BUTTON EVENTS
+        // -----------------------------------------------------
+
+        if (continueButton != null)
+        {
+            continueButton.onClick.AddListener(
+                CloseMenu
+            );
+        }
+
+
+        if (restartButton != null)
+        {
+            restartButton.onClick.AddListener(
+                RestartGame
+            );
+        }
+
+
+        if (settingsButton != null)
+        {
+            settingsButton.onClick.AddListener(
+                OpenSettings
+            );
+        }
+
+
+        if (backButton != null)
+        {
+            backButton.onClick.AddListener(
+                CloseSettings
+            );
+        }
+
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.AddListener(
+                ReturnToMainMenu
+            );
+        }
+
 
         HideImmediately();
-
-        if (settingsRoot != null)
-        {
-            settingsRoot.SetActive(false);
-        }
 
         SetCursorForGameplay();
     }
@@ -142,13 +271,14 @@ public class PauseMenu : MonoBehaviour
 
     private void HandlePause()
     {
-        // Если открыты настройки —
-        // Esc сначала возвращает в главное меню.
+        // Esc внутри Settings возвращает назад.
         if (isSettingsOpen)
         {
             CloseSettings();
+
             return;
         }
+
 
         if (isOpen)
         {
@@ -162,7 +292,7 @@ public class PauseMenu : MonoBehaviour
 
 
     // =========================================================
-    // MENU
+    // TOGGLE
     // =========================================================
 
     public void ToggleMenu()
@@ -178,10 +308,15 @@ public class PauseMenu : MonoBehaviour
     }
 
 
+    // =========================================================
+    // OPEN MENU
+    // =========================================================
+
     public void OpenMenu()
     {
         if (isOpen)
             return;
+
 
         isOpen = true;
         isSettingsOpen = false;
@@ -198,7 +333,7 @@ public class PauseMenu : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // PAUSE
+        // PAUSE GAME
         // -----------------------------------------------------
 
         Time.timeScale = 0f;
@@ -212,7 +347,7 @@ public class PauseMenu : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // SETTINGS
+        // RESET SETTINGS
         // -----------------------------------------------------
 
         if (settingsRoot != null)
@@ -222,76 +357,133 @@ public class PauseMenu : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // MENU
+        // SHOW MENU
         // -----------------------------------------------------
 
         menuRoot.SetActive(true);
 
-        menuCanvasGroup.interactable = true;
-        menuCanvasGroup.blocksRaycasts = true;
-
-
-        KillMenuTweens();
-
-
         menuCanvasGroup.alpha = 0f;
 
-
-        if (menuPanel != null)
-        {
-            menuPanel.localScale =
-                Vector3.one * hiddenScale;
-        }
+        menuCanvasGroup.interactable = false;
+        menuCanvasGroup.blocksRaycasts = false;
 
 
-        // -----------------------------------------------------
-        // UI FOCUS
-        // -----------------------------------------------------
+        KillAllTweens();
 
-        SelectButton(continueButton);
+        PrepareMenuAnimation();
 
 
         // -----------------------------------------------------
-        // FADE
+        // PLAY ANIMATION
         // -----------------------------------------------------
 
-        fadeTween =
+        menuSequence =
+            DOTween.Sequence()
+                .SetUpdate(true)
+                .SetLink(gameObject);
+
+
+        // Затемнение / появление.
+        menuSequence.Append(
             menuCanvasGroup
                 .DOFade(
                     1f,
                     fadeDuration
                 )
                 .SetEase(Ease.OutQuad)
-                .SetUpdate(true)
-                .SetLink(gameObject);
+        );
 
 
-        // -----------------------------------------------------
-        // SCALE
-        // -----------------------------------------------------
-
+        // Общая лёгкая анимация панели.
         if (menuPanel != null)
         {
-            scaleTween =
+            menuSequence.Join(
                 menuPanel
                     .DOScale(
                         Vector3.one,
-                        scaleDuration
+                        panelDuration
+                    )
+                    .SetEase(Ease.OutQuad)
+            );
+        }
+
+
+        // PAUSED.
+        if (pausedTitle != null)
+        {
+            menuSequence.Join(
+                pausedTitle
+                    .DOScale(
+                        Vector3.one,
+                        titleDuration
                     )
                     .SetEase(Ease.OutBack)
-                    .SetUpdate(true)
-                    .SetLink(gameObject);
+            );
         }
+
+
+        // CONTINUE.
+        AppendButtonAnimation(
+            menuSequence,
+            continueButton
+        );
+
+
+        // RESTART.
+        AppendButtonAnimation(
+            menuSequence,
+            restartButton
+        );
+
+
+        // SETTINGS.
+        AppendButtonAnimation(
+            menuSequence,
+            settingsButton
+        );
+
+
+        // MAIN MENU.
+        AppendButtonAnimation(
+            menuSequence,
+            mainMenuButton
+        );
+
+
+        // -----------------------------------------------------
+        // ENABLE UI
+        // -----------------------------------------------------
+
+        menuSequence.OnComplete(
+            () =>
+            {
+                menuCanvasGroup.interactable = true;
+
+                menuCanvasGroup.blocksRaycasts = true;
+
+                SelectButton(
+                    continueButton
+                );
+            }
+        );
     }
 
+
+    // =========================================================
+    // CLOSE MENU
+    // =========================================================
 
     public void CloseMenu()
     {
         if (!isOpen)
             return;
 
+
         isOpen = false;
         isSettingsOpen = false;
+
+
+        KillAllTweens();
 
 
         if (settingsRoot != null)
@@ -299,13 +491,6 @@ public class PauseMenu : MonoBehaviour
             settingsRoot.SetActive(false);
         }
 
-
-        KillMenuTweens();
-
-
-        // -----------------------------------------------------
-        // UI
-        // -----------------------------------------------------
 
         menuCanvasGroup.interactable = false;
         menuCanvasGroup.blocksRaycasts = false;
@@ -336,7 +521,7 @@ public class PauseMenu : MonoBehaviour
                 menuPanel
                     .DOScale(
                         Vector3.one * hiddenScale,
-                        scaleDuration
+                        panelDuration
                     )
                     .SetEase(Ease.InQuad)
                     .SetUpdate(true)
@@ -344,29 +529,147 @@ public class PauseMenu : MonoBehaviour
         }
 
 
-        fadeTween.OnComplete(() =>
-        {
-            menuRoot.SetActive(false);
-
-
-            // Возвращаем время.
-            Time.timeScale = 1f;
-
-
-            // Возвращаем управление игроку.
-            if (inputService != null)
+        fadeTween.OnComplete(
+            () =>
             {
-                inputService.EnablePlayerInput();
+                menuRoot.SetActive(false);
+
+
+                // Возвращаем время.
+                Time.timeScale = 1f;
+
+
+                // Возвращаем игровой input.
+                if (inputService != null)
+                {
+                    inputService.EnablePlayerInput();
+                }
+
+
+                SetCursorForGameplay();
+
+                ClearUISelection();
             }
+        );
+    }
 
 
-            // Возвращаем игровой курсор.
-            SetCursorForGameplay();
+    // =========================================================
+    // PREPARE MENU ANIMATION
+    // =========================================================
+
+    private void PrepareMenuAnimation()
+    {
+        if (menuPanel != null)
+        {
+            menuPanel.localScale =
+                Vector3.one * hiddenScale;
+        }
 
 
-            // Убираем UI selection.
-            ClearUISelection();
-        });
+        if (pausedTitle != null)
+        {
+            pausedTitle.localScale =
+                Vector3.one * titleStartScale;
+        }
+
+
+        PrepareButton(
+            continueButton
+        );
+
+        PrepareButton(
+            restartButton
+        );
+
+        PrepareButton(
+            settingsButton
+        );
+
+        PrepareButton(
+            mainMenuButton
+        );
+    }
+
+
+    private void PrepareButton(
+        Button button)
+    {
+        if (button == null)
+            return;
+
+
+        RectTransform rectTransform =
+            button.GetComponent<RectTransform>();
+
+
+        if (rectTransform != null)
+        {
+            rectTransform.localScale =
+                Vector3.one * buttonStartScale;
+        }
+
+
+        CanvasGroup canvasGroup =
+            GetOrAddCanvasGroup(
+                button.gameObject
+            );
+
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+        }
+    }
+
+
+    private void AppendButtonAnimation(
+        Sequence sequence,
+        Button button)
+    {
+        if (button == null)
+            return;
+
+
+        RectTransform rectTransform =
+            button.GetComponent<RectTransform>();
+
+
+        CanvasGroup canvasGroup =
+            GetOrAddCanvasGroup(
+                button.gameObject
+            );
+
+
+        if (rectTransform == null)
+            return;
+
+
+        sequence.AppendInterval(
+            buttonDelay
+        );
+
+
+        sequence.Append(
+            rectTransform
+                .DOScale(
+                    Vector3.one,
+                    buttonDuration
+                )
+                .SetEase(Ease.OutBack)
+        );
+
+
+        if (canvasGroup != null)
+        {
+            sequence.Join(
+                canvasGroup
+                    .DOFade(
+                        1f,
+                        buttonDuration
+                    )
+            );
+        }
     }
 
 
@@ -379,108 +682,238 @@ public class PauseMenu : MonoBehaviour
         if (!isOpen)
             return;
 
+
         if (settingsRoot == null)
             return;
+
+
+        if (isSettingsOpen)
+            return;
+
 
         isSettingsOpen = true;
 
-        // Скрываем основную панель меню.
-        if (menuPanel != null)
-            menuPanel.gameObject.SetActive(false);
 
-        // Показываем настройки.
+        KillSettingsTween();
+
+
+        // Основное меню временно блокируем.
+        menuCanvasGroup.interactable = false;
+
+        menuCanvasGroup.blocksRaycasts = false;
+
+
         settingsRoot.SetActive(true);
 
-        // Фокусируем кнопку BACK.
-        SelectButton(backButton);
-    }
 
-
-    public void CloseSettings()
-    {
-        if (settingsRoot == null)
-            return;
-
-        isSettingsOpen = false;
-
-        // Скрываем настройки.
-        settingsRoot.SetActive(false);
-
-        // Возвращаем основное меню.
-        if (menuPanel != null)
-            menuPanel.gameObject.SetActive(true);
-
-        // Возвращаем фокус на CONTINUE.
-        SelectButton(continueButton);
-    }
-
-
-    // =========================================================
-    // VOLUME
-    // =========================================================
-
-    private void LoadVolume()
-    {
-        float volume =
-            PlayerPrefs.GetFloat(
-                "MasterVolume",
-                1f
-            );
-
-
-        AudioListener.volume = volume;
-
-
-        if (volumeSlider != null)
+        if (settingsCanvasGroup != null)
         {
-            volumeSlider.value = volume;
+            settingsCanvasGroup.alpha = 0f;
 
-            volumeSlider.onValueChanged.AddListener(
-                SetVolume
+            settingsCanvasGroup.interactable = false;
+
+            settingsCanvasGroup.blocksRaycasts = false;
+        }
+
+
+        if (settingsPanel != null)
+        {
+            settingsPanel.localScale =
+                Vector3.one * hiddenScale;
+        }
+
+
+        // -----------------------------------------------------
+        // TRANSITION
+        // -----------------------------------------------------
+
+        settingsSequence =
+            DOTween.Sequence()
+                .SetUpdate(true)
+                .SetLink(gameObject);
+
+
+        // Скрываем PAUSED меню.
+        settingsSequence.Append(
+            menuCanvasGroup
+                .DOFade(
+                    0f,
+                    settingsFadeDuration
+                )
+                .SetEase(Ease.InQuad)
+        );
+
+
+        settingsSequence.AppendCallback(
+            () =>
+            {
+                if (menuPanel != null)
+                {
+                    menuPanel.gameObject.SetActive(
+                        false
+                    );
+                }
+            }
+        );
+
+
+        // Показываем SETTINGS.
+        if (settingsCanvasGroup != null)
+        {
+            settingsSequence.Append(
+                settingsCanvasGroup
+                    .DOFade(
+                        1f,
+                        settingsFadeDuration
+                    )
+                    .SetEase(Ease.OutQuad)
             );
         }
 
 
-        UpdateVolumeText(volume);
-    }
+        if (settingsPanel != null)
+        {
+            settingsSequence.Join(
+                settingsPanel
+                    .DOScale(
+                        Vector3.one,
+                        settingsScaleDuration
+                    )
+                    .SetEase(Ease.OutBack)
+            );
+        }
 
 
-    public void SetVolume(float value)
-    {
-        value =
-            Mathf.Clamp01(value);
+        settingsSequence.OnComplete(
+            () =>
+            {
+                if (settingsCanvasGroup != null)
+                {
+                    settingsCanvasGroup.interactable =
+                        true;
+
+                    settingsCanvasGroup.blocksRaycasts =
+                        true;
+                }
 
 
-        AudioListener.volume = value;
-
-
-        PlayerPrefs.SetFloat(
-            "MasterVolume",
-            value
+                SelectButton(
+                    backButton
+                );
+            }
         );
-
-
-        PlayerPrefs.Save();
-
-
-        UpdateVolumeText(value);
     }
 
 
-    private void UpdateVolumeText(float value)
+    // =========================================================
+    // CLOSE SETTINGS
+    // =========================================================
+
+    public void CloseSettings()
     {
-        if (volumeText == null)
+        if (!isSettingsOpen)
             return;
 
 
-        int percent =
-            Mathf.RoundToInt(
-                value * 100f
+        isSettingsOpen = false;
+
+
+        KillSettingsTween();
+
+
+        if (settingsCanvasGroup != null)
+        {
+            settingsCanvasGroup.interactable = false;
+
+            settingsCanvasGroup.blocksRaycasts = false;
+        }
+
+
+        settingsSequence =
+            DOTween.Sequence()
+                .SetUpdate(true)
+                .SetLink(gameObject);
+
+
+        // Скрываем SETTINGS.
+        if (settingsCanvasGroup != null)
+        {
+            settingsSequence.Append(
+                settingsCanvasGroup
+                    .DOFade(
+                        0f,
+                        settingsFadeDuration
+                    )
+                    .SetEase(Ease.InQuad)
             );
+        }
+        else
+        {
+            settingsSequence.AppendInterval(
+                settingsFadeDuration
+            );
+        }
 
 
-        volumeText.text =
-            $"Громкость: {percent}%";
+        settingsSequence.AppendCallback(
+            () =>
+            {
+                settingsRoot.SetActive(false);
+
+
+                if (menuPanel != null)
+                {
+                    menuPanel.gameObject.SetActive(
+                        true
+                    );
+
+                    menuPanel.localScale =
+                        Vector3.one * hiddenScale;
+                }
+
+
+                menuCanvasGroup.alpha = 0f;
+            }
+        );
+
+
+        // Показываем основное меню.
+        settingsSequence.Append(
+            menuCanvasGroup
+                .DOFade(
+                    1f,
+                    settingsFadeDuration
+                )
+                .SetEase(Ease.OutQuad)
+        );
+
+
+        if (menuPanel != null)
+        {
+            settingsSequence.Join(
+                menuPanel
+                    .DOScale(
+                        Vector3.one,
+                        settingsScaleDuration
+                    )
+                    .SetEase(Ease.OutBack)
+            );
+        }
+
+
+        settingsSequence.OnComplete(
+            () =>
+            {
+                menuCanvasGroup.interactable = true;
+
+                menuCanvasGroup.blocksRaycasts = true;
+
+
+                SelectButton(
+                    continueButton
+                );
+            }
+        );
     }
 
 
@@ -490,22 +923,7 @@ public class PauseMenu : MonoBehaviour
 
     public void RestartGame()
     {
-        Time.timeScale = 1f;
-
-
-        if (inputService != null)
-        {
-            inputService.EnablePlayerInput();
-        }
-
-
-        SetCursorForGameplay();
-
-
-        ClearUISelection();
-
-
-        KillMenuTweens();
+        PrepareForSceneChange();
 
 
         Scene currentScene =
@@ -519,10 +937,25 @@ public class PauseMenu : MonoBehaviour
 
 
     // =========================================================
-    // QUIT
+    // MAIN MENU
     // =========================================================
 
-    public void QuitGame()
+    public void ReturnToMainMenu()
+    {
+        PrepareForSceneChange();
+
+
+        SceneManager.LoadScene(
+            mainMenuSceneName
+        );
+    }
+
+
+    // =========================================================
+    // PREPARE SCENE CHANGE
+    // =========================================================
+
+    private void PrepareForSceneChange()
     {
         Time.timeScale = 1f;
 
@@ -533,22 +966,16 @@ public class PauseMenu : MonoBehaviour
         }
 
 
-        SetCursorForGameplay();
-
-
         ClearUISelection();
 
+        KillAllTweens();
 
-#if UNITY_EDITOR
 
-        UnityEditor.EditorApplication.isPlaying =
-            false;
+        Cursor.lockState =
+            CursorLockMode.None;
 
-#else
-
-        Application.Quit();
-
-#endif
+        Cursor.visible =
+            true;
     }
 
 
@@ -556,19 +983,25 @@ public class PauseMenu : MonoBehaviour
     // UI FOCUS
     // =========================================================
 
-    private void SelectButton(Button button)
+    private void SelectButton(
+        Button button)
     {
         if (button == null)
             return;
 
+
         EventSystem eventSystem =
             EventSystem.current;
+
 
         if (eventSystem == null)
             return;
 
 
-        eventSystem.SetSelectedGameObject(null);
+        eventSystem.SetSelectedGameObject(
+            null
+        );
+
 
         eventSystem.SetSelectedGameObject(
             button.gameObject
@@ -581,11 +1014,14 @@ public class PauseMenu : MonoBehaviour
         EventSystem eventSystem =
             EventSystem.current;
 
+
         if (eventSystem == null)
             return;
 
 
-        eventSystem.SetSelectedGameObject(null);
+        eventSystem.SetSelectedGameObject(
+            null
+        );
     }
 
 
@@ -598,7 +1034,8 @@ public class PauseMenu : MonoBehaviour
         Cursor.lockState =
             CursorLockMode.None;
 
-        Cursor.visible = true;
+        Cursor.visible =
+            true;
     }
 
 
@@ -607,7 +1044,34 @@ public class PauseMenu : MonoBehaviour
         Cursor.lockState =
             CursorLockMode.Locked;
 
-        Cursor.visible = false;
+        Cursor.visible =
+            false;
+    }
+
+
+    // =========================================================
+    // CANVAS GROUP HELPER
+    // =========================================================
+
+    private CanvasGroup GetOrAddCanvasGroup(
+        GameObject target)
+    {
+        if (target == null)
+            return null;
+
+
+        CanvasGroup canvasGroup =
+            target.GetComponent<CanvasGroup>();
+
+
+        if (canvasGroup == null)
+        {
+            canvasGroup =
+                target.AddComponent<CanvasGroup>();
+        }
+
+
+        return canvasGroup;
     }
 
 
@@ -618,28 +1082,62 @@ public class PauseMenu : MonoBehaviour
     private void KillMenuTweens()
     {
         fadeTween?.Kill();
+
         scaleTween?.Kill();
 
-
         fadeTween = null;
+
         scaleTween = null;
     }
 
 
-    private void HideImmediately()
+    private void KillSettingsTween()
+    {
+        settingsSequence?.Kill();
+
+        settingsSequence = null;
+    }
+
+
+    private void KillAllTweens()
     {
         KillMenuTweens();
 
+        menuSequence?.Kill();
+
+        menuSequence = null;
+
+        KillSettingsTween();
+    }
+
+
+    // =========================================================
+    // HIDE IMMEDIATELY
+    // =========================================================
+
+    private void HideImmediately()
+    {
+        KillAllTweens();
+
 
         isOpen = false;
+
         isSettingsOpen = false;
 
+
+        // -----------------------------------------------------
+        // MENU
+        // -----------------------------------------------------
 
         if (menuCanvasGroup != null)
         {
             menuCanvasGroup.alpha = 0f;
-            menuCanvasGroup.interactable = false;
-            menuCanvasGroup.blocksRaycasts = false;
+
+            menuCanvasGroup.interactable =
+                false;
+
+            menuCanvasGroup.blocksRaycasts =
+                false;
         }
 
 
@@ -650,15 +1148,41 @@ public class PauseMenu : MonoBehaviour
         }
 
 
-        menuRoot.SetActive(false);
+        if (menuRoot != null)
+        {
+            menuRoot.SetActive(false);
+        }
+
+
+        // -----------------------------------------------------
+        // SETTINGS
+        // -----------------------------------------------------
+
+        if (settingsCanvasGroup != null)
+        {
+            settingsCanvasGroup.alpha = 0f;
+
+            settingsCanvasGroup.interactable =
+                false;
+
+            settingsCanvasGroup.blocksRaycasts =
+                false;
+        }
+
+
+        if (settingsRoot != null)
+        {
+            settingsRoot.SetActive(false);
+        }
     }
 
 
     // =========================================================
-    // EDITOR / FOCUS
+    // FOCUS
     // =========================================================
 
-    private void OnApplicationFocus(bool hasFocus)
+    private void OnApplicationFocus(
+        bool hasFocus)
     {
         if (!hasFocus)
             return;
@@ -668,13 +1192,18 @@ public class PauseMenu : MonoBehaviour
         {
             SetCursorForMenu();
 
+
             if (isSettingsOpen)
             {
-                SelectButton(backButton);
+                SelectButton(
+                    backButton
+                );
             }
             else
             {
-                SelectButton(continueButton);
+                SelectButton(
+                    continueButton
+                );
             }
         }
         else
@@ -690,7 +1219,7 @@ public class PauseMenu : MonoBehaviour
 
     private void OnDestroy()
     {
-        KillMenuTweens();
+        KillAllTweens();
 
 
         if (inputService != null)
@@ -700,10 +1229,42 @@ public class PauseMenu : MonoBehaviour
         }
 
 
-        if (volumeSlider != null)
+        if (continueButton != null)
         {
-            volumeSlider.onValueChanged.RemoveListener(
-                SetVolume
+            continueButton.onClick.RemoveListener(
+                CloseMenu
+            );
+        }
+
+
+        if (restartButton != null)
+        {
+            restartButton.onClick.RemoveListener(
+                RestartGame
+            );
+        }
+
+
+        if (settingsButton != null)
+        {
+            settingsButton.onClick.RemoveListener(
+                OpenSettings
+            );
+        }
+
+
+        if (backButton != null)
+        {
+            backButton.onClick.RemoveListener(
+                CloseSettings
+            );
+        }
+
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.RemoveListener(
+                ReturnToMainMenu
             );
         }
 

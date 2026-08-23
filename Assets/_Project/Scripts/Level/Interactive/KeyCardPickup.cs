@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class KeyCardPickup : MonoBehaviour, IPickable
@@ -26,6 +27,13 @@ public class KeyCardPickup : MonoBehaviour, IPickable
 
 
     // =========================================================
+    // EVENT
+    // =========================================================
+
+    public event Action PickedUp;
+
+
+    // =========================================================
     // TRIGGER PICKUP
     // =========================================================
 
@@ -34,10 +42,8 @@ public class KeyCardPickup : MonoBehaviour, IPickable
         if (isPickedUp)
             return;
 
-
         if (!IsPlayer(other.gameObject.layer))
             return;
-
 
         PickUp();
     }
@@ -73,9 +79,6 @@ public class KeyCardPickup : MonoBehaviour, IPickable
 
         if (!inventory.TryAddKeyCard())
         {
-            // Карта уже есть.
-            // Предмет остаётся на месте.
-
             return;
         }
 
@@ -128,6 +131,13 @@ public class KeyCardPickup : MonoBehaviour, IPickable
         Debug.Log(
             $"[{name}] Key card picked up."
         );
+
+
+        // -----------------------------------------------------
+        // NOTIFY OBJECTIVE SYSTEM
+        // -----------------------------------------------------
+
+        PickedUp?.Invoke();
 
 
         Destroy(gameObject);
