@@ -16,6 +16,7 @@ MonoBehaviour:
   damage: 50
   fireRate: 1
   magazineSize: 0
+  maxReserveAmmo: 120
   reserveAmmo: 0
   infiniteAmmo: 1
   range: 35
@@ -54,9 +55,9 @@ MonoBehaviour:
     m_Bits: 0
   katanaAttackRange: 0.8
   katanaAttackRadius: 0.6
-  katanaAttackCooldown: 1
+  katanaAttackCooldown: 1.5
   katanaMaxTargets: 1
   katanaAttackMask:
     serializedVersion: 2
-    m_Bits: 1280
+    m_Bits: 11712
   recoil: 4

@@ -13,13 +13,33 @@ public class GrenadeLauncher : WeaponBase
     [SerializeField]
     private ProjectilePool projectilePool;
 
-
-    [Header("Audio")]
     [SerializeField]
-    private AudioSource audioSource;
+    private ShellEjector shellEjector;
 
+
+    [Header("Weapon Sounds")]
     [SerializeField]
     private AudioClip shootSound;
+
+    [SerializeField]
+    private AudioClip emptyClickSound;
+
+    [SerializeField]
+    private AudioClip reloadSound;
+
+
+    [Header("Sound Settings")]
+    [SerializeField]
+    [Range(0f, 1f)]
+    private float soundVolume = 1f;
+
+    [SerializeField]
+    private float soundPitch = 1f;
+
+
+    [Header("Empty Click")]
+    [SerializeField]
+    private float emptyClickCooldown = 0.2f;
 
 
     [Header("Recoil")]
@@ -30,6 +50,7 @@ public class GrenadeLauncher : WeaponBase
     private Camera playerCamera;
 
     private float nextFireTime;
+    private float nextEmptyClickTime;
 
     private bool shotPending;
 
@@ -65,8 +86,21 @@ public class GrenadeLauncher : WeaponBase
     }
 
 
+    // =========================================================
+    // SHOOT
+    // =========================================================
+
     public override bool Shoot()
     {
+        // Пустой магазин
+        if (currentAmmo <= 0)
+        {
+            PlayEmptyClick();
+
+            return false;
+        }
+
+
         if (!CanShoot)
             return false;
 
@@ -111,7 +145,7 @@ public class GrenadeLauncher : WeaponBase
             return false;
 
 
-        // Патрон расходуем
+        // Патрон расходуется
         // в момент нажатия.
         currentAmmo--;
 
@@ -131,6 +165,10 @@ public class GrenadeLauncher : WeaponBase
         return true;
     }
 
+
+    // =========================================================
+    // FIRE PROJECTILE
+    // =========================================================
 
     /// <summary>
     /// Вызывается Animation Event
@@ -162,38 +200,40 @@ public class GrenadeLauncher : WeaponBase
 
 
         // ==================================================
-        // Вспышка
+        // MUZZLE FLASH
         // ==================================================
 
         muzzleFlash?.Play();
 
 
         // ==================================================
-        // Звук
+        // SHELL EJECTION
         // ==================================================
 
-        if (audioSource != null &&
-            shootSound != null)
-        {
-            audioSource.PlayOneShot(
-                shootSound
-            );
-        }
+        shellEjector?.Eject();
 
 
         // ==================================================
-        // Отдача
+        // SHOOT SOUND
+        // ==================================================
+
+        PlaySound(
+            shootSound
+        );
+
+
+        // ==================================================
+        // RECOIL
         // ==================================================
 
         weaponRecoil?.AddRecoil();
 
 
         // ==================================================
-        // Направление
+        // DIRECTION
         //
-        // Берём именно в момент Animation Event,
-        // чтобы не было проблемы первого выстрела
-        // до поднятия оружия.
+        // Берём направление именно в момент
+        // Animation Event.
         // ==================================================
 
         Vector3 direction =
@@ -207,7 +247,7 @@ public class GrenadeLauncher : WeaponBase
 
 
         // ==================================================
-        // Получаем гранату из пула
+        // GET PROJECTILE
         // ==================================================
 
         GrenadeProjectile projectile =
@@ -228,7 +268,7 @@ public class GrenadeLauncher : WeaponBase
 
 
         // ==================================================
-        // Запускаем гранату
+        // FIRE PROJECTILE
         // ==================================================
 
         projectile.Initialize(
@@ -237,6 +277,10 @@ public class GrenadeLauncher : WeaponBase
         );
     }
 
+
+    // =========================================================
+    // RELOAD
+    // =========================================================
 
     public override void Reload()
     {
@@ -253,6 +297,28 @@ public class GrenadeLauncher : WeaponBase
             return;
 
 
+        // Бесконечный боезапас
+        if (InfiniteAmmo)
+        {
+            currentAmmo =
+                config.MagazineSize;
+
+            NotifyAmmoChanged();
+
+            PlaySound(
+                reloadSound
+            );
+
+
+            Debug.Log(
+                $"Grenade Launcher reload: " +
+                $"{currentAmmo}/∞"
+            );
+
+            return;
+        }
+
+
         if (reserveAmmo <= 0)
             return;
 
@@ -267,12 +333,16 @@ public class GrenadeLauncher : WeaponBase
         currentAmmo +=
             ammoToLoad;
 
-
         reserveAmmo -=
             ammoToLoad;
 
 
         NotifyAmmoChanged();
+
+
+        PlaySound(
+            reloadSound
+        );
 
 
         Debug.Log(
@@ -281,6 +351,50 @@ public class GrenadeLauncher : WeaponBase
         );
     }
 
+
+    // =========================================================
+    // SOUND
+    // =========================================================
+
+    private void PlaySound(
+        AudioClip clip)
+    {
+        if (clip == null)
+            return;
+
+        if (SoundService.Instance == null)
+            return;
+
+
+        SoundService.Instance.Play2D(
+            clip,
+            SoundType.SFX,
+            soundVolume,
+            soundPitch
+        );
+    }
+
+
+    private void PlayEmptyClick()
+    {
+        if (Time.time < nextEmptyClickTime)
+            return;
+
+
+        nextEmptyClickTime =
+            Time.time +
+            emptyClickCooldown;
+
+
+        PlaySound(
+            emptyClickSound
+        );
+    }
+
+
+    // =========================================================
+    // DISABLE
+    // =========================================================
 
     private void OnDisable()
     {

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RifleConfig
   m_EditorClassIdentifier: 
   weaponName: Rifle
-  damage: 15
+  damage: 10
   fireRate: 10
   magazineSize: 30
   maxReserveAmmo: 90

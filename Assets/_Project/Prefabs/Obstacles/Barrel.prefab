@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1316297455358635419}
   - component: {fileID: 6316062741293889807}
   - component: {fileID: 6217003522716848258}
-  - component: {fileID: -2840629602346545360}
+  - component: {fileID: -6699646773519756227}
   m_Layer: 10
   m_Name: Barrel
   m_TagString: Untagged
@@ -154,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destructionPrefab: {fileID: 4875520798462515086, guid: e755b377804a779459d4ee3ee4a523e8, type: 3}
   debrisLifetime: 5
+  dropConfig: {fileID: 0}
 --- !u!114 &1316297455358635419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,7 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 15
-  damage: 50
+  damage: 70
   force: 700
   damageMask:
     serializedVersion: 2
@@ -201,107 +202,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosion: {fileID: 6316062741293889807}
+  audioEffectRadius: 30
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 512
   chainRadius: 4
   barrelLayer:
     serializedVersion: 2
     m_Bits: 1024
   explosionVfx: {fileID: 100012, guid: 3364c97de68d3a147af572d1c71c6455, type: 3}
   vfxLifetime: 3
-  audioSource: {fileID: -2840629602346545360}
   explosionSound: {fileID: 8300000, guid: 601e36663f5e4e640b7c6ef72a92ab7e, type: 3}
---- !u!82 &-2840629602346545360
-AudioSource:
+  soundVolume: 1
+  soundPitch: 1
+  minDistance: 10
+  maxDistance: 30
+  debrisPrefab: {fileID: 4875520798462515086, guid: e755b377804a779459d4ee3ee4a523e8, type: 3}
+  debrisLifetime: 5
+--- !u!114 &-6699646773519756227
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3979707657246093399}
   m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 601e36663f5e4e640b7c6ef72a92ab7e, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 0.8
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 200
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62dac5052d70e9d4b9d34628527d576b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  surfaceType: 1
+  impactVfx: {fileID: 19800006, guid: 94a130fb17f1cae4388a8fe1d8bd3055, type: 3}
+  decalPrefab: {fileID: 0}
+  decalLifetime: 8
+  concreteImpactSound: {fileID: 8300000, guid: 7e384a0899a189349b1de7c84e8d2efd, type: 3}
+  metalImpactSound: {fileID: 8300000, guid: af634d8d446811c4cbdb9d3c3920528b, type: 3}
+  fleshImpactSound: {fileID: 8300000, guid: cb68b84e1070fe84fa460a98fafb575a, type: 3}
+  impactVolume: 1
+  pitchRange: {x: 0.95, y: 1.05}
+  minDistance: 2
+  maxDistance: 10

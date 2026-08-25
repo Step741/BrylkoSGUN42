@@ -27,6 +27,10 @@ public class GrenadeProjectile : MonoBehaviour
     }
 
 
+    // =========================================================
+    // POOL
+    // =========================================================
+
     /// <summary>
     /// Передаёт снаряду ссылку на его пул.
     /// Вызывается ProjectilePool при создании снаряда.
@@ -37,6 +41,10 @@ public class GrenadeProjectile : MonoBehaviour
         projectilePool = pool;
     }
 
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
 
     /// <summary>
     /// Инициализация гранаты перед выстрелом.
@@ -50,6 +58,7 @@ public class GrenadeProjectile : MonoBehaviour
         exploded = false;
 
         damagedTargets.Clear();
+
 
         if (config == null)
         {
@@ -70,8 +79,10 @@ public class GrenadeProjectile : MonoBehaviour
             );
 
 
-        if (explosionResults == null ||
-            explosionResults.Length != maxTargets)
+        if (
+            explosionResults == null ||
+            explosionResults.Length != maxTargets
+        )
         {
             explosionResults =
                 new Collider[maxTargets];
@@ -86,10 +97,15 @@ public class GrenadeProjectile : MonoBehaviour
             direction.normalized *
             config.ProjectileSpeed;
 
+
         rb.angularVelocity =
             Vector3.zero;
     }
 
+
+    // =========================================================
+    // UPDATE
+    // =========================================================
 
     private void Update()
     {
@@ -108,15 +124,24 @@ public class GrenadeProjectile : MonoBehaviour
     }
 
 
+    // =========================================================
+    // COLLISION
+    // =========================================================
+
     private void OnCollisionEnter(
         Collision collision)
     {
         if (exploded)
             return;
 
+
         Explode();
     }
 
+
+    // =========================================================
+    // EXPLOSION
+    // =========================================================
 
     private void Explode()
     {
@@ -151,17 +176,24 @@ public class GrenadeProjectile : MonoBehaviour
 
 
         // ==================================================
-        // SFX
+        // EXPLOSION SOUND
         // ==================================================
 
-        AudioSourcePool.Play(
-            config.ExplosionSound,
-            explosionPosition
-        );
+        if (
+            SoundService.Instance != null &&
+            config.ExplosionSound != null
+        )
+        {
+            SoundService.Instance.Play3D(
+                config.ExplosionSound,
+                explosionPosition,
+                SoundType.SFX
+            );
+        }
 
 
         // ==================================================
-        // Поиск целей
+        // FIND TARGETS
         // ==================================================
 
         int hitCount =
@@ -205,11 +237,14 @@ public class GrenadeProjectile : MonoBehaviour
             // Проверка препятствия
             // --------------------------------------------------
 
-            if (Physics.Linecast(
+            if (
+                Physics.Linecast(
                     explosionPosition,
                     targetPoint,
                     config.ExplosionObstacleMask,
-                    QueryTriggerInteraction.Ignore))
+                    QueryTriggerInteraction.Ignore
+                )
+            )
             {
                 continue;
             }
@@ -220,7 +255,9 @@ public class GrenadeProjectile : MonoBehaviour
             // --------------------------------------------------
 
             IDamageable damageable =
-                targetCollider.GetComponentInParent<IDamageable>();
+                targetCollider.GetComponentInParent<
+                    IDamageable
+                >();
 
 
             if (damageable == null)
@@ -231,8 +268,11 @@ public class GrenadeProjectile : MonoBehaviour
             // Один объект получает урон только один раз
             // --------------------------------------------------
 
-            if (!damagedTargets.Add(
-                    damageable))
+            if (
+                !damagedTargets.Add(
+                    damageable
+                )
+            )
             {
                 continue;
             }
@@ -258,17 +298,47 @@ public class GrenadeProjectile : MonoBehaviour
                 damageMultiplier;
 
 
+            // ==================================================
+            // EXPLOSION AUDIO EFFECT
+            // ==================================================
+
+            PlayerAudioEffects playerAudioEffects =
+                targetCollider.GetComponentInParent<
+                    PlayerAudioEffects
+                >();
+
+
+            if (playerAudioEffects != null)
+            {
+                playerAudioEffects.PlayExplosionEffect(
+                    damageMultiplier
+                );
+            }
+
+
+            // ==================================================
+            // DAMAGE
+            // ==================================================
+
             damageable.TakeDamage(
                 finalDamage
             );
 
-            IStunnable stunnable =
-                targetCollider.GetComponentInParent<IStunnable>();
 
-                if (stunnable != null)
-                {
-                    stunnable.Stun();
-                }
+            // ==================================================
+            // STUN
+            // ==================================================
+
+            IStunnable stunnable =
+                targetCollider.GetComponentInParent<
+                    IStunnable
+                >();
+
+
+            if (stunnable != null)
+            {
+                stunnable.Stun();
+            }
 
 
             // --------------------------------------------------
@@ -276,7 +346,9 @@ public class GrenadeProjectile : MonoBehaviour
             // --------------------------------------------------
 
             Rigidbody targetRigidbody =
-                targetCollider.GetComponentInParent<Rigidbody>();
+                targetCollider.GetComponentInParent<
+                    Rigidbody
+                >();
 
 
             if (targetRigidbody != null)
@@ -293,12 +365,16 @@ public class GrenadeProjectile : MonoBehaviour
 
 
         // ==================================================
-        // Возврат в пул
+        // RETURN TO POOL
         // ==================================================
 
         ReturnToPool();
     }
 
+
+    // =========================================================
+    // RETURN TO POOL
+    // =========================================================
 
     private void ReturnToPool()
     {
@@ -314,17 +390,26 @@ public class GrenadeProjectile : MonoBehaviour
 
         if (projectilePool != null)
         {
-            projectilePool.Release(this);
+            projectilePool.Release(
+                this
+            );
 
             return;
         }
 
 
         // Запасной вариант,
-        // если объект почему-то был создан не через пул.
-        Destroy(gameObject);
+        // если объект почему-то был создан
+        // не через пул.
+        Destroy(
+            gameObject
+        );
     }
 
+
+    // =========================================================
+    // GIZMOS
+    // =========================================================
 
     private void OnDrawGizmosSelected()
     {

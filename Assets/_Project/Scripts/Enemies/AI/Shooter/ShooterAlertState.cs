@@ -4,11 +4,20 @@ public class ShooterAlertState : EnemyState
 {
     private readonly EnemyShooter shooter;
 
+    private readonly EnemySoundController
+        enemySoundController;
+
+
     public ShooterAlertState(Enemy enemy)
         : base(enemy)
     {
-        shooter = enemy.GetComponent<EnemyShooter>();
+        shooter =
+            enemy.GetComponent<EnemyShooter>();
+
+        enemySoundController =
+            enemy.GetComponent<EnemySoundController>();
     }
+
 
     public override void Enter()
     {
@@ -21,6 +30,7 @@ public class ShooterAlertState : EnemyState
             return;
         }
 
+
         if (enemy.Vision == null)
         {
             Debug.LogError(
@@ -30,10 +40,18 @@ public class ShooterAlertState : EnemyState
             return;
         }
 
+
+        if (enemySoundController != null)
+        {
+            enemySoundController.PlayAlert();
+        }
+
+
         Debug.Log(
             $"[{enemy.name}] State: Alert"
         );
     }
+
 
     public override void Tick()
     {
@@ -43,13 +61,18 @@ public class ShooterAlertState : EnemyState
         if (enemy.Vision == null)
             return;
 
-        Transform player = enemy.Vision.Player;
+
+        Transform player =
+            enemy.Vision.Player;
+
 
         if (player == null)
         {
             shooter.StopMoving();
+
             return;
         }
+
 
         float distance =
             Vector3.Distance(
@@ -57,28 +80,40 @@ public class ShooterAlertState : EnemyState
                 player.position
             );
 
+
         if (distance > shooter.AttackDistance)
         {
-            if (shooter.Agent != null &&
-                shooter.Agent.isOnNavMesh)
+            if (
+                shooter.Agent != null &&
+                shooter.Agent.isOnNavMesh
+            )
             {
-                shooter.Agent.isStopped = false;
-                shooter.Agent.SetDestination(player.position);
+                shooter.Agent.isStopped =
+                    false;
+
+                shooter.Agent.SetDestination(
+                    player.position
+                );
             }
 
             return;
         }
 
+
         shooter.StopMoving();
+
 
         enemy.StateMachine.ChangeState(
             new ShooterCombatState(enemy)
         );
     }
 
+
     public override void Exit()
     {
         if (shooter != null)
+        {
             shooter.StopMoving();
+        }
     }
 }

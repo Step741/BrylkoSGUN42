@@ -4,16 +4,27 @@ public class ShooterCombatState : EnemyState
 {
     private readonly EnemyShooter shooter;
 
+    private readonly EnemySoundController
+        enemySoundController;
+
+
     private float attackTimer;
     private int attackCount;
 
-    private const int AttacksBeforeBackstep = 3;
+    private const int AttacksBeforeBackstep =
+        3;
+
 
     public ShooterCombatState(Enemy enemy)
         : base(enemy)
     {
-        shooter = enemy.GetComponent<EnemyShooter>();
+        shooter =
+            enemy.GetComponent<EnemyShooter>();
+
+        enemySoundController =
+            enemy.GetComponent<EnemySoundController>();
     }
+
 
     public override void Enter()
     {
@@ -27,6 +38,7 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
+
         if (enemy.Vision == null)
         {
             Debug.LogError(
@@ -37,29 +49,37 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
+
         shooter.StopMoving();
 
         attackTimer = 0f;
         attackCount = 0;
+
 
         Debug.Log(
             $"[{enemy.name}] State: Combat"
         );
     }
 
+
     public override void Tick()
     {
-        if (shooter == null ||
-            enemy.Vision == null)
+        if (
+            shooter == null ||
+            enemy.Vision == null
+        )
         {
             return;
         }
 
+
         Transform player =
             enemy.Vision.Player;
 
+
         if (player == null)
             return;
+
 
         // ==========================================
         // Низкое здоровье -> TakeCover
@@ -74,6 +94,7 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
+
         // ==========================================
         // Обновляем последнюю известную позицию.
         // ==========================================
@@ -84,6 +105,7 @@ public class ShooterCombatState : EnemyState
                 player.position
             );
         }
+
 
         // ==========================================
         // Потеряли игрока -> Search
@@ -98,34 +120,45 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
+
         Vector3 direction =
             player.position -
             shooter.transform.position;
 
+
         float distance =
             direction.magnitude;
+
 
         // ==========================================
         // Игрок слишком далеко.
         // ==========================================
 
-        if (distance >
-            shooter.AttackDistance + 1f)
+        if (
+            distance >
+            shooter.AttackDistance + 1f
+        )
         {
             MoveToPlayer(player);
+
             return;
         }
+
 
         // ==========================================
         // Игрок слишком близко.
         // ==========================================
 
-        if (distance <
-            shooter.AttackDistance - 1f)
+        if (
+            distance <
+            shooter.AttackDistance - 1f
+        )
         {
             MoveAwayFromPlayer(player);
+
             return;
         }
+
 
         // ==========================================
         // Идеальная дистанция.
@@ -135,7 +168,9 @@ public class ShooterCombatState : EnemyState
 
         LookAtPlayer(player);
 
-        attackTimer -= Time.deltaTime;
+        attackTimer -=
+            Time.deltaTime;
+
 
         if (attackTimer <= 0f)
         {
@@ -146,11 +181,16 @@ public class ShooterCombatState : EnemyState
             attackTimer =
                 shooter.AttackCooldown;
 
-            if (attackCount >=
-                AttacksBeforeBackstep)
+
+            if (
+                attackCount >=
+                AttacksBeforeBackstep
+            )
             {
                 enemy.StateMachine.ChangeState(
-                    new ShooterBackstepState(enemy)
+                    new ShooterBackstepState(
+                        enemy
+                    )
                 );
 
                 return;
@@ -158,24 +198,41 @@ public class ShooterCombatState : EnemyState
         }
     }
 
+
     // ==========================================
     // PREDICTIVE SHOOTING
     // ==========================================
 
-    private void Attack(Transform player)
+    private void Attack(
+        Transform player)
     {
+        // ==========================================
+        // ATTACK SOUND
+        // ==========================================
+
+        if (enemySoundController != null)
+        {
+            enemySoundController.PlayAttack();
+        }
+
+
         Vector3 shooterPosition =
             shooter.transform.position;
 
+
         Vector3 playerPosition =
             player.position;
+
 
         // ------------------------------------------
         // Получаем скорость игрока.
         // ------------------------------------------
 
         Vector3 playerVelocity =
-            GetPlayerVelocity(player);
+            GetPlayerVelocity(
+                player
+            );
+
 
         // ------------------------------------------
         // Начальная дистанция.
@@ -186,6 +243,7 @@ public class ShooterCombatState : EnemyState
                 shooterPosition,
                 playerPosition
             );
+
 
         // ------------------------------------------
         // Время полёта снаряда.
@@ -199,9 +257,11 @@ public class ShooterCombatState : EnemyState
                 0.01f
             );
 
+
         float flightTime =
             distance /
             projectileSpeed;
+
 
         // ------------------------------------------
         // Предсказываем позицию игрока.
@@ -211,7 +271,9 @@ public class ShooterCombatState : EnemyState
 
         Vector3 predictedPosition =
             playerPosition +
-            playerVelocity * flightTime;
+            playerVelocity *
+            flightTime;
+
 
         // ------------------------------------------
         // Дополнительный разброс.
@@ -221,10 +283,18 @@ public class ShooterCombatState : EnemyState
             predictedPosition -
             shooterPosition;
 
-        if (aimDirection.sqrMagnitude < 0.001f)
+
+        if (
+            aimDirection.sqrMagnitude <
+            0.001f
+        )
+        {
             return;
+        }
+
 
         aimDirection.Normalize();
+
 
         aimDirection =
             ApplySpread(
@@ -232,26 +302,34 @@ public class ShooterCombatState : EnemyState
                 shooter.AimSpread
             );
 
+
         // ------------------------------------------
         // Стреляем.
         // ------------------------------------------
 
-        if (Physics.Raycast(
+        if (
+            Physics.Raycast(
                 shooterPosition,
                 aimDirection,
                 out RaycastHit hit,
                 shooter.AttackDistance,
                 shooter.HitMask,
-                QueryTriggerInteraction.Ignore))
+                QueryTriggerInteraction.Ignore
+            )
+        )
         {
             IDamageable damageable =
-                hit.collider.GetComponent<IDamageable>();
+                hit.collider.GetComponent<
+                    IDamageable>();
+
 
             if (damageable == null)
             {
                 damageable =
-                    hit.collider.GetComponentInParent<IDamageable>();
+                    hit.collider.GetComponentInParent<
+                        IDamageable>();
             }
+
 
             if (damageable != null)
             {
@@ -262,7 +340,9 @@ public class ShooterCombatState : EnemyState
                 // ==================================
 
                 Health health =
-                    hit.collider.GetComponentInParent<Health>();
+                    hit.collider.GetComponentInParent<
+                        Health>();
+
 
                 if (health != null)
                 {
@@ -277,6 +357,7 @@ public class ShooterCombatState : EnemyState
                         shooter.AttackDamage
                     );
                 }
+
 
                 Debug.Log(
                     $"[{enemy.name}] " +
@@ -300,6 +381,7 @@ public class ShooterCombatState : EnemyState
             );
         }
 
+
         Debug.DrawRay(
             shooterPosition,
             aimDirection *
@@ -309,27 +391,34 @@ public class ShooterCombatState : EnemyState
         );
     }
 
+
     private Vector3 GetPlayerVelocity(
         Transform player)
     {
         CharacterController controller =
-            player.GetComponent<CharacterController>();
+            player.GetComponent<
+                CharacterController>();
+
 
         if (controller != null)
         {
             return controller.velocity;
         }
 
+
         Rigidbody rigidbody =
             player.GetComponent<Rigidbody>();
+
 
         if (rigidbody != null)
         {
             return rigidbody.velocity;
         }
 
+
         return Vector3.zero;
     }
+
 
     private Vector3 ApplySpread(
         Vector3 direction,
@@ -337,6 +426,7 @@ public class ShooterCombatState : EnemyState
     {
         if (spreadAngle <= 0f)
             return direction;
+
 
         Quaternion spreadRotation =
             Quaternion.Euler(
@@ -351,76 +441,116 @@ public class ShooterCombatState : EnemyState
                 0f
             );
 
+
         return spreadRotation *
                direction;
     }
+
 
     // ==========================================
     // MOVEMENT
     // ==========================================
 
-    private void MoveToPlayer(Transform player)
+    private void MoveToPlayer(
+        Transform player)
     {
-        if (shooter.Agent == null ||
-            !shooter.Agent.isOnNavMesh)
+        if (
+            shooter.Agent == null ||
+            !shooter.Agent.isOnNavMesh
+        )
         {
             return;
         }
 
-        shooter.Agent.isStopped = false;
+
+        shooter.Agent.isStopped =
+            false;
+
 
         shooter.Agent.SetDestination(
             player.position
         );
 
+
         LookAtPlayer(player);
     }
 
-    private void MoveAwayFromPlayer(Transform player)
+
+    private void MoveAwayFromPlayer(
+        Transform player)
     {
-        if (shooter.Agent == null ||
-            !shooter.Agent.isOnNavMesh)
+        if (
+            shooter.Agent == null ||
+            !shooter.Agent.isOnNavMesh
+        )
         {
             return;
         }
+
 
         Vector3 direction =
             shooter.transform.position -
             player.position;
 
+
         direction.y = 0f;
 
-        if (direction.sqrMagnitude < 0.001f)
+
+        if (
+            direction.sqrMagnitude <
+            0.001f
+        )
+        {
             return;
+        }
+
 
         direction.Normalize();
+
 
         Vector3 targetPosition =
             shooter.transform.position +
             direction * 3f;
 
-        shooter.Agent.isStopped = false;
+
+        shooter.Agent.isStopped =
+            false;
+
 
         shooter.Agent.SetDestination(
             targetPosition
         );
 
+
         LookAtPlayer(player);
     }
 
-    private void LookAtPlayer(Transform player)
+
+    private void LookAtPlayer(
+        Transform player)
     {
         Vector3 direction =
             player.position -
             shooter.transform.position;
 
+
         direction.y = 0f;
 
-        if (direction.sqrMagnitude < 0.001f)
+
+        if (
+            direction.sqrMagnitude <
+            0.001f
+        )
+        {
             return;
+        }
+
 
         Quaternion targetRotation =
-            Quaternion.LookRotation(direction);
+            Quaternion.LookRotation(
+                direction
+            );
+
 
         shooter.transform.rotation =
             Quaternion.Slerp(
@@ -429,6 +559,7 @@ public class ShooterCombatState : EnemyState
                 Time.deltaTime * 8f
             );
     }
+
 
     public override void Exit()
     {

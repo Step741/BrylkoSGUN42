@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RailgunConfig
   m_EditorClassIdentifier: 
   weaponName: GrenadeLauncher
-  damage: 100
+  damage: 80
   fireRate: 1
   magazineSize: 1
   maxReserveAmmo: 120
@@ -52,7 +52,7 @@ MonoBehaviour:
   railgunBeamDuration: 0.08
   railgunHitMask:
     serializedVersion: 2
-    m_Bits: 1472
+    m_Bits: 11712
   katanaAttackRange: 2
   katanaAttackRadius: 1.2
   katanaAttackCooldown: 0.8

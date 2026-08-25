@@ -944,6 +944,10 @@ public class PauseMenu : MonoBehaviour
     {
         PrepareForSceneChange();
 
+        MusicTransitionManager.StartMenuTransition(
+            GameMusic.Instance,
+            1.5f
+        );
 
         SceneManager.LoadScene(
             mainMenuSceneName

@@ -29,10 +29,10 @@ MonoBehaviour:
   maxDamageMultiplier: 1
   knockbackForce: 4
   projectilePrefab: {fileID: 4640734999919491806, guid: 710c3266785eabf48a546bfed8ed91ca, type: 3}
-  projectileSpeed: 20
+  projectileSpeed: 35
   projectileLifetime: 8
   explosionDamage: 80
-  explosionRadius: 5
+  explosionRadius: 10
   explosionForce: 700
   explosionUpwardModifier: 0.5
   maxExplosionTargets: 32

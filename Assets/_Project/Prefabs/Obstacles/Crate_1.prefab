@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5618875790472728228}
   - component: {fileID: 7670541766815085276}
   - component: {fileID: 3495588498714229877}
+  - component: {fileID: -5538460527493178157}
   m_Layer: 7
   m_Name: Crate_1
   m_TagString: Untagged
@@ -105,3 +106,26 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.024302224, y: 0.060162675, z: 0.025864229}
   m_Center: {x: 2.910383e-11, y: 0, z: 0}
+--- !u!114 &-5538460527493178157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5543064067593284267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62dac5052d70e9d4b9d34628527d576b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  surfaceType: 1
+  impactVfx: {fileID: 19800006, guid: 94a130fb17f1cae4388a8fe1d8bd3055, type: 3}
+  decalPrefab: {fileID: 0}
+  decalLifetime: 8
+  concreteImpactSound: {fileID: 8300000, guid: 7e384a0899a189349b1de7c84e8d2efd, type: 3}
+  metalImpactSound: {fileID: 8300000, guid: af634d8d446811c4cbdb9d3c3920528b, type: 3}
+  fleshImpactSound: {fileID: 8300000, guid: cb68b84e1070fe84fa460a98fafb575a, type: 3}
+  impactVolume: 1
+  pitchRange: {x: 0.95, y: 1.05}
+  minDistance: 2
+  maxDistance: 10

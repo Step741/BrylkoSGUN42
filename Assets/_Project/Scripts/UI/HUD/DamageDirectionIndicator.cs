@@ -38,6 +38,10 @@ public class DamageDirectionIndicator : MonoBehaviour
     [SerializeField]
     private float distanceFromCenter = 400f;
 
+    [SerializeField]
+    [Tooltip("Максимальное расстояние индикатора вверх и вниз от центра.")]
+    private float verticalLimit = 250f;
+
 
     [Header("DOTween Punch")]
 
@@ -114,7 +118,7 @@ public class DamageDirectionIndicator : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // ОРИГИНАЛЬНАЯ ЛОГИКА НАПРАВЛЕНИЯ
+        // WORLD DIRECTION
         // -----------------------------------------------------
 
         Vector3 worldDirection =
@@ -130,6 +134,10 @@ public class DamageDirectionIndicator : MonoBehaviour
 
         worldDirection.Normalize();
 
+
+        // -----------------------------------------------------
+        // CAMERA DIRECTION
+        // -----------------------------------------------------
 
         Vector3 cameraForward =
             playerCamera.transform.forward;
@@ -164,10 +172,38 @@ public class DamageDirectionIndicator : MonoBehaviour
             ).normalized;
 
 
-        indicator.anchoredPosition =
-            screenDirection *
+        // -----------------------------------------------------
+        // POSITION
+        // -----------------------------------------------------
+
+        float positionX =
+            screenDirection.x *
             distanceFromCenter;
 
+        float positionY =
+            screenDirection.y *
+            distanceFromCenter;
+
+
+        // Ограничиваем только верх и низ.
+        positionY =
+            Mathf.Clamp(
+                positionY,
+                -verticalLimit,
+                verticalLimit
+            );
+
+
+        indicator.anchoredPosition =
+            new Vector2(
+                positionX,
+                positionY
+            );
+
+
+        // -----------------------------------------------------
+        // ROTATION
+        // -----------------------------------------------------
 
         float angle =
             Mathf.Atan2(
@@ -186,7 +222,7 @@ public class DamageDirectionIndicator : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // DOTWEEN ANIMATION
+        // ANIMATION
         // -----------------------------------------------------
 
         PlayDamageAnimation();
@@ -199,19 +235,14 @@ public class DamageDirectionIndicator : MonoBehaviour
 
     private void PlayDamageAnimation()
     {
-        // Останавливаем только предыдущую
-        // последовательность.
-        if (damageSequence != null &&
-            damageSequence.IsActive())
+        if (
+            damageSequence != null &&
+            damageSequence.IsActive()
+        )
         {
             damageSequence.Kill();
         }
 
-
-        // ВАЖНО:
-        // Не вызываем canvasGroup.DOKill()
-        // или indicator.DOKill(), потому что
-        // tween'ы будут принадлежать Sequence.
 
         canvasGroup.alpha = 0f;
 
@@ -236,8 +267,7 @@ public class DamageDirectionIndicator : MonoBehaviour
         );
 
 
-        // Punch запускаем отдельно внутри
-        // этой же последовательности.
+        // Punch.
         damageSequence.Join(
             indicator
                 .DOPunchScale(
@@ -291,8 +321,10 @@ public class DamageDirectionIndicator : MonoBehaviour
 
     private void KillAnimation()
     {
-        if (damageSequence != null &&
-            damageSequence.IsActive())
+        if (
+            damageSequence != null &&
+            damageSequence.IsActive()
+        )
         {
             damageSequence.Kill();
         }

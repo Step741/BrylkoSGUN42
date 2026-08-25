@@ -84,10 +84,13 @@ PrefabInstance:
       addedObject: {fileID: 5347326807179455380}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 96e8c54f6028cd648b3f06a7400aed04, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -6718298599775771683}
+      addedObject: {fileID: 1876976019521982328}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 96e8c54f6028cd648b3f06a7400aed04, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7351235799004248071}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 96e8c54f6028cd648b3f06a7400aed04, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -68795463201332510}
   m_SourcePrefab: {fileID: 100100000, guid: 96e8c54f6028cd648b3f06a7400aed04, type: 3}
 --- !u!1 &4074934224867578838 stripped
 GameObject:
@@ -142,7 +145,7 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &-6718298599775771683
+--- !u!114 &1876976019521982328
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -151,11 +154,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 4074934224867578838}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed29dab9d1d941148ad7f171f6991423, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a2f2fd6c2771454e821235fdadecfb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   destructionPrefab: {fileID: 8286082642232545264, guid: a7f357a6d818b6e4bb069bedfbd703d3, type: 3}
   debrisLifetime: 5
+  breakSound: {fileID: 8300000, guid: 8196e28eb7a38bc47acf042eb25004ae, type: 3}
+  soundVolume: 1
+  soundPitch: 1
+  minDistance: 2
+  maxDistance: 10
   dropConfig: {fileID: 11400000, guid: 5977e714fb8b439499ed6c487deec5c5, type: 2}
 --- !u!114 &7351235799004248071
 MonoBehaviour:
@@ -170,3 +178,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 40
+--- !u!114 &-68795463201332510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4074934224867578838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62dac5052d70e9d4b9d34628527d576b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  surfaceType: 0
+  impactVfx: {fileID: 19800006, guid: 94a130fb17f1cae4388a8fe1d8bd3055, type: 3}
+  decalPrefab: {fileID: 0}
+  decalLifetime: 8
+  concreteImpactSound: {fileID: 8300000, guid: 7e384a0899a189349b1de7c84e8d2efd, type: 3}
+  metalImpactSound: {fileID: 8300000, guid: af634d8d446811c4cbdb9d3c3920528b, type: 3}
+  fleshImpactSound: {fileID: 8300000, guid: cb68b84e1070fe84fa460a98fafb575a, type: 3}
+  impactVolume: 1
+  pitchRange: {x: 0.95, y: 1.05}
+  minDistance: 2
+  maxDistance: 10

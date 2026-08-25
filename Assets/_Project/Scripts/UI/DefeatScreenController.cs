@@ -274,6 +274,11 @@ public class DefeatScreenController : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
+        MusicTransitionManager.StartMenuTransition(
+            GameMusic.Instance,
+            1.5f
+        );
+
         SceneManager.LoadScene(
             mainMenuSceneName
         );

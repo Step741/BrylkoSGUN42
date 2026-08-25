@@ -25,10 +25,6 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private float minimumLoadingTime = 1.5f;
 
 
-    [Header("Menu Music")]
-    [SerializeField] private AudioSource menuMusic;
-
-
     [Header("Panel Animation")]
     [SerializeField] private float panelAnimationDuration = 0.4f;
     [SerializeField] private float panelSlideDistance = 1200f;
@@ -212,16 +208,6 @@ public class MainMenuController : MonoBehaviour
 
         // Начальные значения Loading UI
         ResetLoadingVisuals();
-
-
-        // Музыка главного меню
-        if (menuMusic != null)
-        {
-            menuMusic.loop = true;
-
-            if (!menuMusic.isPlaying)
-                menuMusic.Play();
-        }
     }
 
 
@@ -264,9 +250,8 @@ public class MainMenuController : MonoBehaviour
         yield return StartCoroutine(ShowLoadingBar());
 
 
-        // Плавно выключаем музыку
-        if (menuMusic != null)
-            StartCoroutine(FadeOutMusic());
+        // Запускаем плавный переход музыки
+        MusicTransitionManager.StartGameTransition(1.5f);
 
 
         // Асинхронная загрузка сцены
@@ -777,43 +762,6 @@ public class MainMenuController : MonoBehaviour
 #else
         Application.Quit();
 #endif
-    }
-
-
-    // =========================
-    // MUSIC FADE OUT
-    // =========================
-
-    private IEnumerator FadeOutMusic()
-    {
-        if (menuMusic == null)
-            yield break;
-
-
-        float startVolume = menuMusic.volume;
-        float timer = 0f;
-        float fadeDuration = 0.5f;
-
-
-        while (timer < fadeDuration)
-        {
-            timer += Time.unscaledDeltaTime;
-
-
-            menuMusic.volume =
-                Mathf.Lerp(
-                    startVolume,
-                    0f,
-                    timer / fadeDuration
-                );
-
-
-            yield return null;
-        }
-
-
-        menuMusic.volume = 0f;
-        menuMusic.Stop();
     }
 
 

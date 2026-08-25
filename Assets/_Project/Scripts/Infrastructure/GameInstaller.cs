@@ -3,15 +3,27 @@ using Zenject;
 
 public class GameInstaller : MonoInstaller
 {
+    [Header("Camera")]
     [SerializeField]
     private Camera mainCamera;
 
+
+    [Header("Player")]
     [SerializeField]
     private Transform playerTransform;
+
 
     [Header("Pickups")]
     [SerializeField]
     private PickupFactoryConfig pickupFactoryConfig;
+
+
+    [Header("Audio")]
+    [SerializeField]
+    private SoundService soundService;
+
+    [SerializeField]
+    private UISoundLibrary uiSoundLibrary;
 
 
     public override void InstallBindings()
@@ -71,5 +83,25 @@ public class GameInstaller : MonoInstaller
         Container
             .Bind<DropTable>()
             .AsTransient();
+
+
+        // ==========================================
+        // SOUND SERVICE
+        // ==========================================
+
+        Container
+            .Bind<ISoundService>()
+            .To<SoundService>()
+            .FromInstance(soundService)
+            .AsSingle();
+
+
+        // ==========================================
+        // UI SOUND LIBRARY
+        // ==========================================
+
+        Container
+            .BindInstance(uiSoundLibrary)
+            .AsSingle();
     }
 }

@@ -101,16 +101,16 @@ public class Health : MonoBehaviour, IDamageable
         );
 
 
-        // Передаём направление источника урона.
-        if (
-            damageSourcePosition !=
-            Vector3.zero
-        )
-        {
-            DamageReceived?.Invoke(
-                damageSourcePosition
-            );
-        }
+        // ==========================================
+        // DAMAGE RECEIVED
+        //
+        // Вызываем событие при любом получении урона.
+        // Если источник неизвестен, передаётся Vector3.zero.
+        // ==========================================
+
+        DamageReceived?.Invoke(
+            damageSourcePosition
+        );
 
 
         if (currentHealth <= 0f)

@@ -51,6 +51,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController characterController;
     private IInputService inputService;
     private Transform cameraTransform;
+    private PlayerVoiceController playerVoiceController;
 
     private float verticalVelocity;
 
@@ -90,6 +91,9 @@ public class PlayerController : MonoBehaviour
     {
         characterController =
             GetComponent<CharacterController>();
+
+        playerVoiceController =
+            GetComponent<PlayerVoiceController>();
 
         standingHeight =
             characterController.height;
@@ -263,6 +267,11 @@ public class PlayerController : MonoBehaviour
                     -2f *
                     gravity
                 );
+
+            if (playerVoiceController != null)
+            {
+                playerVoiceController.PlayJump();
+            }
         }
 
 

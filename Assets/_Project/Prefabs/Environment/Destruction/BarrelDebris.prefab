@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7590053473677561571}
   - component: {fileID: 5994919180045149432}
   - component: {fileID: 113028842831224641}
+  - component: {fileID: 319002647440309658}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -133,6 +134,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.115567, y: 1.1042131, z: 1.7550305}
   m_Center: {x: -0.0066995025, y: 0.02551133, z: 0.8773765}
+--- !u!114 &319002647440309658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1012606849256673037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cae6b199852112543aa528cb584bfaaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 2.5
+  explosionRadius: 1.5
+  upwardModifier: 0.4
+  impactSounds:
+  - {fileID: 8300000, guid: de8d08c9261f05e4d936437c86eb6ee4, type: 3}
+  - {fileID: 8300000, guid: 48f6e311fd066714f99d633fd089f8e9, type: 3}
+  impactVolume: 1
+  pitchRange: {x: 0.95, y: 1.05}
+  minimumImpactVelocity: 1.5
+  impactCooldown: 0.15
+  minDistance: 2
+  maxDistance: 15
 --- !u!1 &1484324731403732828
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,8 +235,9 @@ GameObject:
   - component: {fileID: 8541351219008251153}
   - component: {fileID: 3049275092990862739}
   - component: {fileID: 1074965399127177203}
+  - component: {fileID: 5334773357873817730}
   m_Layer: 0
-  m_Name: barrel
+  m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -330,6 +356,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.115567, y: 1.1042131, z: 1.7550305}
   m_Center: {x: -0.0066995025, y: 0.02551133, z: 0.8773765}
+--- !u!114 &5334773357873817730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4147365290563964504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cae6b199852112543aa528cb584bfaaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 2.5
+  explosionRadius: 1.5
+  upwardModifier: 0.4
+  impactSounds:
+  - {fileID: 8300000, guid: de8d08c9261f05e4d936437c86eb6ee4, type: 3}
+  - {fileID: 8300000, guid: 48f6e311fd066714f99d633fd089f8e9, type: 3}
+  impactVolume: 1
+  pitchRange: {x: 0.95, y: 1.05}
+  minimumImpactVelocity: 1.5
+  impactCooldown: 0.15
+  minDistance: 2
+  maxDistance: 15
 --- !u!1 &4607328484272739240
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,6 +393,7 @@ GameObject:
   - component: {fileID: 2131492148621193388}
   - component: {fileID: 5388887055781340578}
   - component: {fileID: 4344245675842694187}
+  - component: {fileID: 6683696527950417256}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -463,6 +514,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.115567, y: 1.104213, z: 1.75503}
   m_Center: {x: -0.0066995025, y: 0.025511328, z: 0.87737626}
+--- !u!114 &6683696527950417256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4607328484272739240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cae6b199852112543aa528cb584bfaaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 2.5
+  explosionRadius: 1.5
+  upwardModifier: 0.4
+  impactSounds:
+  - {fileID: 8300000, guid: de8d08c9261f05e4d936437c86eb6ee4, type: 3}
+  - {fileID: 8300000, guid: 48f6e311fd066714f99d633fd089f8e9, type: 3}
+  impactVolume: 1
+  pitchRange: {x: 0.95, y: 1.05}
+  minimumImpactVelocity: 1.5
+  impactCooldown: 0.15
+  minDistance: 2
+  maxDistance: 15
 --- !u!1 &4875520798462515086
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,6 +618,7 @@ GameObject:
   - component: {fileID: 4958108777238771881}
   - component: {fileID: 2409642227917648751}
   - component: {fileID: 5206997582308407595}
+  - component: {fileID: 8628478062551153924}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -663,6 +739,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.115567, y: 1.104213, z: 1.7550305}
   m_Center: {x: -0.0066995025, y: 0.025511328, z: 0.8773765}
+--- !u!114 &8628478062551153924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8347130357388083348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cae6b199852112543aa528cb584bfaaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 2.5
+  explosionRadius: 1.5
+  upwardModifier: 0.4
+  impactSounds:
+  - {fileID: 8300000, guid: de8d08c9261f05e4d936437c86eb6ee4, type: 3}
+  - {fileID: 8300000, guid: 48f6e311fd066714f99d633fd089f8e9, type: 3}
+  impactVolume: 1
+  pitchRange: {x: 0.95, y: 1.05}
+  minimumImpactVelocity: 1.5
+  impactCooldown: 0.15
+  minDistance: 2
+  maxDistance: 15
 --- !u!1 &9189344041127266363
 GameObject:
   m_ObjectHideFlags: 0

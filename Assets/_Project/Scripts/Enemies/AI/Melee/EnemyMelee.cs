@@ -6,23 +6,33 @@ public class EnemyMelee :
     IStunnable
 {
     [Header("Combat")]
+
     [SerializeField] private float attackDistance = 2f;
     [SerializeField] private float attackDamage = 20f;
     [SerializeField] private float attackCooldown = 1.2f;
 
+
     [Header("Melee Hit")]
+
     [SerializeField] private LayerMask attackTargetMask;
     [SerializeField] private float attackSectorAngle = 120f;
 
+
     [Header("Movement")]
+
     [SerializeField] private float chaseStoppingDistance = 1.5f;
     [SerializeField] private float rotationSpeed = 8f;
 
+
     [Header("Animation")]
+
     [SerializeField] private Animator animator;
 
+
     [Header("Stunned")]
+
     [SerializeField] private float stunDuration = 1.5f;
+
 
     private static readonly int AttackHash =
         Animator.StringToHash("Attack");
@@ -30,39 +40,60 @@ public class EnemyMelee :
     private static readonly int StunnedHash =
         Animator.StringToHash("Stunned");
 
+
     private Enemy enemy;
     private NavMeshAgent agent;
     private Health health;
 
+    private EnemySoundController
+        enemySoundController;
+
+
     private bool attackAnimationPlaying;
+
 
     private readonly Collider[] attackResults =
         new Collider[16];
+
 
     public Enemy Enemy => enemy;
     public NavMeshAgent Agent => agent;
     public Health Health => health;
 
+
     public float AttackDistance => attackDistance;
     public float AttackDamage => attackDamage;
     public float AttackCooldown => attackCooldown;
 
+
     public float ChaseStoppingDistance =>
         chaseStoppingDistance;
 
+
     public float StunDuration => stunDuration;
+
 
     private void Awake()
     {
-        enemy = GetComponent<Enemy>();
-        agent = GetComponent<NavMeshAgent>();
-        health = GetComponent<Health>();
+        enemy =
+            GetComponent<Enemy>();
+
+        agent =
+            GetComponent<NavMeshAgent>();
+
+        health =
+            GetComponent<Health>();
+
+        enemySoundController =
+            GetComponent<EnemySoundController>();
+
 
         if (animator == null)
         {
             animator =
                 GetComponentInChildren<Animator>();
         }
+
 
         if (enemy == null)
         {
@@ -71,12 +102,14 @@ public class EnemyMelee :
             );
         }
 
+
         if (agent == null)
         {
             Debug.LogError(
                 $"[{name}] EnemyMelee requires NavMeshAgent."
             );
         }
+
 
         if (health == null)
         {
@@ -85,6 +118,7 @@ public class EnemyMelee :
             );
         }
 
+
         if (animator == null)
         {
             Debug.LogError(
@@ -92,75 +126,112 @@ public class EnemyMelee :
             );
         }
 
+
         if (health != null)
         {
-            health.Died += Die;
+            health.Died +=
+                Die;
         }
     }
+
 
     private void OnDestroy()
     {
         if (health != null)
         {
-            health.Died -= Die;
+            health.Died -=
+                Die;
         }
     }
+
 
     // ==========================================
     // MOVEMENT
     // ==========================================
 
-    public void MoveToPlayer(Transform player)
+    public void MoveToPlayer(
+        Transform player)
     {
         if (player == null)
             return;
 
-        if (agent == null ||
-            !agent.isOnNavMesh)
+
+        if (
+            agent == null ||
+            !agent.isOnNavMesh
+        )
         {
             return;
         }
 
-        agent.isStopped = false;
+
+        agent.isStopped =
+            false;
+
 
         agent.stoppingDistance =
             chaseStoppingDistance;
+
 
         agent.SetDestination(
             player.position
         );
 
-        LookAtPlayer(player);
+
+        LookAtPlayer(
+            player
+        );
     }
+
 
     public void StopMoving()
     {
         if (agent == null)
             return;
 
+
         if (!agent.isOnNavMesh)
             return;
 
-        agent.isStopped = true;
+
+        agent.isStopped =
+            true;
+
+
         agent.ResetPath();
     }
 
-    public void LookAtPlayer(Transform player)
+
+    public void LookAtPlayer(
+        Transform player)
     {
         if (player == null)
             return;
+
 
         Vector3 direction =
             player.position -
             transform.position;
 
-        direction.y = 0f;
 
-        if (direction.sqrMagnitude < 0.001f)
+        direction.y =
+            0f;
+
+
+        if (
+            direction.sqrMagnitude <
+            0.001f
+        )
+        {
             return;
+        }
+
 
         Quaternion targetRotation =
-            Quaternion.LookRotation(direction);
+            Quaternion.LookRotation(
+                direction
+            );
+
 
         transform.rotation =
             Quaternion.Slerp(
@@ -170,6 +241,7 @@ public class EnemyMelee :
                 Time.deltaTime
             );
     }
+
 
     // ==========================================
     // ATTACK RANGE
@@ -181,15 +253,20 @@ public class EnemyMelee :
         if (player == null)
             return false;
 
+
         Vector3 direction =
             player.position -
             transform.position;
 
-        direction.y = 0f;
+
+        direction.y =
+            0f;
+
 
         return direction.magnitude <=
                attackDistance;
     }
+
 
     // ==========================================
     // ATTACK ANIMATION
@@ -200,24 +277,31 @@ public class EnemyMelee :
         if (animator == null)
             return;
 
+
         if (attackAnimationPlaying)
             return;
 
-        attackAnimationPlaying = true;
+
+        attackAnimationPlaying =
+            true;
+
 
         animator.ResetTrigger(
             AttackHash
         );
+
 
         animator.SetTrigger(
             AttackHash
         );
     }
 
+
     public bool IsAttackAnimationPlaying()
     {
         return attackAnimationPlaying;
     }
+
 
     // ==========================================
     // MELEE ATTACK
@@ -235,8 +319,21 @@ public class EnemyMelee :
         if (!attackAnimationPlaying)
             return;
 
+
+        // ==========================================
+        // ATTACK SOUND
+        // ==========================================
+
+        // Звук замаха / атаки.
+        if (enemySoundController != null)
+        {
+            enemySoundController.PlayAttack();
+        }
+
+
         Vector3 attackCenter =
             transform.position;
+
 
         int hitCount =
             Physics.OverlapSphereNonAlloc(
@@ -247,8 +344,10 @@ public class EnemyMelee :
                 QueryTriggerInteraction.Ignore
             );
 
+
         if (hitCount <= 0)
             return;
+
 
         float minDot =
             Mathf.Cos(
@@ -257,37 +356,57 @@ public class EnemyMelee :
                 Mathf.Deg2Rad
             );
 
-        for (int i = 0; i < hitCount; i++)
+
+        for (
+            int i = 0;
+            i < hitCount;
+            i++
+        )
         {
             Collider targetCollider =
                 attackResults[i];
 
+
             if (targetCollider == null)
                 continue;
+
 
             IDamageable damageable =
                 targetCollider.GetComponentInParent<
                     IDamageable
                 >();
 
+
             if (damageable == null)
                 continue;
+
 
             Vector3 targetPoint =
                 targetCollider.ClosestPoint(
                     attackCenter
                 );
 
+
             Vector3 direction =
                 targetPoint -
                 attackCenter;
 
-            direction.y = 0f;
 
-            if (direction.sqrMagnitude < 0.001f)
+            direction.y =
+                0f;
+
+
+            if (
+                direction.sqrMagnitude <
+                0.001f
+            )
+            {
                 continue;
+            }
+
 
             direction.Normalize();
+
 
             float dot =
                 Vector3.Dot(
@@ -295,14 +414,29 @@ public class EnemyMelee :
                     direction
                 );
 
+
             // Цель должна находиться
             // в переднем секторе удара.
             if (dot < minDot)
                 continue;
 
+
+            // ==========================================
+            // CLAW HIT SOUND
+            // ==========================================
+
+            // Звук когтей проигрывается только
+            // при реальном успешном попадании.
+            if (enemySoundController != null)
+            {
+                enemySoundController.PlayClawHit();
+            }
+
+
             damageable.TakeDamage(
                 attackDamage
             );
+
 
             Debug.Log(
                 $"[{name}] Melee attack hit " +
@@ -310,10 +444,12 @@ public class EnemyMelee :
                 $"{attackDamage} damage."
             );
 
+
             // Один удар — один урон одной цели.
             break;
         }
     }
+
 
     /// <summary>
     /// Animation Event.
@@ -324,31 +460,44 @@ public class EnemyMelee :
         if (!attackAnimationPlaying)
             return;
 
-        attackAnimationPlaying = false;
 
-        if (enemy == null ||
+        attackAnimationPlaying =
+            false;
+
+
+        if (
+            enemy == null ||
             enemy.StateMachine == null ||
-            enemy.IsDead)
+            enemy.IsDead
+        )
         {
             return;
         }
 
+
         enemy.StateMachine.ChangeState(
-            new MeleeBackstepState(enemy)
+            new MeleeBackstepState(
+                enemy
+            )
         );
     }
 
+
     public void CancelAttack()
     {
-        attackAnimationPlaying = false;
+        attackAnimationPlaying =
+            false;
+
 
         if (animator == null)
             return;
+
 
         animator.ResetTrigger(
             AttackHash
         );
     }
+
 
     // ==========================================
     // STUN
@@ -356,36 +505,48 @@ public class EnemyMelee :
 
     public void Stun()
     {
-        if (enemy == null ||
-            enemy.StateMachine == null)
+        if (
+            enemy == null ||
+            enemy.StateMachine == null
+        )
         {
             return;
         }
 
-        if (health != null &&
-            health.IsDead)
+
+        if (
+            health != null &&
+            health.IsDead
+        )
         {
             return;
         }
+
 
         enemy.StateMachine.ChangeState(
-            new MeleeStunnedState(enemy)
+            new MeleeStunnedState(
+                enemy
+            )
         );
     }
+
 
     public void PlayStunnedAnimation()
     {
         if (animator == null)
             return;
 
+
         animator.ResetTrigger(
             StunnedHash
         );
+
 
         animator.SetTrigger(
             StunnedHash
         );
     }
+
 
     // ==========================================
     // DEATH
@@ -393,20 +554,26 @@ public class EnemyMelee :
 
     public void Die()
     {
-        if (enemy == null ||
-            enemy.StateMachine == null)
+        if (
+            enemy == null ||
+            enemy.StateMachine == null
+        )
         {
             return;
         }
+
 
         // Health уже выставил IsDead = true
         // перед вызовом события Died.
         // Поэтому здесь НЕ проверяем enemy.IsDead.
 
         enemy.StateMachine.ChangeState(
-            new MeleeDeadState(enemy)
+            new MeleeDeadState(
+                enemy
+            )
         );
     }
+
 
     // ==========================================
     // GIZMOS
@@ -419,11 +586,15 @@ public class EnemyMelee :
             attackDistance
         );
 
+
         Vector3 forward =
             transform.forward;
 
+
         float halfAngle =
-            attackSectorAngle * 0.5f;
+            attackSectorAngle *
+            0.5f;
+
 
         Vector3 leftDirection =
             Quaternion.Euler(
@@ -432,6 +603,7 @@ public class EnemyMelee :
                 0f
             ) * forward;
 
+
         Vector3 rightDirection =
             Quaternion.Euler(
                 0f,
@@ -439,16 +611,20 @@ public class EnemyMelee :
                 0f
             ) * forward;
 
-        Gizmos.DrawLine(
-            transform.position,
-            transform.position +
-            leftDirection * attackDistance
-        );
 
         Gizmos.DrawLine(
             transform.position,
             transform.position +
-            rightDirection * attackDistance
+            leftDirection *
+            attackDistance
+        );
+
+
+        Gizmos.DrawLine(
+            transform.position,
+            transform.position +
+            rightDirection *
+            attackDistance
         );
     }
 }

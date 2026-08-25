@@ -514,6 +514,10 @@ public class MissionCompleteController : MonoBehaviour
     {
         Time.timeScale = 1f;
 
+        MusicTransitionManager.StartMenuTransition(
+            GameMusic.Instance,
+            1.5f
+        );
 
         SceneManager.LoadScene(
             mainMenuSceneName
