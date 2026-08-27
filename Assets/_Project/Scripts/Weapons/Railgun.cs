@@ -7,6 +7,7 @@ using Zenject;
 public class Railgun : WeaponBase
 {
     [Header("References")]
+
     [SerializeField]
     private Transform muzzlePoint;
 
@@ -15,6 +16,7 @@ public class Railgun : WeaponBase
 
 
     [Header("Weapon Sounds")]
+
     [SerializeField]
     private AudioClip shootSound;
 
@@ -23,6 +25,7 @@ public class Railgun : WeaponBase
 
 
     [Header("Sound Settings")]
+
     [SerializeField]
     [Range(0f, 1f)]
     private float soundVolume = 1f;
@@ -32,16 +35,19 @@ public class Railgun : WeaponBase
 
 
     [Header("Overheat Click")]
+
     [SerializeField]
     private float overheatClickCooldown = 0.3f;
 
 
     [Header("Effects")]
+
     [SerializeField]
     private ParticleSystem muzzleFlash;
 
 
     [Header("Recoil")]
+
     [SerializeField]
     private WeaponRecoil weaponRecoil;
 
@@ -67,8 +73,9 @@ public class Railgun : WeaponBase
     private float nextOverheatClickTime;
 
 
-    private readonly HashSet<IDamageable> damagedTargets =
-        new HashSet<IDamageable>();
+    private readonly HashSet<IDamageable>
+        damagedTargets =
+            new HashSet<IDamageable>();
 
 
     public float CurrentHeat =>
@@ -83,7 +90,8 @@ public class Railgun : WeaponBase
 
     public float HeatNormalized =>
         MaxHeat > 0f
-            ? currentHeat / MaxHeat
+            ? currentHeat /
+              MaxHeat
             : 0f;
 
 
@@ -111,11 +119,14 @@ public class Railgun : WeaponBase
 
         if (beam != null)
         {
-            beam.positionCount = 2;
+            beam.positionCount =
+                2;
 
-            beam.useWorldSpace = true;
+            beam.useWorldSpace =
+                true;
 
-            beam.enabled = false;
+            beam.enabled =
+                false;
         }
 
 
@@ -185,7 +196,8 @@ public class Railgun : WeaponBase
             playerCamera.transform.forward;
 
 
-        shotPending = true;
+        shotPending =
+            true;
 
 
         nextFireTime =
@@ -211,7 +223,8 @@ public class Railgun : WeaponBase
             return;
 
 
-        shotPending = false;
+        shotPending =
+            false;
 
 
         if (config == null)
@@ -232,7 +245,7 @@ public class Railgun : WeaponBase
                 hitBuffer,
                 config.Range,
                 config.RailgunHitMask,
-                QueryTriggerInteraction.Ignore
+                QueryTriggerInteraction.Collide
             );
 
 
@@ -244,7 +257,8 @@ public class Railgun : WeaponBase
         );
 
 
-        int damagedCount = 0;
+        int damagedCount =
+            0;
 
 
         Vector3 beamEnd =
@@ -253,7 +267,11 @@ public class Railgun : WeaponBase
             config.Range;
 
 
-        for (int i = 0; i < hitCount; i++)
+        for (
+            int i = 0;
+            i < hitCount;
+            i++
+        )
         {
             RaycastHit hit =
                 hitBuffer[i];
@@ -281,16 +299,43 @@ public class Railgun : WeaponBase
 
             // Один объект получает урон
             // только один раз за выстрел.
-            if (!damagedTargets.Add(
-                    damageable))
+            if (
+                !damagedTargets.Add(
+                    damageable
+                )
+            )
             {
                 continue;
             }
 
 
-            damageable.TakeDamage(
-                config.Damage
-            );
+            // ==========================================
+            // DAMAGE HITBOX
+            // ==========================================
+
+            DamageHitbox hitbox =
+                hit.collider.GetComponent<
+                    DamageHitbox
+                >();
+
+
+            if (hitbox != null)
+            {
+                hitbox.ApplyDamage(
+                    config.Damage,
+                    transform.position
+                );
+            }
+            else
+            {
+                // ==========================================
+                // NORMAL DAMAGE
+                // ==========================================
+
+                damageable.TakeDamage(
+                    config.Damage
+                );
+            }
 
 
             damagedCount++;
@@ -309,7 +354,8 @@ public class Railgun : WeaponBase
 
             if (
                 damagedCount >=
-                config.RailgunMaxTargets)
+                config.RailgunMaxTargets
+            )
             {
                 break;
             }
@@ -382,7 +428,8 @@ public class Railgun : WeaponBase
 
     private void StartOverheat()
     {
-        isOverheated = true;
+        isOverheated =
+            true;
 
 
         Debug.Log(
@@ -405,11 +452,14 @@ public class Railgun : WeaponBase
         );
 
 
-        currentHeat = 0f;
+        currentHeat =
+            0f;
 
-        shotsSinceCooldown = 0;
+        shotsSinceCooldown =
+            0;
 
-        isOverheated = false;
+        isOverheated =
+            false;
 
 
         Debug.Log(
@@ -429,7 +479,8 @@ public class Railgun : WeaponBase
             return;
 
 
-        beam.positionCount = 2;
+        beam.positionCount =
+            2;
 
 
         beam.SetPosition(
@@ -444,7 +495,8 @@ public class Railgun : WeaponBase
         );
 
 
-        beam.enabled = true;
+        beam.enabled =
+            true;
 
 
         CancelInvoke(
@@ -463,7 +515,8 @@ public class Railgun : WeaponBase
     {
         if (beam != null)
         {
-            beam.enabled = false;
+            beam.enabled =
+                false;
         }
     }
 
@@ -489,6 +542,7 @@ public class Railgun : WeaponBase
     {
         if (clip == null)
             return;
+
 
         if (SoundService.Instance == null)
             return;
@@ -531,20 +585,26 @@ public class Railgun : WeaponBase
 
     private void OnDisable()
     {
-        shotPending = false;
+        shotPending =
+            false;
 
-        currentHeat = 0f;
+        currentHeat =
+            0f;
 
-        shotsSinceCooldown = 0;
+        shotsSinceCooldown =
+            0;
 
-        isOverheated = false;
+        isOverheated =
+            false;
 
-        nextOverheatClickTime = 0f;
+        nextOverheatClickTime =
+            0f;
 
 
         if (beam != null)
         {
-            beam.enabled = false;
+            beam.enabled =
+                false;
         }
 
 

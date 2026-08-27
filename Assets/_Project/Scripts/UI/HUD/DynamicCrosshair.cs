@@ -98,11 +98,26 @@ public class DynamicCrosshair : MonoBehaviour
 
 
     // =========================================================
+    // INITIAL POSITIONS
+    // Сохраняем размер прицела, настроенный вручную в сцене.
+    // =========================================================
+
+    private Vector2 topBasePosition;
+    private Vector2 bottomBasePosition;
+    private Vector2 leftBasePosition;
+    private Vector2 rightBasePosition;
+
+
+    // =========================================================
     // UNITY
     // =========================================================
 
     private void Awake()
     {
+        // Сохраняем исходные позиции частей прицела.
+        // Именно эти позиции будут соответствовать idleSpread.
+        SaveInitialPositions();
+
         currentBaseSpread = idleSpread;
 
         if (adsController != null)
@@ -150,6 +165,41 @@ public class DynamicCrosshair : MonoBehaviour
         KillCrosshairTweens();
 
         SetPartsScale(1f);
+    }
+
+
+    // =========================================================
+    // INITIAL POSITIONS
+    // =========================================================
+
+    private void SaveInitialPositions()
+    {
+        if (top != null)
+        {
+            topBasePosition =
+                top.anchoredPosition;
+        }
+
+
+        if (bottom != null)
+        {
+            bottomBasePosition =
+                bottom.anchoredPosition;
+        }
+
+
+        if (left != null)
+        {
+            leftBasePosition =
+                left.anchoredPosition;
+        }
+
+
+        if (right != null)
+        {
+            rightBasePosition =
+                right.anchoredPosition;
+        }
     }
 
 
@@ -236,7 +286,6 @@ public class DynamicCrosshair : MonoBehaviour
 
     // =========================================================
     // MOVEMENT SPREAD
-    // ОРИГИНАЛЬНАЯ ЛОГИКА
     // =========================================================
 
     private void UpdateBaseSpread()
@@ -314,7 +363,6 @@ public class DynamicCrosshair : MonoBehaviour
 
     // =========================================================
     // FIRE SPREAD
-    // ОРИГИНАЛЬНАЯ ЛОГИКА + DOTWEEN PUNCH
     // =========================================================
 
     private void UpdateFireSpread()
@@ -382,7 +430,9 @@ public class DynamicCrosshair : MonoBehaviour
             .DOPunchScale(
                 Vector3.one *
                 firePunchScale,
+
                 firePunchDuration,
+
                 1,
                 0.5f
             );
@@ -391,50 +441,62 @@ public class DynamicCrosshair : MonoBehaviour
 
     // =========================================================
     // CROSSHAIR POSITION
-    // ОРИГИНАЛЬНАЯ ЛОГИКА
     // =========================================================
 
     private void UpdateCrosshair(
         float spread
     )
     {
+        // Вычисляем изменение относительно idleSpread.
+        //
+        // spread = idleSpread:
+        // части остаются точно там,
+        // где ты разместил их в сцене.
+        //
+        // spread > idleSpread:
+        // прицел расширяется.
+        //
+        // spread < idleSpread:
+        // прицел сужается.
+
+        float spreadOffset =
+            spread -
+            idleSpread;
+
+
         if (top != null)
         {
             top.anchoredPosition =
-                new Vector2(
-                    0f,
-                    spread
-                );
+                topBasePosition +
+                Vector2.up *
+                spreadOffset;
         }
 
 
         if (bottom != null)
         {
             bottom.anchoredPosition =
-                new Vector2(
-                    0f,
-                    -spread
-                );
+                bottomBasePosition +
+                Vector2.down *
+                spreadOffset;
         }
 
 
         if (left != null)
         {
             left.anchoredPosition =
-                new Vector2(
-                    -spread,
-                    0f
-                );
+                leftBasePosition +
+                Vector2.left *
+                spreadOffset;
         }
 
 
         if (right != null)
         {
             right.anchoredPosition =
-                new Vector2(
-                    spread,
-                    0f
-                );
+                rightBasePosition +
+                Vector2.right *
+                spreadOffset;
         }
     }
 

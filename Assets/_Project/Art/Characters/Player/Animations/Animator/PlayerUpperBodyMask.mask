@@ -12,11 +12,11 @@ AvatarMask:
   - m_Path: 
     m_Weight: 1
   - m_Path: Ch03
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: mixamorig:Hips
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: mixamorig:Hips/mixamorig:LeftUpLeg
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg
     m_Weight: 1
   - m_Path: mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot
@@ -26,7 +26,7 @@ AvatarMask:
   - m_Path: mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase/mixamorig:LeftToe_End
     m_Weight: 1
   - m_Path: mixamorig:Hips/mixamorig:RightUpLeg
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg
     m_Weight: 1
   - m_Path: mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot

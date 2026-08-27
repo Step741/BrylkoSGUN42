@@ -6,11 +6,14 @@ public class MeleeAttackState : EnemyState
 
     private float attackTimer;
 
+
     public MeleeAttackState(Enemy enemy)
         : base(enemy)
     {
-        melee = enemy.GetComponent<EnemyMelee>();
+        melee =
+            enemy.GetComponent<EnemyMelee>();
     }
+
 
     public override void Enter()
     {
@@ -24,31 +27,45 @@ public class MeleeAttackState : EnemyState
             return;
         }
 
+
         melee.StopMoving();
 
-        attackTimer = 0f;
+
+        attackTimer =
+            0f;
+
 
         Debug.Log(
             $"[{enemy.name}] State: Melee Attack"
         );
     }
 
+
     public override void Tick()
     {
-        if (melee == null ||
-            enemy.Vision == null)
+        if (
+            melee == null ||
+            enemy.Vision == null
+        )
         {
             return;
         }
 
+
         Transform player =
             enemy.Vision.Player;
+
 
         if (player == null)
             return;
 
+
+        // Если игрок потерян — прекращаем атаку.
         if (!enemy.Vision.CanSeePlayer())
         {
+            melee.CancelAttack();
+
+
             enemy.StateMachine.ChangeState(
                 new MeleeIdleState(enemy)
             );
@@ -56,15 +73,24 @@ public class MeleeAttackState : EnemyState
             return;
         }
 
+
         float distance =
             Vector3.Distance(
                 melee.transform.position,
                 player.position
             );
 
-        if (distance >
-            melee.AttackDistance + 0.25f)
+
+        // Если игрок успел уйти далеко,
+        // прекращаем атаку и начинаем преследование.
+        if (
+            distance >
+            melee.AttackDistance + 0.25f
+        )
         {
+            melee.CancelAttack();
+
+
             enemy.StateMachine.ChangeState(
                 new MeleeChaseState(enemy)
             );
@@ -72,25 +98,40 @@ public class MeleeAttackState : EnemyState
             return;
         }
 
+
         melee.StopMoving();
-        melee.LookAtPlayer(player);
 
-        attackTimer -= Time.deltaTime;
 
-        if(attackTimer <= 0f)
-{
+        melee.LookAtPlayer(
+            player
+        );
+
+
+        // Пока идёт анимация атаки —
+        // ждём Animation Event.
+        if (
+            melee.IsAttackAnimationPlaying()
+        )
+        {
+            return;
+        }
+
+
+        attackTimer -=
+            Time.deltaTime;
+
+
+        // Запускаем следующую атаку.
+        if (attackTimer <= 0f)
+        {
             melee.StartAttackAnimation();
+
 
             attackTimer =
                 melee.AttackCooldown;
-
-            enemy.StateMachine.ChangeState(
-                new MeleeBackstepState(enemy)
-            );
-
-            return;
         }
     }
+
 
     public override void Exit()
     {

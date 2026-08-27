@@ -5,6 +5,7 @@ using Zenject;
 public class Shotgun : WeaponBase
 {
     [Header("References")]
+
     [SerializeField]
     private LayerMask hitMask;
 
@@ -16,6 +17,7 @@ public class Shotgun : WeaponBase
 
 
     [Header("Weapon Sounds")]
+
     [SerializeField]
     private AudioClip shootSound;
 
@@ -27,6 +29,7 @@ public class Shotgun : WeaponBase
 
 
     [Header("Sound Settings")]
+
     [SerializeField]
     [Range(0f, 1f)]
     private float soundVolume = 1f;
@@ -36,11 +39,13 @@ public class Shotgun : WeaponBase
 
 
     [Header("Empty Click")]
+
     [SerializeField]
     private float emptyClickCooldown = 0.2f;
 
 
     [Header("Recoil")]
+
     [SerializeField]
     private WeaponRecoil weaponRecoil;
 
@@ -62,9 +67,11 @@ public class Shotgun : WeaponBase
 
 
     [Inject]
-    private void Construct(Camera playerCamera)
+    private void Construct(
+        Camera playerCamera)
     {
-        this.playerCamera = playerCamera;
+        this.playerCamera =
+            playerCamera;
     }
 
 
@@ -72,12 +79,14 @@ public class Shotgun : WeaponBase
     {
         base.Awake();
 
+
         if (playerCamera == null)
         {
             Debug.LogError(
                 $"{name}: Player Camera is missing."
             );
         }
+
 
         if (cameraController == null)
         {
@@ -106,8 +115,10 @@ public class Shotgun : WeaponBase
         if (!CanShoot)
             return false;
 
+
         if (playerCamera == null)
             return false;
+
 
         if (Time.time < nextFireTime)
             return false;
@@ -127,7 +138,9 @@ public class Shotgun : WeaponBase
 
 
         // Shoot Sound
-        PlaySound(shootSound);
+        PlaySound(
+            shootSound
+        );
 
 
         // Weapon Recoil
@@ -140,7 +153,8 @@ public class Shotgun : WeaponBase
 
         nextFireTime =
             Time.time +
-            1f / config.FireRate;
+            1f /
+            config.FireRate;
 
 
         // Новая цель оглушения
@@ -164,7 +178,8 @@ public class Shotgun : WeaponBase
         for (
             int i = 0;
             i < config.Pellets;
-            i++)
+            i++
+        )
         {
             Vector3 direction =
                 GetPelletDirection();
@@ -177,18 +192,25 @@ public class Shotgun : WeaponBase
                 );
 
 
-            if (Physics.Raycast(
+            if (
+                Physics.Raycast(
                     ray,
                     out RaycastHit hit,
                     config.Range,
                     hitMask,
-                    QueryTriggerInteraction.Ignore))
+                    QueryTriggerInteraction.Collide
+                )
+            )
             {
                 // Surface Impact
-                SurfaceImpactUtility.ProcessHit(hit);
+                SurfaceImpactUtility.ProcessHit(
+                    hit
+                );
 
 
-                ApplyPelletDamage(hit);
+                ApplyPelletDamage(
+                    hit
+                );
 
 
                 ApplyKnockback(
@@ -242,16 +264,6 @@ public class Shotgun : WeaponBase
     private void ApplyPelletDamage(
         RaycastHit hit)
     {
-        IDamageable damageable =
-            hit.collider.GetComponentInParent<
-                IDamageable
-            >();
-
-
-        if (damageable == null)
-            return;
-
-
         float distanceMultiplier =
             GetDamageMultiplier(
                 hit.distance
@@ -263,9 +275,42 @@ public class Shotgun : WeaponBase
             distanceMultiplier;
 
 
-        damageable.TakeDamage(
-            damage
-        );
+        // ==========================================
+        // DAMAGE HITBOX
+        // ==========================================
+
+        DamageHitbox hitbox =
+            hit.collider.GetComponent<
+                DamageHitbox
+            >();
+
+
+        if (hitbox != null)
+        {
+            hitbox.ApplyDamage(
+                damage,
+                transform.position
+            );
+        }
+        else
+        {
+            // ==========================================
+            // NORMAL DAMAGE
+            // ==========================================
+
+            IDamageable damageable =
+                hit.collider.GetComponentInParent<
+                    IDamageable
+                >();
+
+
+            if (damageable != null)
+            {
+                damageable.TakeDamage(
+                    damage
+                );
+            }
+        }
 
 
         // ==========================================
@@ -280,7 +325,10 @@ public class Shotgun : WeaponBase
 
         if (
             stunnable != null &&
-            stunnedTargets.Add(stunnable))
+            stunnedTargets.Add(
+                stunnable
+            )
+        )
         {
             stunnable.Stun();
         }
@@ -354,7 +402,11 @@ public class Shotgun : WeaponBase
 
             NotifyAmmoChanged();
 
-            PlaySound(reloadSound);
+
+            PlaySound(
+                reloadSound
+            );
+
 
             Debug.Log(
                 $"Shotgun reload: " +
@@ -377,15 +429,19 @@ public class Shotgun : WeaponBase
             );
 
 
-        currentAmmo += ammoToLoad;
+        currentAmmo +=
+            ammoToLoad;
 
-        reserveAmmo -= ammoToLoad;
+        reserveAmmo -=
+            ammoToLoad;
 
 
         NotifyAmmoChanged();
 
 
-        PlaySound(reloadSound);
+        PlaySound(
+            reloadSound
+        );
 
 
         Debug.Log(
@@ -405,6 +461,7 @@ public class Shotgun : WeaponBase
         if (clip == null)
             return;
 
+
         if (SoundService.Instance == null)
             return;
 
@@ -420,8 +477,13 @@ public class Shotgun : WeaponBase
 
     private void PlayEmptyClick()
     {
-        if (Time.time < nextEmptyClickTime)
+        if (
+            Time.time <
+            nextEmptyClickTime
+        )
+        {
             return;
+        }
 
 
         nextEmptyClickTime =
@@ -429,6 +491,8 @@ public class Shotgun : WeaponBase
             emptyClickCooldown;
 
 
-        PlaySound(emptyClickSound);
+        PlaySound(
+            emptyClickSound
+        );
     }
 }

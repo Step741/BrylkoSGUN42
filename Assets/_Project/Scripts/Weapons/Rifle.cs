@@ -4,6 +4,7 @@ using Zenject;
 public class Rifle : WeaponBase
 {
     [Header("References")]
+
     [SerializeField]
     private LayerMask hitMask;
 
@@ -15,6 +16,7 @@ public class Rifle : WeaponBase
 
 
     [Header("Weapon Sounds")]
+
     [SerializeField]
     private AudioClip shootSound;
 
@@ -26,6 +28,7 @@ public class Rifle : WeaponBase
 
 
     [Header("Sound Settings")]
+
     [SerializeField]
     [Range(0f, 1f)]
     private float soundVolume = 1f;
@@ -35,11 +38,13 @@ public class Rifle : WeaponBase
 
 
     [Header("Empty Click")]
+
     [SerializeField]
     private float emptyClickCooldown = 0.2f;
 
 
     [Header("Recoil")]
+
     [SerializeField]
     private WeaponRecoil weaponRecoil;
 
@@ -56,9 +61,11 @@ public class Rifle : WeaponBase
 
 
     [Inject]
-    private void Construct(Camera playerCamera)
+    private void Construct(
+        Camera playerCamera)
     {
-        this.playerCamera = playerCamera;
+        this.playerCamera =
+            playerCamera;
     }
 
 
@@ -66,10 +73,12 @@ public class Rifle : WeaponBase
     {
         base.Awake();
 
+
         currentSpread =
             config != null
                 ? config.Spread
                 : 0f;
+
 
         if (playerCamera == null)
         {
@@ -77,6 +86,7 @@ public class Rifle : WeaponBase
                 $"{name}: Player Camera is missing."
             );
         }
+
 
         if (cameraController == null)
         {
@@ -111,8 +121,10 @@ public class Rifle : WeaponBase
         if (!CanShoot)
             return false;
 
+
         if (playerCamera == null)
             return false;
+
 
         if (Time.time < nextFireTime)
             return false;
@@ -124,11 +136,12 @@ public class Rifle : WeaponBase
 
 
         // Увеличиваем разброс после каждого выстрела
-        currentSpread = Mathf.Min(
-            currentSpread +
-            config.SpreadIncreasePerShot,
-            config.MaxSpread
-        );
+        currentSpread =
+            Mathf.Min(
+                currentSpread +
+                config.SpreadIncreasePerShot,
+                config.MaxSpread
+            );
 
 
         // Muzzle Flash
@@ -140,7 +153,9 @@ public class Rifle : WeaponBase
 
 
         // Shoot Sound
-        PlaySound(shootSound);
+        PlaySound(
+            shootSound
+        );
 
 
         // Отдача оружия
@@ -152,39 +167,73 @@ public class Rifle : WeaponBase
 
 
         nextFireTime =
-            Time.time + 1f / config.FireRate;
+            Time.time +
+            1f /
+            config.FireRate;
 
 
         Vector3 direction =
             GetSpreadDirection();
 
 
-        Ray ray = new Ray(
-            playerCamera.transform.position,
-            direction
-        );
+        Ray ray =
+            new Ray(
+                playerCamera.transform.position,
+                direction
+            );
 
 
-        if (Physics.Raycast(
-            ray,
-            out RaycastHit hit,
-            config.Range,
-            hitMask,
-            QueryTriggerInteraction.Ignore))
+        if (
+            Physics.Raycast(
+                ray,
+                out RaycastHit hit,
+                config.Range,
+                hitMask,
+                QueryTriggerInteraction.Collide
+            )
+        )
         {
             // Surface Impact
-            SurfaceImpactUtility.ProcessHit(hit);
+            SurfaceImpactUtility.ProcessHit(
+                hit
+            );
 
 
-            IDamageable damageable =
-                hit.collider.GetComponentInParent<IDamageable>();
+            // ==========================================
+            // DAMAGE HITBOX
+            // ==========================================
+
+            DamageHitbox hitbox =
+                hit.collider.GetComponent<
+                    DamageHitbox
+                >();
 
 
-            if (damageable != null)
+            if (hitbox != null)
             {
-                damageable.TakeDamage(
-                    config.Damage
+                hitbox.ApplyDamage(
+                    config.Damage,
+                    transform.position
                 );
+            }
+            else
+            {
+                // ==========================================
+                // NORMAL DAMAGE
+                // ==========================================
+
+                IDamageable damageable =
+                    hit.collider.GetComponentInParent<
+                        IDamageable
+                    >();
+
+
+                if (damageable != null)
+                {
+                    damageable.TakeDamage(
+                        config.Damage
+                    );
+                }
             }
 
 
@@ -196,7 +245,8 @@ public class Rifle : WeaponBase
 
         Debug.DrawRay(
             ray.origin,
-            ray.direction * config.Range,
+            ray.direction *
+            config.Range,
             Color.red,
             1f
         );
@@ -238,12 +288,13 @@ public class Rifle : WeaponBase
             return;
 
 
-        currentSpread = Mathf.MoveTowards(
-            currentSpread,
-            config.Spread,
-            config.SpreadRecoverySpeed *
-            Time.deltaTime
-        );
+        currentSpread =
+            Mathf.MoveTowards(
+                currentSpread,
+                config.Spread,
+                config.SpreadRecoverySpeed *
+                Time.deltaTime
+            );
     }
 
 
@@ -254,7 +305,8 @@ public class Rifle : WeaponBase
     public override void Reload()
     {
         int missingAmmo =
-            config.MagazineSize - currentAmmo;
+            config.MagazineSize -
+            currentAmmo;
 
 
         if (missingAmmo <= 0)
@@ -268,7 +320,11 @@ public class Rifle : WeaponBase
 
             NotifyAmmoChanged();
 
-            PlaySound(reloadSound);
+
+            PlaySound(
+                reloadSound
+            );
+
 
             Debug.Log(
                 $"Rifle reload: {currentAmmo}/∞"
@@ -289,18 +345,24 @@ public class Rifle : WeaponBase
             );
 
 
-        currentAmmo += ammoToLoad;
+        currentAmmo +=
+            ammoToLoad;
 
-        reserveAmmo -= ammoToLoad;
+        reserveAmmo -=
+            ammoToLoad;
+
 
         NotifyAmmoChanged();
 
 
-        PlaySound(reloadSound);
+        PlaySound(
+            reloadSound
+        );
 
 
         Debug.Log(
-            $"Rifle reload: {currentAmmo}/{reserveAmmo}"
+            $"Rifle reload: " +
+            $"{currentAmmo}/{reserveAmmo}"
         );
     }
 
@@ -314,6 +376,7 @@ public class Rifle : WeaponBase
     {
         if (clip == null)
             return;
+
 
         if (SoundService.Instance == null)
             return;
@@ -330,14 +393,22 @@ public class Rifle : WeaponBase
 
     private void PlayEmptyClick()
     {
-        if (Time.time < nextEmptyClickTime)
+        if (
+            Time.time <
+            nextEmptyClickTime
+        )
+        {
             return;
+        }
 
 
         nextEmptyClickTime =
-            Time.time + emptyClickCooldown;
+            Time.time +
+            emptyClickCooldown;
 
 
-        PlaySound(emptyClickSound);
+        PlaySound(
+            emptyClickSound
+        );
     }
 }

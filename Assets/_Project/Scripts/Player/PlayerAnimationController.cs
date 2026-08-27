@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Zenject;
 
@@ -18,40 +19,6 @@ public class PlayerAnimationController : MonoBehaviour
     private static readonly int HitReactionHash =
         Animator.StringToHash("Hit");
 
-    [Header("References")]
-    [SerializeField]
-    private Animator animator;
-
-    [SerializeField]
-    private CharacterController characterController;
-
-    [SerializeField]
-    private Health health;
-
-    [Header("Animation")]
-    [SerializeField]
-    private float smoothTime = 0.1f;
-
-    [Header("Sprint Animation")]
-    [SerializeField]
-    private float sprintSpeedThreshold = 6.5f;
-
-    [SerializeField]
-    private float runBlendValue = 2f;
-
-    [Header("Jump Animation")]
-    [SerializeField]
-    private float jumpAnimationDelay = 0.05f;
-
-    private IInputService inputService;
-
-    private Vector2 currentBlend;
-    private Vector2 blendVelocity;
-
-    private float jumpTimer;
-
-    private float previousHealth;
-
     private static readonly int ShootHash =
         Animator.StringToHash("Shoot");
 
@@ -62,28 +29,122 @@ public class PlayerAnimationController : MonoBehaviour
         Animator.StringToHash("ShootShotgun");
 
     private static readonly int ShootGrenadeHash =
-    Animator.StringToHash("ShootGrenade");
+        Animator.StringToHash("ShootGrenade");
 
     private static readonly int ShootRailgunHash =
-    Animator.StringToHash("ShootRailgun");
+        Animator.StringToHash("ShootRailgun");
 
     private static readonly int KatanaAttackHash =
-    Animator.StringToHash("KatanaAttack");
+        Animator.StringToHash("KatanaAttack");
 
     private static readonly int ReloadHash =
         Animator.StringToHash("Reload");
 
+    private static readonly int WeaponSwitchHash =
+        Animator.StringToHash("WeaponSwitch");
+
+    private static readonly int CombatReadyHash =
+        Animator.StringToHash("CombatReady");
+
+
+    // =========================================================
+    // REFERENCES
+    // =========================================================
+
+    [Header("References")]
+
+    [SerializeField]
+    private Animator animator;
+
+    [SerializeField]
+    private CharacterController characterController;
+
+    [SerializeField]
+    private Health health;
+
+
+    // =========================================================
+    // ANIMATION
+    // =========================================================
+
+    [Header("Animation")]
+
+    [SerializeField]
+    private float smoothTime = 0.1f;
+
+
+    // =========================================================
+    // SPRINT ANIMATION
+    // =========================================================
+
+    [Header("Sprint Animation")]
+
+    [SerializeField]
+    private float sprintSpeedThreshold = 6.5f;
+
+    [SerializeField]
+    private float runBlendValue = 2f;
+
+
+    // =========================================================
+    // JUMP ANIMATION
+    // =========================================================
+
+    [Header("Jump Animation")]
+
+    [SerializeField]
+    private float jumpAnimationDelay = 0.05f;
+
+
+    // =========================================================
+    // COMBAT READY
+    // =========================================================
+
+    [Header("Combat Ready")]
+
+    [SerializeField]
+    [Tooltip("Сколько времени персонаж держит оружие в боеготовности после последнего выстрела")]
+    private float combatReadyDuration = 1.2f;
+
+
+    // =========================================================
+    // PRIVATE
+    // =========================================================
+
+    private IInputService inputService;
+
+    private Vector2 currentBlend;
+    private Vector2 blendVelocity;
+
+    private float jumpTimer;
+
+    private float previousHealth;
+
+    private Coroutine combatReadyCoroutine;
+
+
+    // =========================================================
+    // CONSTRUCT
+    // =========================================================
+
     [Inject]
-    private void Construct(IInputService inputService)
+    private void Construct(
+        IInputService inputService)
     {
         this.inputService = inputService;
     }
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
         if (health == null)
         {
-            health = GetComponent<Health>();
+            health =
+                GetComponent<Health>();
         }
 
         if (characterController == null)
@@ -93,59 +154,76 @@ public class PlayerAnimationController : MonoBehaviour
         }
     }
 
+
     private void OnEnable()
     {
         if (health != null)
         {
-            health.HealthChanged += OnHealthChanged;
-            previousHealth = health.CurrentHealth;
+            health.HealthChanged +=
+                OnHealthChanged;
+
+            previousHealth =
+                health.CurrentHealth;
         }
     }
+
 
     private void OnDisable()
     {
         if (health != null)
         {
-            health.HealthChanged -= OnHealthChanged;
+            health.HealthChanged -=
+                OnHealthChanged;
         }
+
+        StopCombatReady();
     }
+
 
     private void Update()
     {
         UpdateLocomotion();
+
         UpdateCrouchAnimation();
+
         UpdateJumpAnimation();
     }
+
+
+    // =========================================================
+    // HEALTH
+    // =========================================================
 
     private void OnHealthChanged(
         float currentHealth,
         float maxHealth)
     {
-        // Если здоровье уменьшилось —
-        // проигрываем Hit Reaction.
-
-        // При смерти реакцию урона не запускаем,
-        // потому что должна проигрываться Death.
-        if (currentHealth < previousHealth &&
-            currentHealth > 0f)
+        if (
+            currentHealth < previousHealth &&
+            currentHealth > 0f
+        )
         {
-            animator.SetTrigger(HitReactionHash);
+            animator.SetTrigger(
+                HitReactionHash
+            );
         }
 
-        previousHealth = currentHealth;
+        previousHealth =
+            currentHealth;
     }
+
+
+    // =========================================================
+    // MOVEMENT
+    // =========================================================
 
     private void UpdateLocomotion()
     {
-        // Получаем фактическую скорость персонажа.
         Vector3 worldVelocity =
             characterController.velocity;
 
-        // Вертикальная скорость не влияет
-        // на выбор анимации движения.
         worldVelocity.y = 0f;
 
-        // Переводим скорость в локальное пространство Player.
         Vector3 localVelocity =
             transform.InverseTransformDirection(
                 worldVelocity
@@ -154,47 +232,49 @@ public class PlayerAnimationController : MonoBehaviour
         float horizontalSpeed =
             localVelocity.magnitude;
 
-        Vector2 targetBlend = Vector2.zero;
+        Vector2 targetBlend =
+            Vector2.zero;
 
         if (horizontalSpeed > 0.01f)
         {
-            // Определяем направление движения.
             Vector3 localDirection =
                 localVelocity.normalized;
 
-            targetBlend = new Vector2(
-                localDirection.x,
-                localDirection.z
-            );
+            targetBlend =
+                new Vector2(
+                    localDirection.x,
+                    localDirection.z
+                );
 
-            // Получаем реальный ввод игрока.
             Vector2 moveInput =
-                inputService.Move.ReadValue<Vector2>();
+                inputService.Move
+                    .ReadValue<Vector2>();
 
             bool isSprinting =
-                inputService.Sprint.IsPressed();
+                inputService.Sprint
+                    .IsPressed();
 
-            // Sprint-анимация используется только при
-            // движении вперёд с зажатым Shift.
             bool sprintingForward =
                 !inputService.Crouch.IsPressed() &&
                 isSprinting &&
                 moveInput.y > 0.5f &&
-                horizontalSpeed >= sprintSpeedThreshold;
+                horizontalSpeed >=
+                    sprintSpeedThreshold;
 
             if (sprintingForward)
             {
-                targetBlend.y = runBlendValue;
+                targetBlend.y =
+                    runBlendValue;
             }
         }
 
-        // Плавно изменяем параметры Blend Tree.
-        currentBlend = Vector2.SmoothDamp(
-            currentBlend,
-            targetBlend,
-            ref blendVelocity,
-            smoothTime
-        );
+        currentBlend =
+            Vector2.SmoothDamp(
+                currentBlend,
+                targetBlend,
+                ref blendVelocity,
+                smoothTime
+            );
 
         animator.SetFloat(
             MoveXHash,
@@ -207,6 +287,11 @@ public class PlayerAnimationController : MonoBehaviour
         );
     }
 
+
+    // =========================================================
+    // CROUCH
+    // =========================================================
+
     private void UpdateCrouchAnimation()
     {
         bool isCrouching =
@@ -218,15 +303,22 @@ public class PlayerAnimationController : MonoBehaviour
         );
     }
 
+
+    // =========================================================
+    // JUMP
+    // =========================================================
+
     private void UpdateJumpAnimation()
     {
-        // Если персонаж находится в воздухе,
-        // запускаем Jump.
         if (!characterController.isGrounded)
         {
-            jumpTimer += Time.deltaTime;
+            jumpTimer +=
+                Time.deltaTime;
 
-            if (jumpTimer >= jumpAnimationDelay)
+            if (
+                jumpTimer >=
+                jumpAnimationDelay
+            )
             {
                 animator.SetBool(
                     JumpHash,
@@ -237,7 +329,6 @@ public class PlayerAnimationController : MonoBehaviour
             return;
         }
 
-        // Персонаж снова на земле.
         jumpTimer = 0f;
 
         animator.SetBool(
@@ -246,38 +337,231 @@ public class PlayerAnimationController : MonoBehaviour
         );
     }
 
+
+    // =========================================================
+    // SHOOT
+    // =========================================================
+
     public void PlayShoot()
     {
-        animator.SetTrigger(ShootHash);
+        PlayShootAnimation(
+            ShootHash
+        );
     }
+
 
     public void PlayRifleShoot()
     {
-        animator.SetTrigger(ShootRifleHash);
+        PlayShootAnimation(
+            ShootRifleHash
+        );
     }
+
 
     public void PlayShotgunShoot()
     {
-        animator.SetTrigger(ShootShotgunHash);
+        PlayShootAnimation(
+            ShootShotgunHash
+        );
     }
+
 
     public void PlayGrenadeShoot()
     {
-        animator.SetTrigger(ShootGrenadeHash);
+        PlayShootAnimation(
+            ShootGrenadeHash
+        );
     }
+
 
     public void PlayRailgunShoot()
     {
-        animator.SetTrigger(ShootRailgunHash);
+        PlayShootAnimation(
+            ShootRailgunHash
+        );
     }
+
+
+    private void PlayShootAnimation(
+        int shootHash)
+    {
+        if (animator == null)
+            return;
+
+
+        // Если уже идёт отсчёт боеготовности —
+        // отменяем старый таймер.
+
+        if (combatReadyCoroutine != null)
+        {
+            StopCoroutine(
+                combatReadyCoroutine
+            );
+
+            combatReadyCoroutine = null;
+        }
+
+
+        // Важно:
+        // очищаем все старые триггеры выстрела,
+        // чтобы они не сработали позже после выхода
+        // из CombatHold.
+
+        ResetShootTriggers();
+
+
+        // Включаем боеготовность.
+
+        animator.SetBool(
+            CombatReadyHash,
+            true
+        );
+
+
+        // Запускаем только нужную
+        // анимацию выстрела.
+
+        animator.SetTrigger(
+            shootHash
+        );
+
+
+        // Запускаем новый таймер.
+
+        combatReadyCoroutine =
+            StartCoroutine(
+                CombatReadyTimer()
+            );
+    }
+
+
+    private IEnumerator CombatReadyTimer()
+    {
+        yield return new WaitForSeconds(
+            combatReadyDuration
+        );
+
+
+        // На всякий случай очищаем все
+        // ожидающие триггеры выстрела перед выходом
+        // из CombatHold.
+
+        ResetShootTriggers();
+
+
+        // Выключаем боеготовность.
+
+        animator.SetBool(
+            CombatReadyHash,
+            false
+        );
+
+        combatReadyCoroutine = null;
+    }
+
+
+    // =========================================================
+    // RESET SHOOT TRIGGERS
+    // =========================================================
+
+    private void ResetShootTriggers()
+    {
+        if (animator == null)
+            return;
+
+        animator.ResetTrigger(
+            ShootHash
+        );
+
+        animator.ResetTrigger(
+            ShootRifleHash
+        );
+
+        animator.ResetTrigger(
+            ShootShotgunHash
+        );
+
+        animator.ResetTrigger(
+            ShootGrenadeHash
+        );
+
+        animator.ResetTrigger(
+            ShootRailgunHash
+        );
+    }
+
+
+    // =========================================================
+    // STOP COMBAT READY
+    // =========================================================
+
+    private void StopCombatReady()
+    {
+        if (combatReadyCoroutine != null)
+        {
+            StopCoroutine(
+                combatReadyCoroutine
+            );
+
+            combatReadyCoroutine = null;
+        }
+
+        if (animator != null)
+        {
+            // Очищаем все возможные ожидающие
+            // анимации выстрела.
+
+            ResetShootTriggers();
+
+            animator.SetBool(
+                CombatReadyHash,
+                false
+            );
+        }
+    }
+
+
+    // =========================================================
+    // KATANA
+    // =========================================================
 
     public void PlayKatanaAttack()
     {
-        animator.SetTrigger(KatanaAttackHash);
+        StopCombatReady();
+
+        animator.SetTrigger(
+            KatanaAttackHash
+        );
     }
+
+
+    // =========================================================
+    // RELOAD
+    // =========================================================
 
     public void PlayReload()
     {
-        animator.SetTrigger(ReloadHash);
+        StopCombatReady();
+
+        animator.SetTrigger(
+            ReloadHash
+        );
+    }
+
+
+    // =========================================================
+    // WEAPON SWITCH
+    // =========================================================
+
+    public void PlayWeaponSwitch()
+    {
+        if (animator == null)
+            return;
+
+        StopCombatReady();
+
+        animator.SetTrigger(
+            WeaponSwitchHash
+        );
     }
 }

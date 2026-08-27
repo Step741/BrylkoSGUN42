@@ -31,9 +31,11 @@ public class GameMusic : MonoBehaviour
 
         Instance = this;
 
-        // Нужно для корректного fade-out
-        // при переходе GameScene → MainMenu
+        // ВАЖНО:
+        // GameMusic должен быть корневым GameObject в Hierarchy,
+        // а не дочерним объектом другого GameObject.
         DontDestroyOnLoad(gameObject);
+
 
         audioSource = GetComponent<AudioSource>();
 
@@ -78,7 +80,9 @@ public class GameMusic : MonoBehaviour
     {
         if (audioSource == null ||
             audioSource.clip == null)
+        {
             return;
+        }
 
         if (!audioSource.isPlaying)
         {

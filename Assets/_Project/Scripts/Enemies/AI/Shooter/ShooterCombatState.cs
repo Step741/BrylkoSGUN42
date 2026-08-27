@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class ShooterCombatState : EnemyState
 {
     private readonly EnemyShooter shooter;
@@ -9,22 +10,39 @@ public class ShooterCombatState : EnemyState
 
 
     private float attackTimer;
+
     private int attackCount;
+
+
+    // ==========================================
+    // ATTACK SETTINGS
+    // ==========================================
+
+    private const float MinAttackDistance =
+        10f;
 
     private const int AttacksBeforeBackstep =
         3;
 
 
-    public ShooterCombatState(Enemy enemy)
+    public ShooterCombatState(
+        Enemy enemy
+    )
         : base(enemy)
     {
         shooter =
             enemy.GetComponent<EnemyShooter>();
 
         enemySoundController =
-            enemy.GetComponent<EnemySoundController>();
+            enemy.GetComponent<
+                EnemySoundController
+            >();
     }
 
+
+    // ==========================================
+    // ENTER
+    // ==========================================
 
     public override void Enter()
     {
@@ -52,8 +70,12 @@ public class ShooterCombatState : EnemyState
 
         shooter.StopMoving();
 
-        attackTimer = 0f;
-        attackCount = 0;
+
+        attackTimer =
+            0f;
+
+        attackCount =
+            0;
 
 
         Debug.Log(
@@ -61,6 +83,10 @@ public class ShooterCombatState : EnemyState
         );
     }
 
+
+    // ==========================================
+    // TICK
+    // ==========================================
 
     public override void Tick()
     {
@@ -82,13 +108,15 @@ public class ShooterCombatState : EnemyState
 
 
         // ==========================================
-        // Низкое здоровье -> TakeCover
+        // LOW HEALTH -> TAKE COVER
         // ==========================================
 
         if (shooter.NeedsToTakeCover())
         {
             enemy.StateMachine.ChangeState(
-                new ShooterTakeCoverState(enemy)
+                new ShooterTakeCoverState(
+                    enemy
+                )
             );
 
             return;
@@ -96,7 +124,7 @@ public class ShooterCombatState : EnemyState
 
 
         // ==========================================
-        // Обновляем последнюю известную позицию.
+        // PLAYER MEMORY / SEARCH
         // ==========================================
 
         if (enemy.Vision.CanSeePlayer())
@@ -105,25 +133,44 @@ public class ShooterCombatState : EnemyState
                 player.position
             );
         }
-
-
-        // ==========================================
-        // Потеряли игрока -> Search
-        // ==========================================
-
-        if (!enemy.Vision.CanSeePlayer())
+        else
         {
             enemy.StateMachine.ChangeState(
-                new ShooterSearchState(enemy)
+                new ShooterSearchState(
+                    enemy
+                )
             );
 
             return;
         }
 
 
+        // ==========================================
+        // WHILE ATTACK ANIMATION IS PLAYING
+        // ==========================================
+
+        if (shooter.IsAttackAnimationPlaying())
+        {
+            shooter.StopMoving();
+
+            LookAtPlayer(
+                player
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // DISTANCE TO PLAYER
+        // ==========================================
+
         Vector3 direction =
             player.position -
             shooter.transform.position;
+
+        direction.y =
+            0f;
 
 
         float distance =
@@ -131,56 +178,60 @@ public class ShooterCombatState : EnemyState
 
 
         // ==========================================
-        // Игрок слишком далеко.
-        // ==========================================
-
-        if (
-            distance >
-            shooter.AttackDistance + 1f
-        )
-        {
-            MoveToPlayer(player);
-
-            return;
-        }
-
-
-        // ==========================================
-        // Игрок слишком близко.
+        // TOO CLOSE
         // ==========================================
 
         if (
             distance <
-            shooter.AttackDistance - 1f
+            MinAttackDistance
         )
         {
-            MoveAwayFromPlayer(player);
+            MoveAwayFromPlayer(
+                player
+            );
 
             return;
         }
 
 
         // ==========================================
-        // Идеальная дистанция.
+        // ATTACK POSITION
         // ==========================================
 
         shooter.StopMoving();
 
-        LookAtPlayer(player);
+        LookAtPlayer(
+            player
+        );
+
+
+        // ==========================================
+        // ATTACK TIMER
+        // ==========================================
 
         attackTimer -=
             Time.deltaTime;
 
 
-        if (attackTimer <= 0f)
+        if (
+            attackTimer <=
+            0f
+        )
         {
-            Attack(player);
+            StartAttack(
+                player
+            );
 
             attackCount++;
+
 
             attackTimer =
                 shooter.AttackCooldown;
 
+
+            // ======================================
+            // AFTER 3 ATTACKS -> BACKSTEP
+            // ======================================
 
             if (
                 attackCount >=
@@ -200,88 +251,29 @@ public class ShooterCombatState : EnemyState
 
 
     // ==========================================
-    // PREDICTIVE SHOOTING
+    // START ATTACK
     // ==========================================
 
-    private void Attack(
-        Transform player)
+    private void StartAttack(
+        Transform player
+    )
     {
-        // ==========================================
-        // ATTACK SOUND
-        // ==========================================
-
-        if (enemySoundController != null)
+        if (
+            shooter.IsAttackAnimationPlaying()
+        )
         {
-            enemySoundController.PlayAttack();
+            return;
         }
 
 
-        Vector3 shooterPosition =
-            shooter.transform.position;
-
-
-        Vector3 playerPosition =
-            player.position;
-
-
-        // ------------------------------------------
-        // Получаем скорость игрока.
-        // ------------------------------------------
-
-        Vector3 playerVelocity =
-            GetPlayerVelocity(
-                player
-            );
-
-
-        // ------------------------------------------
-        // Начальная дистанция.
-        // ------------------------------------------
-
-        float distance =
-            Vector3.Distance(
-                shooterPosition,
-                playerPosition
-            );
-
-
-        // ------------------------------------------
-        // Время полёта снаряда.
-        //
-        // t = distance / speed
-        // ------------------------------------------
-
-        float projectileSpeed =
-            Mathf.Max(
-                shooter.ProjectileSpeed,
-                0.01f
-            );
-
-
-        float flightTime =
-            distance /
-            projectileSpeed;
-
-
-        // ------------------------------------------
-        // Предсказываем позицию игрока.
-        //
-        // P = P0 + V * t
-        // ------------------------------------------
-
-        Vector3 predictedPosition =
-            playerPosition +
-            playerVelocity *
-            flightTime;
-
-
-        // ------------------------------------------
-        // Дополнительный разброс.
-        // ------------------------------------------
+        // ==========================================
+        // CALCULATE PROJECTILE DIRECTION
+        // ==========================================
 
         Vector3 aimDirection =
-            predictedPosition -
-            shooterPosition;
+            CalculateAimDirection(
+                player
+            );
 
 
         if (
@@ -293,8 +285,142 @@ public class ShooterCombatState : EnemyState
         }
 
 
+        // ==========================================
+        // QUEUE PROJECTILE
+        // ==========================================
+
+        shooter.QueueProjectile(
+            aimDirection
+        );
+
+
+        // ==========================================
+        // START ATTACK ANIMATION
+        // ==========================================
+
+        shooter.StartAttackAnimation();
+
+
+        // ==========================================
+        // ATTACK SOUND
+        // ==========================================
+
+        if (
+            enemySoundController != null
+        )
+        {
+            enemySoundController.PlayAttack();
+        }
+    }
+
+
+    // ==========================================
+    // CALCULATE AIM DIRECTION
+    // ==========================================
+
+    private Vector3 CalculateAimDirection(
+        Transform player
+    )
+    {
+        if (player == null)
+            return Vector3.zero;
+
+
+        // ==========================================
+        // PROJECTILE ORIGIN
+        //
+        // Используем фактическую точку запуска.
+        // ==========================================
+
+        Vector3 shooterPosition =
+            shooter.SpitOrigin.position;
+
+
+        // ==========================================
+        // PLAYER AIM POINT
+        // ==========================================
+
+        PlayerAimTarget aimTarget =
+            player.GetComponent<
+                PlayerAimTarget
+            >();
+
+
+        Vector3 playerPosition =
+            aimTarget != null &&
+            aimTarget.AimPoint != null
+                ? aimTarget.AimPoint.position
+                : player.position;
+
+
+        // ==========================================
+        // PLAYER VELOCITY
+        // ==========================================
+
+        Vector3 playerVelocity =
+            GetPlayerVelocity(
+                player
+            );
+
+
+        // ==========================================
+        // PROJECTILE SPEED
+        // ==========================================
+
+        float projectileSpeed =
+            Mathf.Max(
+                shooter.ProjectileSpeed,
+                0.01f
+            );
+
+
+        // ==========================================
+        // INTERCEPT TIME
+        // ==========================================
+
+        float interceptTime =
+            CalculateInterceptTime(
+                shooterPosition,
+                playerPosition,
+                playerVelocity,
+                projectileSpeed
+            );
+
+
+        // ==========================================
+        // PREDICTED POSITION
+        // ==========================================
+
+        Vector3 predictedPosition =
+            playerPosition +
+            playerVelocity *
+            interceptTime;
+
+
+        // ==========================================
+        // AIM DIRECTION
+        // ==========================================
+
+        Vector3 aimDirection =
+            predictedPosition -
+            shooterPosition;
+
+
+        if (
+            aimDirection.sqrMagnitude <
+            0.001f
+        )
+        {
+            return Vector3.zero;
+        }
+
+
         aimDirection.Normalize();
 
+
+        // ==========================================
+        // AIM SPREAD
+        // ==========================================
 
         aimDirection =
             ApplySpread(
@@ -303,129 +429,182 @@ public class ShooterCombatState : EnemyState
             );
 
 
-        // ------------------------------------------
-        // Стреляем.
-        // ------------------------------------------
+        return aimDirection;
+    }
+
+
+    // ==========================================
+    // INTERCEPT TIME
+    // ==========================================
+
+    private float CalculateInterceptTime(
+        Vector3 shooterPosition,
+        Vector3 targetPosition,
+        Vector3 targetVelocity,
+        float projectileSpeed
+    )
+    {
+        Vector3 relativePosition =
+            targetPosition -
+            shooterPosition;
+
+
+        float a =
+            targetVelocity.sqrMagnitude -
+            projectileSpeed *
+            projectileSpeed;
+
+
+        float b =
+            2f *
+            Vector3.Dot(
+                relativePosition,
+                targetVelocity
+            );
+
+
+        float c =
+            relativePosition.sqrMagnitude;
+
 
         if (
-            Physics.Raycast(
-                shooterPosition,
-                aimDirection,
-                out RaycastHit hit,
-                shooter.AttackDistance,
-                shooter.HitMask,
-                QueryTriggerInteraction.Ignore
-            )
+            Mathf.Abs(a) <
+            0.001f
         )
         {
-            IDamageable damageable =
-                hit.collider.GetComponent<
-                    IDamageable>();
-
-
-            if (damageable == null)
+            if (
+                Mathf.Abs(b) <
+                0.001f
+            )
             {
-                damageable =
-                    hit.collider.GetComponentInParent<
-                        IDamageable>();
+                return
+                    relativePosition.magnitude /
+                    projectileSpeed;
             }
 
 
-            if (damageable != null)
-            {
-                // ==================================
-                // Если цель имеет Health,
-                // передаём также позицию источника
-                // урона для DamageDirectionIndicator.
-                // ==================================
-
-                Health health =
-                    hit.collider.GetComponentInParent<
-                        Health>();
+            float interceptTime =
+                -c / b;
 
 
-                if (health != null)
-                {
-                    health.TakeDamage(
-                        shooter.AttackDamage,
-                        shooter.transform.position
-                    );
-                }
-                else
-                {
-                    damageable.TakeDamage(
-                        shooter.AttackDamage
-                    );
-                }
-
-
-                Debug.Log(
-                    $"[{enemy.name}] " +
-                    $"Predictive shot HIT player. " +
-                    $"Flight time: {flightTime:F2}s"
-                );
-            }
-            else
-            {
-                Debug.Log(
-                    $"[{enemy.name}] Shot hit " +
-                    $"{hit.collider.name}, but target " +
-                    "is not damageable."
-                );
-            }
-        }
-        else
-        {
-            Debug.Log(
-                $"[{enemy.name}] Predictive shot MISS."
+            return Mathf.Max(
+                interceptTime,
+                0f
             );
         }
 
 
-        Debug.DrawRay(
-            shooterPosition,
-            aimDirection *
-            shooter.AttackDistance,
-            Color.red,
-            0.5f
-        );
+        float discriminant =
+            b * b -
+            4f * a * c;
+
+
+        if (discriminant < 0f)
+        {
+            return
+                relativePosition.magnitude /
+                projectileSpeed;
+        }
+
+
+        float sqrt =
+            Mathf.Sqrt(
+                discriminant
+            );
+
+
+        float time1 =
+            (-b + sqrt) /
+            (2f * a);
+
+
+        float time2 =
+            (-b - sqrt) /
+            (2f * a);
+
+
+        float time =
+            Mathf.Min(
+                time1 > 0f
+                    ? time1
+                    : float.MaxValue,
+
+                time2 > 0f
+                    ? time2
+                    : float.MaxValue
+            );
+
+
+        if (
+            time ==
+            float.MaxValue
+        )
+        {
+            return
+                relativePosition.magnitude /
+                projectileSpeed;
+        }
+
+
+        return time;
     }
 
 
+    // ==========================================
+    // PLAYER VELOCITY
+    // ==========================================
+
     private Vector3 GetPlayerVelocity(
-        Transform player)
+        Transform player
+    )
     {
         CharacterController controller =
             player.GetComponent<
-                CharacterController>();
+                CharacterController
+            >();
 
 
         if (controller != null)
         {
-            return controller.velocity;
+            return
+                controller.velocity;
         }
 
 
         Rigidbody rigidbody =
-            player.GetComponent<Rigidbody>();
+            player.GetComponent<
+                Rigidbody
+            >();
 
 
         if (rigidbody != null)
         {
-            return rigidbody.velocity;
+            return
+                rigidbody.velocity;
         }
 
 
-        return Vector3.zero;
+        return
+            Vector3.zero;
     }
 
 
+    // ==========================================
+    // SPREAD
+    // ==========================================
+
     private Vector3 ApplySpread(
         Vector3 direction,
-        float spreadAngle)
+        float spreadAngle
+    )
     {
-        if (spreadAngle <= 0f)
+        if (
+            spreadAngle <=
+            0f
+        )
+        {
             return direction;
+        }
 
 
         Quaternion spreadRotation =
@@ -434,50 +613,29 @@ public class ShooterCombatState : EnemyState
                     -spreadAngle,
                     spreadAngle
                 ),
+
                 Random.Range(
                     -spreadAngle,
                     spreadAngle
                 ),
+
                 0f
             );
 
 
-        return spreadRotation *
-               direction;
+        return
+            spreadRotation *
+            direction;
     }
 
 
     // ==========================================
-    // MOVEMENT
+    // MOVE AWAY FROM PLAYER
     // ==========================================
-
-    private void MoveToPlayer(
-        Transform player)
-    {
-        if (
-            shooter.Agent == null ||
-            !shooter.Agent.isOnNavMesh
-        )
-        {
-            return;
-        }
-
-
-        shooter.Agent.isStopped =
-            false;
-
-
-        shooter.Agent.SetDestination(
-            player.position
-        );
-
-
-        LookAtPlayer(player);
-    }
-
 
     private void MoveAwayFromPlayer(
-        Transform player)
+        Transform player
+    )
     {
         if (
             shooter.Agent == null ||
@@ -492,8 +650,8 @@ public class ShooterCombatState : EnemyState
             shooter.transform.position -
             player.position;
 
-
-        direction.y = 0f;
+        direction.y =
+            0f;
 
 
         if (
@@ -516,25 +674,35 @@ public class ShooterCombatState : EnemyState
         shooter.Agent.isStopped =
             false;
 
-
         shooter.Agent.SetDestination(
             targetPosition
         );
 
 
-        LookAtPlayer(player);
+        LookAtPlayer(
+            player
+        );
     }
 
 
+    // ==========================================
+    // LOOK AT PLAYER
+    // ==========================================
+
     private void LookAtPlayer(
-        Transform player)
+        Transform player
+    )
     {
+        if (player == null)
+            return;
+
+
         Vector3 direction =
             player.position -
             shooter.transform.position;
 
-
-        direction.y = 0f;
+        direction.y =
+            0f;
 
 
         if (
@@ -561,11 +729,19 @@ public class ShooterCombatState : EnemyState
     }
 
 
+    // ==========================================
+    // EXIT
+    // ==========================================
+
     public override void Exit()
     {
-        if (shooter != null)
+        if (
+            shooter != null
+        )
         {
             shooter.StopMoving();
+
+            shooter.CancelAttackAnimation();
         }
     }
 }

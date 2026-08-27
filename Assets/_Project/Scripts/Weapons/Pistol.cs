@@ -4,6 +4,7 @@ using Zenject;
 public class Pistol : WeaponBase
 {
     [Header("References")]
+
     [SerializeField]
     private LayerMask hitMask;
 
@@ -15,6 +16,7 @@ public class Pistol : WeaponBase
 
 
     [Header("Weapon Sounds")]
+
     [SerializeField]
     private AudioClip shootSound;
 
@@ -26,6 +28,7 @@ public class Pistol : WeaponBase
 
 
     [Header("Sound Settings")]
+
     [SerializeField]
     [Range(0f, 1f)]
     private float soundVolume = 1f;
@@ -35,11 +38,13 @@ public class Pistol : WeaponBase
 
 
     [Header("Empty Click")]
+
     [SerializeField]
     private float emptyClickCooldown = 0.2f;
 
 
     [Header("Recoil")]
+
     [SerializeField]
     private WeaponRecoil weaponRecoil;
 
@@ -51,15 +56,18 @@ public class Pistol : WeaponBase
 
 
     [Inject]
-    private void Construct(Camera playerCamera)
+    private void Construct(
+        Camera playerCamera)
     {
-        this.playerCamera = playerCamera;
+        this.playerCamera =
+            playerCamera;
     }
 
 
     protected override void Awake()
     {
         base.Awake();
+
 
         if (playerCamera == null)
         {
@@ -88,8 +96,10 @@ public class Pistol : WeaponBase
         if (!CanShoot)
             return false;
 
+
         if (playerCamera == null)
             return false;
+
 
         if (Time.time < nextFireTime)
             return false;
@@ -103,46 +113,84 @@ public class Pistol : WeaponBase
         // Muzzle Flash
         muzzleFlash?.Play();
 
+
         // Shell Ejection
         shellEjector?.Eject();
 
+
         // Shoot Sound
-        PlaySound(shootSound);
+        PlaySound(
+            shootSound
+        );
+
 
         // Recoil
         weaponRecoil?.AddRecoil();
 
 
         nextFireTime =
-            Time.time + 1f / config.FireRate;
+            Time.time +
+            1f / config.FireRate;
 
 
-        Ray ray = new Ray(
-            playerCamera.transform.position,
-            playerCamera.transform.forward
-        );
+        Ray ray =
+            new Ray(
+                playerCamera.transform.position,
+                playerCamera.transform.forward
+            );
 
 
-        if (Physics.Raycast(
-            ray,
-            out RaycastHit hit,
-            config.Range,
-            hitMask,
-            QueryTriggerInteraction.Ignore))
+        if (
+            Physics.Raycast(
+                ray,
+                out RaycastHit hit,
+                config.Range,
+                hitMask,
+                QueryTriggerInteraction.Collide
+            )
+        )
         {
             // Surface Impact
-            SurfaceImpactUtility.ProcessHit(hit);
+            SurfaceImpactUtility.ProcessHit(
+                hit
+            );
 
 
-            IDamageable damageable =
-                hit.collider.GetComponentInParent<IDamageable>();
+            // ==========================================
+            // DAMAGE HITBOX
+            // ==========================================
+
+            DamageHitbox hitbox =
+                hit.collider.GetComponent<
+                    DamageHitbox
+                >();
 
 
-            if (damageable != null)
+            if (hitbox != null)
             {
-                damageable.TakeDamage(
-                    config.Damage
+                hitbox.ApplyDamage(
+                    config.Damage,
+                    transform.position
                 );
+            }
+            else
+            {
+                // ==========================================
+                // NORMAL DAMAGE
+                // ==========================================
+
+                IDamageable damageable =
+                    hit.collider.GetComponentInParent<
+                        IDamageable
+                    >();
+
+
+                if (damageable != null)
+                {
+                    damageable.TakeDamage(
+                        config.Damage
+                    );
+                }
             }
 
 
@@ -154,7 +202,8 @@ public class Pistol : WeaponBase
 
         Debug.DrawRay(
             ray.origin,
-            ray.direction * config.Range,
+            ray.direction *
+            config.Range,
             Color.red,
             1f
         );
@@ -171,7 +220,8 @@ public class Pistol : WeaponBase
     public override void Reload()
     {
         int missingAmmo =
-            config.MagazineSize - currentAmmo;
+            config.MagazineSize -
+            currentAmmo;
 
 
         if (missingAmmo <= 0)
@@ -187,7 +237,9 @@ public class Pistol : WeaponBase
             NotifyAmmoChanged();
 
 
-            PlaySound(reloadSound);
+            PlaySound(
+                reloadSound
+            );
 
 
             Debug.Log(
@@ -210,18 +262,24 @@ public class Pistol : WeaponBase
             );
 
 
-        currentAmmo += ammoToLoad;
+        currentAmmo +=
+            ammoToLoad;
 
-        reserveAmmo -= ammoToLoad;
+        reserveAmmo -=
+            ammoToLoad;
+
 
         NotifyAmmoChanged();
 
 
-        PlaySound(reloadSound);
+        PlaySound(
+            reloadSound
+        );
 
 
         Debug.Log(
-            $"Pistol reload: {currentAmmo}/{reserveAmmo}"
+            $"Pistol reload: " +
+            $"{currentAmmo}/{reserveAmmo}"
         );
     }
 
@@ -235,6 +293,7 @@ public class Pistol : WeaponBase
     {
         if (clip == null)
             return;
+
 
         if (SoundService.Instance == null)
             return;
@@ -251,14 +310,22 @@ public class Pistol : WeaponBase
 
     private void PlayEmptyClick()
     {
-        if (Time.time < nextEmptyClickTime)
+        if (
+            Time.time <
+            nextEmptyClickTime
+        )
+        {
             return;
+        }
 
 
         nextEmptyClickTime =
-            Time.time + emptyClickCooldown;
+            Time.time +
+            emptyClickCooldown;
 
 
-        PlaySound(emptyClickSound);
+        PlaySound(
+            emptyClickSound
+        );
     }
 }

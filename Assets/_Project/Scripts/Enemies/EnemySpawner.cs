@@ -9,7 +9,13 @@ public class EnemySpawner : MonoBehaviour
         Trigger
     }
 
+
+    // ==========================================
+    // SPAWN
+    // ==========================================
+
     [Header("Spawn")]
+
     [SerializeField]
     private SpawnMode spawnMode =
         SpawnMode.Timer;
@@ -18,23 +24,59 @@ public class EnemySpawner : MonoBehaviour
     private EnemySpawnType enemyType =
         EnemySpawnType.Shooter;
 
-    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField]
+    private GameObject enemyPrefab;
 
-    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField]
+    private Transform[] spawnPoints;
+
+
+    // ==========================================
+    // PROJECTILE POOL
+    // ==========================================
+
+    [Header("Projectile Pool")]
+
+    [SerializeField]
+    private SpitProjectilePool spitProjectilePool;
+
+
+    // ==========================================
+    // WAVE
+    // ==========================================
 
     [Header("Wave")]
-    [SerializeField] private int enemiesPerWave = 3;
 
-    [SerializeField] private float waveInterval = 10f;
+    [SerializeField]
+    private int enemiesPerWave = 3;
+
+    [SerializeField]
+    private float waveInterval = 10f;
 
     [SerializeField]
     private bool spawnFirstWaveImmediately =
         true;
 
+
+    // ==========================================
+    // DEPENDENCIES
+    // ==========================================
+
     private IEnemyFactory enemyFactory;
 
+
+    // ==========================================
+    // STATE
+    // ==========================================
+
     private float timer;
+
     private bool waveActive;
+
+
+    // ==========================================
+    // INJECTION
+    // ==========================================
 
     [Inject]
     private void Construct(
@@ -43,6 +85,11 @@ public class EnemySpawner : MonoBehaviour
         this.enemyFactory =
             enemyFactory;
     }
+
+
+    // ==========================================
+    // UNITY
+    // ==========================================
 
     private void Start()
     {
@@ -60,6 +107,7 @@ public class EnemySpawner : MonoBehaviour
             timer = waveInterval;
         }
     }
+
 
     private void Update()
     {
@@ -79,6 +127,7 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+
     private void OnTriggerEnter(
         Collider other)
     {
@@ -97,6 +146,11 @@ public class EnemySpawner : MonoBehaviour
         SpawnWave();
     }
 
+
+    // ==========================================
+    // SPAWN WAVE
+    // ==========================================
+
     public void SpawnWave()
     {
         if (waveActive)
@@ -107,9 +161,10 @@ public class EnemySpawner : MonoBehaviour
 
         waveActive = true;
 
-        for (int i = 0;
-             i < enemiesPerWave;
-             i++)
+        for (
+            int i = 0;
+            i < enemiesPerWave;
+            i++)
         {
             SpawnEnemy(i);
         }
@@ -122,7 +177,13 @@ public class EnemySpawner : MonoBehaviour
         );
     }
 
-    private void SpawnEnemy(int index)
+
+    // ==========================================
+    // SPAWN ENEMY
+    // ==========================================
+
+    private void SpawnEnemy(
+        int index)
     {
         Transform spawnPoint =
             GetSpawnPoint(index);
@@ -130,6 +191,8 @@ public class EnemySpawner : MonoBehaviour
         if (spawnPoint == null)
             return;
 
+
+        // Создаём врага через текущую фабрику.
         Enemy enemy =
             enemyFactory.Create(
                 enemyPrefab,
@@ -140,18 +203,49 @@ public class EnemySpawner : MonoBehaviour
         if (enemy == null)
             return;
 
+
         enemy.name =
             $"{enemyType}_Enemy_{index + 1}";
+
+
+        // ==========================================
+        // SHOOTER PROJECTILE POOL
+        // ==========================================
+
+        // Если заспавненный враг является стрелком,
+        // передаём ему общий пул снарядов со сцены.
+        if (spitProjectilePool != null)
+        {
+            EnemyShooter shooter =
+                enemy.GetComponentInChildren<
+                    EnemyShooter
+                >();
+
+            if (shooter != null)
+            {
+                shooter.SetProjectilePool(
+                    spitProjectilePool
+                );
+            }
+        }
     }
+
+
+    // ==========================================
+    // SPAWN POINT
+    // ==========================================
 
     private Transform GetSpawnPoint(
         int index)
     {
-        if (spawnPoints == null ||
-            spawnPoints.Length == 0)
+        if (
+            spawnPoints == null ||
+            spawnPoints.Length == 0
+        )
         {
             return null;
         }
+
 
         // Распределяем врагов по точкам
         // по кругу:
@@ -161,11 +255,19 @@ public class EnemySpawner : MonoBehaviour
         // 2 → Point 0
         // 3 → Point 1
         //
+
         int pointIndex =
             index % spawnPoints.Length;
 
-        return spawnPoints[pointIndex];
+        return spawnPoints[
+            pointIndex
+        ];
     }
+
+
+    // ==========================================
+    // VALIDATION
+    // ==========================================
 
     private bool ValidateSetup()
     {
@@ -178,6 +280,7 @@ public class EnemySpawner : MonoBehaviour
             return false;
         }
 
+
         if (enemyPrefab == null)
         {
             Debug.LogError(
@@ -187,8 +290,11 @@ public class EnemySpawner : MonoBehaviour
             return false;
         }
 
-        if (spawnPoints == null ||
-            spawnPoints.Length < 2)
+
+        if (
+            spawnPoints == null ||
+            spawnPoints.Length < 2
+        )
         {
             Debug.LogError(
                 $"[{name}] EnemySpawner requires " +
@@ -197,6 +303,7 @@ public class EnemySpawner : MonoBehaviour
 
             return false;
         }
+
 
         if (enemiesPerWave <= 0)
         {
@@ -207,17 +314,37 @@ public class EnemySpawner : MonoBehaviour
             return false;
         }
 
+
+        // Пул нужен только для врага-стрелка.
+        if (
+            enemyType ==
+            EnemySpawnType.Shooter &&
+            spitProjectilePool == null
+        )
+        {
+            Debug.LogWarning(
+                $"[{name}] SpitProjectilePool is not assigned. " +
+                "Spawned EnemyShooter will not be able to fire."
+            );
+        }
+
         return true;
     }
+
+
+    // ==========================================
+    // GIZMOS
+    // ==========================================
 
     private void OnDrawGizmosSelected()
     {
         if (spawnPoints == null)
             return;
 
-        for (int i = 0;
-             i < spawnPoints.Length;
-             i++)
+        for (
+            int i = 0;
+            i < spawnPoints.Length;
+            i++)
         {
             Transform point =
                 spawnPoints[i];

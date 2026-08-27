@@ -3,6 +3,7 @@ using UnityEngine;
 public class MinimapPlayerMarker : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private Transform player;
 
@@ -12,8 +13,12 @@ public class MinimapPlayerMarker : MonoBehaviour
     [SerializeField]
     private RectTransform markerRect;
 
+    [SerializeField]
+    private RectTransform rotationTarget;
+
 
     [Header("Settings")]
+
     [SerializeField]
     private bool rotateWithView = true;
 
@@ -38,6 +43,14 @@ public class MinimapPlayerMarker : MonoBehaviour
             playerCamera =
                 Camera.main;
         }
+
+        if (rotationTarget == null)
+        {
+            rotationTarget =
+                markerRect;
+        }
+
+        SetupMarkerPosition();
     }
 
 
@@ -51,7 +64,16 @@ public class MinimapPlayerMarker : MonoBehaviour
         // POSITION
         // =====================================================
 
-        // Игрок всегда находится в центре миникарты.
+        // Игрок всегда находится точно в центре миникарты.
+        markerRect.anchorMin =
+            new Vector2(0.5f, 0.5f);
+
+        markerRect.anchorMax =
+            new Vector2(0.5f, 0.5f);
+
+        markerRect.pivot =
+            new Vector2(0.5f, 0.5f);
+
         markerRect.anchoredPosition =
             Vector2.zero;
 
@@ -63,16 +85,17 @@ public class MinimapPlayerMarker : MonoBehaviour
         if (!rotateWithView)
             return;
 
-
         if (playerCamera == null)
+            return;
+
+        if (rotationTarget == null)
             return;
 
 
         Vector3 forward =
             playerCamera.transform.forward;
 
-
-        // Нам нужна только горизонтальная составляющая.
+        // Убираем наклон камеры.
         forward.y = 0f;
 
 
@@ -83,8 +106,10 @@ public class MinimapPlayerMarker : MonoBehaviour
         forward.Normalize();
 
 
-        // Получаем угол направления взгляда
-        // относительно мирового направления Z.
+        // =====================================================
+        // CALCULATE ANGLE
+        // =====================================================
+
         float angle =
             Mathf.Atan2(
                 forward.x,
@@ -92,11 +117,39 @@ public class MinimapPlayerMarker : MonoBehaviour
             ) * Mathf.Rad2Deg;
 
 
-        markerRect.localRotation =
+        // =====================================================
+        // ROTATE ONLY VISUAL
+        // =====================================================
+
+        rotationTarget.localRotation =
             Quaternion.Euler(
                 0f,
                 0f,
                 -angle + rotationOffset
             );
+    }
+
+
+    // =========================================================
+    // SETUP
+    // =========================================================
+
+    private void SetupMarkerPosition()
+    {
+        if (markerRect == null)
+            return;
+
+
+        markerRect.anchorMin =
+            new Vector2(0.5f, 0.5f);
+
+        markerRect.anchorMax =
+            new Vector2(0.5f, 0.5f);
+
+        markerRect.pivot =
+            new Vector2(0.5f, 0.5f);
+
+        markerRect.anchoredPosition =
+            Vector2.zero;
     }
 }
