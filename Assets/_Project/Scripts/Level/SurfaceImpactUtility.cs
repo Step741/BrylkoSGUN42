@@ -8,10 +8,12 @@ public static class SurfaceImpactUtility
         if (hit.collider == null)
             return;
 
+
         SurfaceIdentifier surface =
             hit.collider.GetComponent<
                 SurfaceIdentifier
             >();
+
 
         if (surface == null)
         {
@@ -21,12 +23,15 @@ public static class SurfaceImpactUtility
                 >();
         }
 
+
         if (surface == null)
             return;
 
+
         surface.PlayImpact(
             hit.point,
-            hit.normal
+            hit.normal,
+            hit.collider.transform
         );
     }
 }

@@ -3,108 +3,375 @@ using Zenject;
 
 public class EnemyVision : MonoBehaviour
 {
+    // =========================================================
+    // VISION
+    // =========================================================
+
     [Header("Vision")]
-    [SerializeField] private float viewRadius = 15f;
-    [SerializeField][Range(0f, 180f)] private float viewAngle = 60f;
+
+    [SerializeField]
+    private float viewRadius = 15f;
+
+
+    [SerializeField]
+    [Range(0f, 180f)]
+    private float viewAngle = 60f;
+
+
+    [SerializeField]
+    private float eyeHeight = 1.5f;
+
+
+    [SerializeField]
+    private float playerTargetHeight = 1f;
+
+
+    // =========================================================
+    // LINE OF SIGHT
+    // =========================================================
 
     [Header("Line Of Sight")]
-    [SerializeField] private LayerMask obstacleMask;
+
+    [SerializeField]
+    private LayerMask obstacleMask;
+
+
+    // =========================================================
+    // GIZMOS
+    // =========================================================
 
     [Header("Gizmos")]
-    [SerializeField] private bool showGizmos = true;
+
+    [SerializeField]
+    private bool showGizmos = true;
+
+
+    // =========================================================
+    // PLAYER
+    // =========================================================
 
     private Transform player;
 
+
+    // =========================================================
+    // ZENJECT
+    // =========================================================
+
     [Inject]
-    private void Construct(PlayerTarget playerTarget)
+    private void Construct(
+        PlayerTarget playerTarget
+    )
     {
-        player = playerTarget.Transform;
+        player =
+            playerTarget.Transform;
     }
+
+
+    // =========================================================
+    // CAN SEE PLAYER
+    // =========================================================
 
     public bool CanSeePlayer()
     {
+        // =====================================================
+        // NO PLAYER
+        // =====================================================
+
         if (player == null)
             return false;
 
-        Vector3 directionToPlayer = player.position - transform.position;
 
-        float distanceToPlayer = directionToPlayer.magnitude;
+        // =====================================================
+        // POSITIONS
+        // =====================================================
+
+        Vector3 enemyPosition =
+            transform.position;
+
+
+        Vector3 playerPosition =
+            player.position;
+
+
+        // =====================================================
+        // DISTANCE
+        // =====================================================
+
+        Vector3 directionToPlayer =
+            playerPosition -
+            enemyPosition;
+
+
+        float distanceToPlayer =
+            directionToPlayer.magnitude;
+
 
         if (distanceToPlayer > viewRadius)
             return false;
 
-        directionToPlayer.Normalize();
+
+        // =====================================================
+        // VIEW ANGLE
+        // =====================================================
+
+        Vector3 flatDirection =
+            directionToPlayer;
+
+
+        flatDirection.y =
+            0f;
+
+
+        if (flatDirection.sqrMagnitude <= 0.001f)
+            return true;
+
+
+        flatDirection.Normalize();
+
 
         float angleToPlayer =
-            Vector3.Angle(transform.forward, directionToPlayer);
+            Vector3.Angle(
+                transform.forward,
+                flatDirection
+            );
 
-        if (angleToPlayer > viewAngle * 0.5f)
-            return false;
 
-        Vector3 origin = transform.position;
-
-        if (Physics.Raycast(
-                origin,
-                directionToPlayer,
-                out RaycastHit hit,
-                distanceToPlayer,
-                obstacleMask,
-                QueryTriggerInteraction.Ignore))
+        if (
+            angleToPlayer >
+            viewAngle * 0.5f
+        )
         {
-            return hit.transform == player ||
-                   hit.transform.IsChildOf(player);
+            return false;
         }
+
+
+        // =====================================================
+        // LINE OF SIGHT
+        // =====================================================
+
+        Vector3 origin =
+            transform.position +
+            Vector3.up *
+            eyeHeight;
+
+
+        Vector3 target =
+            player.position +
+            Vector3.up *
+            playerTargetHeight;
+
+
+        Vector3 direction =
+            target -
+            origin;
+
+
+        float distance =
+            direction.magnitude;
+
+
+        if (distance <= 0.01f)
+            return true;
+
+
+        direction.Normalize();
+
+
+        // =====================================================
+        // OBSTACLE CHECK
+        // =====================================================
+
+        if (
+            Physics.Raycast(
+                origin,
+                direction,
+                distance,
+                obstacleMask,
+                QueryTriggerInteraction.Ignore
+            )
+        )
+        {
+            return false;
+        }
+
+
+        // =====================================================
+        // PLAYER IS VISIBLE
+        // =====================================================
 
         return true;
     }
+
+
+    // =========================================================
+    // GIZMOS
+    // =========================================================
 
     private void OnDrawGizmosSelected()
     {
         if (!showGizmos)
             return;
 
-        // Радиус зрения.
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, viewRadius);
 
-        // Центральное направление.
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(
+        // =====================================================
+        // VIEW RADIUS
+        // =====================================================
+
+        Gizmos.color =
+            Color.yellow;
+
+
+        Gizmos.DrawWireSphere(
             transform.position,
-            transform.forward * viewRadius
+            viewRadius
         );
 
-        // Левая граница конуса.
+
+        // =====================================================
+        // CENTER DIRECTION
+        // =====================================================
+
+        Gizmos.color =
+            Color.blue;
+
+
+        Gizmos.DrawRay(
+            transform.position,
+            transform.forward *
+            viewRadius
+        );
+
+
+        // =====================================================
+        // LEFT BOUNDARY
+        // =====================================================
+
         Vector3 leftBoundary =
-            DirectionFromAngle(-viewAngle * 0.5f);
+            DirectionFromAngle(
+                -viewAngle * 0.5f
+            );
 
-        // Правая граница конуса.
+
+        // =====================================================
+        // RIGHT BOUNDARY
+        // =====================================================
+
         Vector3 rightBoundary =
-            DirectionFromAngle(viewAngle * 0.5f);
+            DirectionFromAngle(
+                viewAngle * 0.5f
+            );
 
-        Gizmos.color = Color.green;
+
+        Gizmos.color =
+            Color.green;
+
 
         Gizmos.DrawRay(
             transform.position,
-            leftBoundary * viewRadius
+            leftBoundary *
+            viewRadius
         );
+
 
         Gizmos.DrawRay(
             transform.position,
-            rightBoundary * viewRadius
+            rightBoundary *
+            viewRadius
         );
+
+
+        // =====================================================
+        // LINE TO PLAYER
+        // =====================================================
+
+        if (player != null)
+        {
+            Vector3 origin =
+                transform.position +
+                Vector3.up *
+                eyeHeight;
+
+
+            Vector3 target =
+                player.position +
+                Vector3.up *
+                playerTargetHeight;
+
+
+            Vector3 direction =
+                target -
+                origin;
+
+
+            float distance =
+                direction.magnitude;
+
+
+            if (distance > 0.01f)
+            {
+                bool blocked =
+                    Physics.Raycast(
+                        origin,
+                        direction.normalized,
+                        distance,
+                        obstacleMask,
+                        QueryTriggerInteraction.Ignore
+                    );
+
+
+                Gizmos.color =
+                    blocked
+                        ? Color.red
+                        : Color.green;
+
+
+                Gizmos.DrawLine(
+                    origin,
+                    target
+                );
+            }
+        }
     }
 
-    private Vector3 DirectionFromAngle(float angle)
+
+    // =========================================================
+    // DIRECTION FROM ANGLE
+    // =========================================================
+
+    private Vector3 DirectionFromAngle(
+        float angle
+    )
     {
         Quaternion rotation =
-            Quaternion.Euler(0f, angle, 0f);
+            Quaternion.Euler(
+                0f,
+                angle,
+                0f
+            );
 
-        return rotation * transform.forward;
+
+        return
+            rotation *
+            transform.forward;
     }
 
-    public float ViewRadius => viewRadius;
-    public float ViewAngle => viewAngle;
-    public Transform Player => player;
-    public LayerMask ObstacleMask => obstacleMask;
+
+    // =========================================================
+    // PUBLIC ACCESS
+    // =========================================================
+
+    public float ViewRadius =>
+        viewRadius;
+
+
+    public float ViewAngle =>
+        viewAngle;
+
+
+    public Transform Player =>
+        player;
+
+
+    public LayerMask ObstacleMask =>
+        obstacleMask;
 }

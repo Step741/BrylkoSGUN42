@@ -6,6 +6,10 @@ using Zenject;
 
 public class Railgun : WeaponBase
 {
+    // =========================================================
+    // REFERENCES
+    // =========================================================
+
     [Header("References")]
 
     [SerializeField]
@@ -15,6 +19,10 @@ public class Railgun : WeaponBase
     private LineRenderer beam;
 
 
+    // =========================================================
+    // WEAPON SOUNDS
+    // =========================================================
+
     [Header("Weapon Sounds")]
 
     [SerializeField]
@@ -23,6 +31,10 @@ public class Railgun : WeaponBase
     [SerializeField]
     private AudioClip overheatClickSound;
 
+
+    // =========================================================
+    // SOUND SETTINGS
+    // =========================================================
 
     [Header("Sound Settings")]
 
@@ -34,11 +46,19 @@ public class Railgun : WeaponBase
     private float soundPitch = 1f;
 
 
+    // =========================================================
+    // OVERHEAT CLICK
+    // =========================================================
+
     [Header("Overheat Click")]
 
     [SerializeField]
     private float overheatClickCooldown = 0.3f;
 
+
+    // =========================================================
+    // EFFECTS
+    // =========================================================
 
     [Header("Effects")]
 
@@ -46,15 +66,28 @@ public class Railgun : WeaponBase
     private ParticleSystem muzzleFlash;
 
 
+    // =========================================================
+    // RECOIL
+    // =========================================================
+
     [Header("Recoil")]
 
     [SerializeField]
     private WeaponRecoil weaponRecoil;
 
 
+    // =========================================================
+    // COMPONENTS
+    // =========================================================
+
     private Camera playerCamera;
 
     private RaycastHit[] hitBuffer;
+
+
+    // =========================================================
+    // STATE
+    // =========================================================
 
     private float nextFireTime;
 
@@ -73,10 +106,18 @@ public class Railgun : WeaponBase
     private float nextOverheatClickTime;
 
 
+    // =========================================================
+    // DAMAGE TRACKING
+    // =========================================================
+
     private readonly HashSet<IDamageable>
         damagedTargets =
             new HashSet<IDamageable>();
 
+
+    // =========================================================
+    // PROPERTIES
+    // =========================================================
 
     public float CurrentHeat =>
         currentHeat;
@@ -99,6 +140,10 @@ public class Railgun : WeaponBase
         isOverheated;
 
 
+    // =========================================================
+    // INJECTION
+    // =========================================================
+
     [Inject]
     private void Construct(
         Camera playerCamera)
@@ -107,6 +152,10 @@ public class Railgun : WeaponBase
             playerCamera;
     }
 
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     protected override void Awake()
     {
@@ -175,20 +224,33 @@ public class Railgun : WeaponBase
         }
 
 
+        // =====================================================
+        // SHOT PENDING
+        // =====================================================
+
         // Не запускаем новую стрельбу,
         // пока текущая анимация
         // не дошла до Animation Event.
+
         if (shotPending)
             return false;
 
 
-        // Задержка между выстрелами.
+        // =====================================================
+        // FIRE RATE
+        // =====================================================
+
         if (Time.time < nextFireTime)
             return false;
 
 
-        // Запоминаем прицел
-        // в момент нажатия.
+        // =====================================================
+        // SAVE AIM
+        // =====================================================
+
+        // Запоминаем направление прицела
+        // в момент нажатия кнопки.
+
         pendingFireOrigin =
             playerCamera.transform.position;
 
@@ -235,8 +297,16 @@ public class Railgun : WeaponBase
             return;
 
 
+        // =====================================================
+        // CLEAR DAMAGED TARGETS
+        // =====================================================
+
         damagedTargets.Clear();
 
+
+        // =====================================================
+        // RAYCAST
+        // =====================================================
 
         int hitCount =
             Physics.RaycastNonAlloc(
@@ -281,11 +351,18 @@ public class Railgun : WeaponBase
                 continue;
 
 
-            // Surface Impact
+            // =================================================
+            // SURFACE IMPACT
+            // =================================================
+
             SurfaceImpactUtility.ProcessHit(
                 hit
             );
 
+
+            // =================================================
+            // DAMAGEABLE
+            // =================================================
 
             IDamageable damageable =
                 hit.collider.GetComponentInParent<
@@ -297,8 +374,10 @@ public class Railgun : WeaponBase
                 continue;
 
 
-            // Один объект получает урон
-            // только один раз за выстрел.
+            // =================================================
+            // ONE DAMAGE PER TARGET
+            // =================================================
+
             if (
                 !damagedTargets.Add(
                     damageable
@@ -309,9 +388,9 @@ public class Railgun : WeaponBase
             }
 
 
-            // ==========================================
+            // =================================================
             // DAMAGE HITBOX
-            // ==========================================
+            // =================================================
 
             DamageHitbox hitbox =
                 hit.collider.GetComponent<
@@ -328,10 +407,6 @@ public class Railgun : WeaponBase
             }
             else
             {
-                // ==========================================
-                // NORMAL DAMAGE
-                // ==========================================
-
                 damageable.TakeDamage(
                     config.Damage
                 );
@@ -340,6 +415,9 @@ public class Railgun : WeaponBase
 
             damagedCount++;
 
+
+            // Последняя поражённая цель —
+            // визуальный конец луча.
 
             beamEnd =
                 hit.point;
@@ -397,7 +475,6 @@ public class Railgun : WeaponBase
         );
 
 
-        // Четвёртый выстрел вызывает перегрев.
         if (shotsSinceCooldown >= 4)
         {
             StartOverheat();
@@ -408,16 +485,17 @@ public class Railgun : WeaponBase
         // EFFECTS
         // =====================================================
 
-        muzzleFlash?.Play();
+        MuzzleFlashPool.Instance?.Play(
+            muzzleFlash,
+            muzzlePoint
+        );
 
 
-        // Реальный звук лазерного выстрела.
         PlaySound(
             shootSound
         );
 
 
-        // Отдача.
         weaponRecoil?.AddRecoil();
     }
 
@@ -446,7 +524,6 @@ public class Railgun : WeaponBase
 
     private IEnumerator CooldownAfterOverheat()
     {
-        // Ровно 5 секунд перегрева.
         yield return new WaitForSeconds(
             5f
         );
@@ -495,14 +572,23 @@ public class Railgun : WeaponBase
         );
 
 
+        // Показываем луч.
+
         beam.enabled =
             true;
 
+
+        // Если предыдущий луч ещё отображается,
+        // отменяем старый таймер скрытия.
 
         CancelInvoke(
             nameof(HideBeam)
         );
 
+
+        // Новый таймер начинается заново.
+        // Длительность настраивается
+        // в WeaponConfig.
 
         Invoke(
             nameof(HideBeam),
@@ -557,6 +643,10 @@ public class Railgun : WeaponBase
     }
 
 
+    // =========================================================
+    // OVERHEAT CLICK
+    // =========================================================
+
     private void PlayOverheatClick()
     {
         if (
@@ -601,6 +691,11 @@ public class Railgun : WeaponBase
             0f;
 
 
+        CancelInvoke(
+            nameof(HideBeam)
+        );
+
+
         if (beam != null)
         {
             beam.enabled =
@@ -611,6 +706,10 @@ public class Railgun : WeaponBase
         StopAllCoroutines();
     }
 
+
+    // =========================================================
+    // RAYCAST COMPARER
+    // =========================================================
 
     private sealed class RaycastHitDistanceComparer
         : IComparer<RaycastHit>

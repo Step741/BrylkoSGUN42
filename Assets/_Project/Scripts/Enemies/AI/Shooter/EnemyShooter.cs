@@ -149,6 +149,31 @@ public class EnemyShooter : MonoBehaviour
 
 
     // ==========================================
+    // DISABLE DEATH COLLIDERS
+    // ==========================================
+
+    private void DisableDeathColliders()
+    {
+        Collider[] colliders =
+            GetComponentsInChildren<Collider>(
+                true
+            );
+
+        foreach (
+            Collider collider
+            in colliders
+        )
+        {
+            if (collider == null)
+                continue;
+
+            collider.enabled =
+                false;
+        }
+    }
+
+
+    // ==========================================
     // DEATH
     // ==========================================
 
@@ -576,6 +601,17 @@ public class EnemyShooter : MonoBehaviour
 
         deathAnimationPlayed =
             true;
+
+        ImpactDecal.RemoveDecalsForTarget(
+            transform
+        );
+
+
+        // Отключаем все коллайдеры врага,
+        // чтобы после смерти пули больше не попадали
+        // в вертикальный коллайдер и не создавали декали в воздухе.
+        DisableDeathColliders();
+
 
         projectileQueued =
             false;

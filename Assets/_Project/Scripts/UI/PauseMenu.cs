@@ -1,3 +1,4 @@
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -133,6 +134,8 @@ public class PauseMenu : MonoBehaviour
     private bool isOpen;
     private bool isSettingsOpen;
 
+    private bool isSceneChanging;
+
     private Sequence menuSequence;
     private Sequence settingsSequence;
 
@@ -265,12 +268,19 @@ public class PauseMenu : MonoBehaviour
         if (!context.performed)
             return;
 
+        if (isSceneChanging)
+            return;
+
         HandlePause();
     }
 
 
     private void HandlePause()
     {
+        if (isSceneChanging)
+            return;
+
+
         // Esc внутри Settings возвращает назад.
         if (isSettingsOpen)
         {
@@ -297,6 +307,10 @@ public class PauseMenu : MonoBehaviour
 
     public void ToggleMenu()
     {
+        if (isSceneChanging)
+            return;
+
+
         if (isOpen)
         {
             CloseMenu();
@@ -314,6 +328,9 @@ public class PauseMenu : MonoBehaviour
 
     public void OpenMenu()
     {
+        if (isSceneChanging)
+            return;
+
         if (isOpen)
             return;
 
@@ -457,6 +474,9 @@ public class PauseMenu : MonoBehaviour
         menuSequence.OnComplete(
             () =>
             {
+                if (isSceneChanging)
+                    return;
+
                 menuCanvasGroup.interactable = true;
 
                 menuCanvasGroup.blocksRaycasts = true;
@@ -475,6 +495,9 @@ public class PauseMenu : MonoBehaviour
 
     public void CloseMenu()
     {
+        if (isSceneChanging)
+            return;
+
         if (!isOpen)
             return;
 
@@ -532,6 +555,9 @@ public class PauseMenu : MonoBehaviour
         fadeTween.OnComplete(
             () =>
             {
+                if (isSceneChanging)
+                    return;
+
                 menuRoot.SetActive(false);
 
 
@@ -679,6 +705,9 @@ public class PauseMenu : MonoBehaviour
 
     public void OpenSettings()
     {
+        if (isSceneChanging)
+            return;
+
         if (!isOpen)
             return;
 
@@ -747,6 +776,9 @@ public class PauseMenu : MonoBehaviour
         settingsSequence.AppendCallback(
             () =>
             {
+                if (isSceneChanging)
+                    return;
+
                 if (menuPanel != null)
                 {
                     menuPanel.gameObject.SetActive(
@@ -787,6 +819,9 @@ public class PauseMenu : MonoBehaviour
         settingsSequence.OnComplete(
             () =>
             {
+                if (isSceneChanging)
+                    return;
+
                 if (settingsCanvasGroup != null)
                 {
                     settingsCanvasGroup.interactable =
@@ -811,6 +846,9 @@ public class PauseMenu : MonoBehaviour
 
     public void CloseSettings()
     {
+        if (isSceneChanging)
+            return;
+
         if (!isSettingsOpen)
             return;
 
@@ -858,6 +896,9 @@ public class PauseMenu : MonoBehaviour
         settingsSequence.AppendCallback(
             () =>
             {
+                if (isSceneChanging)
+                    return;
+
                 settingsRoot.SetActive(false);
 
 
@@ -904,6 +945,9 @@ public class PauseMenu : MonoBehaviour
         settingsSequence.OnComplete(
             () =>
             {
+                if (isSceneChanging)
+                    return;
+
                 menuCanvasGroup.interactable = true;
 
                 menuCanvasGroup.blocksRaycasts = true;
@@ -923,7 +967,25 @@ public class PauseMenu : MonoBehaviour
 
     public void RestartGame()
     {
+        if (isSceneChanging)
+            return;
+
+
+        isSceneChanging = true;
+
+
         PrepareForSceneChange();
+
+
+        StartCoroutine(
+            RestartSceneNextFrame()
+        );
+    }
+
+
+    private IEnumerator RestartSceneNextFrame()
+    {
+        yield return null;
 
 
         Scene currentScene =
@@ -942,12 +1004,21 @@ public class PauseMenu : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
+        if (isSceneChanging)
+            return;
+
+
+        isSceneChanging = true;
+
+
         PrepareForSceneChange();
+
 
         MusicTransitionManager.StartMenuTransition(
             GameMusic.Instance,
             1.5f
         );
+
 
         SceneManager.LoadScene(
             mainMenuSceneName
@@ -962,6 +1033,10 @@ public class PauseMenu : MonoBehaviour
     private void PrepareForSceneChange()
     {
         Time.timeScale = 1f;
+
+
+        isOpen = false;
+        isSettingsOpen = false;
 
 
         if (inputService != null)
@@ -1189,6 +1264,9 @@ public class PauseMenu : MonoBehaviour
         bool hasFocus)
     {
         if (!hasFocus)
+            return;
+
+        if (isSceneChanging)
             return;
 
 

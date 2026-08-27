@@ -160,6 +160,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewRadius: 35
   viewAngle: 120
+  eyeHeight: 1.5
+  playerTargetHeight: 1
   obstacleMask:
     serializedVersion: 2
     m_Bits: 192
@@ -214,11 +216,11 @@ MonoBehaviour:
   lowHealthThreshold: 30
   reloadTime: 2
   coverPointTolerance: 0.8
-  projectileSpeed: 40
+  projectileSpeed: 50
   aimSpread: 0.01
   projectilePool: {fileID: 0}
   spitOrigin: {fileID: 5069270564629932626}
-  moveSpeed: 4.5
+  moveSpeed: 5
   rotationSpeed: 8
   animator: {fileID: 3068022467024400389}
   animationSpeedDampTime: 0.1
@@ -346,8 +348,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceType: 4
-  impactVfx: {fileID: 19800006, guid: 94a130fb17f1cae4388a8fe1d8bd3055, type: 3}
-  decalPrefab: {fileID: 0}
+  impactVfx: {fileID: 0}
+  decalPrefab: {fileID: 5145229514821273470, guid: a3b3fd28b7e8fcc4b8d187816da7eb35, type: 3}
   decalLifetime: 8
   concreteImpactSound: {fileID: 8300000, guid: 7e384a0899a189349b1de7c84e8d2efd, type: 3}
   metalImpactSound: {fileID: 8300000, guid: af634d8d446811c4cbdb9d3c3920528b, type: 3}

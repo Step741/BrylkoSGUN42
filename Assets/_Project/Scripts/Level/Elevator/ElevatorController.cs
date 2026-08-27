@@ -5,23 +5,34 @@ using UnityEngine;
 public class ElevatorController : MonoBehaviour
 {
     [Header("Platform")]
-    [SerializeField] private Transform platform;
+
+    [SerializeField]
+    private Transform platform;
 
 
     [Header("Movement")]
-    [SerializeField] private float height = 8f;
-    [SerializeField] private float moveDuration = 3f;
+
+    [SerializeField]
+    private float height = 8f;
+
+    [SerializeField]
+    private float moveDuration = 3f;
 
 
     [Header("Return")]
-    [SerializeField] private float returnDelay = 5f;
+
+    [SerializeField]
+    private float returnDelay = 5f;
 
 
     [Header("Player")]
-    [SerializeField] private Transform player;
+
+    [SerializeField]
+    private Transform player;
 
 
     [Header("Sound")]
+
     [SerializeField]
     private ElevatorSoundController elevatorSoundController;
 
@@ -34,6 +45,13 @@ public class ElevatorController : MonoBehaviour
 
     private Coroutine returnCoroutine;
 
+    // Текущий tween движения лифта.
+    private Tween movementTween;
+
+
+    // ==========================================
+    // UNITY
+    // ==========================================
 
     private void Awake()
     {
@@ -57,6 +75,24 @@ public class ElevatorController : MonoBehaviour
     }
 
 
+    private void OnDisable()
+    {
+        CancelReturn();
+        KillMovementTween();
+    }
+
+
+    private void OnDestroy()
+    {
+        CancelReturn();
+        KillMovementTween();
+    }
+
+
+    // ==========================================
+    // PLAYER
+    // ==========================================
+
     public void SetPlayer(
         Transform target)
     {
@@ -78,6 +114,10 @@ public class ElevatorController : MonoBehaviour
     }
 
 
+    // ==========================================
+    // ACTIVATE
+    // ==========================================
+
     public void Activate()
     {
         if (isMoving)
@@ -96,11 +136,14 @@ public class ElevatorController : MonoBehaviour
 
     private void MoveUp()
     {
+        if (platform == null)
+            return;
+
+
         isMoving = true;
 
         CancelReturn();
-
-        platform.DOKill();
+        KillMovementTween();
 
 
         // 🔊 SOUND UP
@@ -119,25 +162,38 @@ public class ElevatorController : MonoBehaviour
         }
 
 
-        platform
-            .DOMove(
-                topPosition,
-                moveDuration
-            )
-            .SetEase(
-                Ease.InOutQuad
-            )
-            .SetLink(
-                gameObject
-            )
-            .OnComplete(() =>
-            {
-                isMoving = false;
+        movementTween =
+            platform
+                .DOMove(
+                    topPosition,
+                    moveDuration
+                )
+                .SetEase(
+                    Ease.InOutQuad
+                )
+                .SetLink(
+                    gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        movementTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        movementTween = null;
 
-                isAtTop = true;
+                        if (this == null)
+                            return;
 
-                StartReturnTimer();
-            });
+                        isMoving = false;
+                        isAtTop = true;
+
+                        StartReturnTimer();
+                    }
+                );
     }
 
 
@@ -153,11 +209,14 @@ public class ElevatorController : MonoBehaviour
         if (!isAtTop)
             return;
 
+        if (platform == null)
+            return;
+
+
         isMoving = true;
 
         CancelReturn();
-
-        platform.DOKill();
+        KillMovementTween();
 
 
         // 🔊 SOUND DOWN
@@ -172,32 +231,45 @@ public class ElevatorController : MonoBehaviour
         // оставляем его дочерним объектом.
         // Он поедет вниз вместе с лифтом.
 
-        platform
-            .DOMove(
-                bottomPosition,
-                moveDuration
-            )
-            .SetEase(
-                Ease.InOutQuad
-            )
-            .SetLink(
-                gameObject
-            )
-            .OnComplete(() =>
-            {
-                isMoving = false;
+        movementTween =
+            platform
+                .DOMove(
+                    bottomPosition,
+                    moveDuration
+                )
+                .SetEase(
+                    Ease.InOutQuad
+                )
+                .SetLink(
+                    gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        movementTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        movementTween = null;
 
-                isAtTop = false;
+                        if (this == null)
+                            return;
 
-                if (player != null)
-                {
-                    player.SetParent(
-                        null
-                    );
+                        isMoving = false;
+                        isAtTop = false;
 
-                    player = null;
-                }
-            });
+                        if (player != null)
+                        {
+                            player.SetParent(
+                                null
+                            );
+
+                            player = null;
+                        }
+                    }
+                );
     }
 
 
@@ -238,6 +310,30 @@ public class ElevatorController : MonoBehaviour
         );
 
         returnCoroutine = null;
+    }
+
+
+    // ==========================================
+    // TWEEN CLEANUP
+    // ==========================================
+
+    private void KillMovementTween()
+    {
+        if (
+            movementTween != null &&
+            movementTween.IsActive()
+        )
+        {
+            movementTween.Kill();
+        }
+
+        movementTween = null;
+
+
+        if (platform != null)
+        {
+            platform.DOKill();
+        }
     }
 
 

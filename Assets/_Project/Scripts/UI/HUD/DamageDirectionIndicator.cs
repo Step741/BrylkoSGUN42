@@ -98,6 +98,12 @@ public class DamageDirectionIndicator : MonoBehaviour
     }
 
 
+    private void OnDestroy()
+    {
+        KillAnimation();
+    }
+
+
     // =========================================================
     // DAMAGE DIRECTION
     // =========================================================
@@ -235,12 +241,15 @@ public class DamageDirectionIndicator : MonoBehaviour
 
     private void PlayDamageAnimation()
     {
+        KillAnimation();
+
+
         if (
-            damageSequence != null &&
-            damageSequence.IsActive()
+            canvasGroup == null ||
+            indicator == null
         )
         {
-            damageSequence.Kill();
+            return;
         }
 
 
@@ -251,7 +260,8 @@ public class DamageDirectionIndicator : MonoBehaviour
 
 
         damageSequence =
-            DOTween.Sequence();
+            DOTween.Sequence()
+                .SetLink(gameObject);
 
 
         // Появление.
@@ -334,12 +344,16 @@ public class DamageDirectionIndicator : MonoBehaviour
 
         if (canvasGroup != null)
         {
+            canvasGroup.DOKill();
+
             canvasGroup.alpha = 0f;
         }
 
 
         if (indicator != null)
         {
+            indicator.DOKill();
+
             indicator.localScale =
                 Vector3.one;
         }

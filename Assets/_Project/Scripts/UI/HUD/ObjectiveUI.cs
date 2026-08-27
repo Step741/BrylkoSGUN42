@@ -55,6 +55,13 @@ public class ObjectiveUI : MonoBehaviour
     // Исходная позиция текста.
     private Vector3 originalLocalPosition;
 
+    // Текущая последовательность анимации текста.
+    private Sequence textSequence;
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
@@ -105,6 +112,14 @@ public class ObjectiveUI : MonoBehaviour
         }
 
 
+        KillTextTween();
+
+        ResetTextState();
+    }
+
+
+    private void OnDestroy()
+    {
         KillTextTween();
     }
 
@@ -177,12 +192,15 @@ public class ObjectiveUI : MonoBehaviour
         KillTextTween();
 
 
-        Sequence sequence =
-            DOTween.Sequence();
+        textSequence =
+            DOTween.Sequence()
+                .SetLink(
+                    gameObject
+                );
 
 
         // Плавно скрываем текущий текст.
-        sequence.Append(
+        textSequence.Append(
             objectiveText
                 .DOFade(
                     0f,
@@ -195,9 +213,13 @@ public class ObjectiveUI : MonoBehaviour
 
 
         // Меняем текст после исчезновения.
-        sequence.AppendCallback(
+        textSequence.AppendCallback(
             () =>
             {
+                if (objectiveText == null)
+                    return;
+
+
                 objectiveText.text =
                     newText;
 
@@ -216,7 +238,7 @@ public class ObjectiveUI : MonoBehaviour
 
         // Параллельно возвращаем текст
         // в исходную позицию и показываем его.
-        sequence.Append(
+        textSequence.Append(
             objectiveText
                 .DOFade(
                     1f,
@@ -228,7 +250,7 @@ public class ObjectiveUI : MonoBehaviour
         );
 
 
-        sequence.Join(
+        textSequence.Join(
             objectiveText.transform
                 .DOLocalMove(
                     originalLocalPosition,
@@ -237,6 +259,22 @@ public class ObjectiveUI : MonoBehaviour
                 .SetEase(
                     Ease.OutQuad
                 )
+        );
+
+
+        textSequence.OnKill(
+            () =>
+            {
+                textSequence = null;
+            }
+        );
+
+
+        textSequence.OnComplete(
+            () =>
+            {
+                textSequence = null;
+            }
         );
     }
 
@@ -270,11 +308,41 @@ public class ObjectiveUI : MonoBehaviour
 
 
     // =========================================================
+    // RESET
+    // =========================================================
+
+    private void ResetTextState()
+    {
+        if (objectiveText == null)
+            return;
+
+
+        objectiveText.alpha =
+            1f;
+
+
+        objectiveText.transform.localPosition =
+            originalLocalPosition;
+    }
+
+
+    // =========================================================
     // CLEANUP
     // =========================================================
 
     private void KillTextTween()
     {
+        if (
+            textSequence != null &&
+            textSequence.IsActive()
+        )
+        {
+            textSequence.Kill();
+        }
+
+        textSequence = null;
+
+
         if (objectiveText == null)
             return;
 

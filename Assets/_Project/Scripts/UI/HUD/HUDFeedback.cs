@@ -9,10 +9,12 @@ public class HUDFeedback : MonoBehaviour
     [SerializeField] private RectTransform hudShakeRoot;
     [SerializeField] private Slider healthBar;
 
+
     [Header("Damage Shake")]
     [SerializeField] private float shakeDuration = 0.25f;
     [SerializeField] private float shakeStrength = 8f;
     [SerializeField] private int shakeVibrato = 20;
+
 
     [Header("Low HP Pulse")]
     [SerializeField, Range(0f, 1f)]
@@ -21,27 +23,52 @@ public class HUDFeedback : MonoBehaviour
     [SerializeField] private float pulseScale = 1.08f;
     [SerializeField] private float pulseDuration = 0.35f;
 
+
     private float previousHealth;
+
     private Vector3 originalScale;
+    private Vector2 originalShakePosition;
+
+    private Tween shakeTween;
     private Tween pulseTween;
+    private Tween returnScaleTween;
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
         if (healthBar != null)
         {
-            originalScale = healthBar.transform.localScale;
+            originalScale =
+                healthBar.transform.localScale;
+        }
+
+        if (hudShakeRoot != null)
+        {
+            originalShakePosition =
+                hudShakeRoot.anchoredPosition;
         }
     }
+
 
     private void Start()
     {
         if (health == null)
         {
-            Debug.LogError("HUDFeedback: Health reference is missing.");
+            Debug.LogError(
+                "HUDFeedback: Health reference is missing."
+            );
+
             return;
         }
 
-        previousHealth = health.CurrentHealth;
+
+        previousHealth =
+            health.CurrentHealth;
+
 
         UpdateLowHealthPulse(
             health.CurrentHealth,
@@ -49,28 +76,40 @@ public class HUDFeedback : MonoBehaviour
         );
     }
 
+
     private void OnEnable()
     {
         if (health != null)
         {
-            health.HealthChanged += OnHealthChanged;
+            health.HealthChanged +=
+                OnHealthChanged;
         }
     }
+
 
     private void OnDisable()
     {
         if (health != null)
         {
-            health.HealthChanged -= OnHealthChanged;
+            health.HealthChanged -=
+                OnHealthChanged;
         }
 
-        pulseTween?.Kill();
+        KillAllTweens();
 
-        if (healthBar != null)
-        {
-            healthBar.transform.localScale = originalScale;
-        }
+        ResetVisualState();
     }
+
+
+    private void OnDestroy()
+    {
+        KillAllTweens();
+    }
+
+
+    // =========================================================
+    // HEALTH CHANGED
+    // =========================================================
 
     private void OnHealthChanged(
         float currentHealth,
@@ -81,39 +120,89 @@ public class HUDFeedback : MonoBehaviour
             ShakeHUD();
         }
 
+
         UpdateLowHealthPulse(
             currentHealth,
             maxHealth
         );
 
-        previousHealth = currentHealth;
+
+        previousHealth =
+            currentHealth;
     }
+
+
+    // =========================================================
+    // DAMAGE SHAKE
+    // =========================================================
 
     private void ShakeHUD()
     {
         if (hudShakeRoot == null)
             return;
 
+
+        // Останавливаем предыдущую тряску.
         hudShakeRoot.DOKill();
 
-        hudShakeRoot.DOShakeAnchorPos(
-            shakeDuration,
-            shakeStrength,
-            shakeVibrato,
-            90f,
-            false,
-            true
-        );
+        shakeTween?.Kill();
+
+
+        shakeTween =
+            hudShakeRoot
+                .DOShakeAnchorPos(
+                    shakeDuration,
+                    shakeStrength,
+                    shakeVibrato,
+                    90f,
+                    false,
+                    true
+                )
+                .SetLink(
+                    hudShakeRoot.gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        shakeTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        shakeTween = null;
+
+                        if (hudShakeRoot != null)
+                        {
+                            hudShakeRoot.anchoredPosition =
+                                originalShakePosition;
+                        }
+                    }
+                );
     }
+
+
+    // =========================================================
+    // LOW HEALTH PULSE
+    // =========================================================
 
     private void UpdateLowHealthPulse(
         float currentHealth,
         float maxHealth)
     {
-        if (healthBar == null || maxHealth <= 0f)
+        if (
+            healthBar == null ||
+            maxHealth <= 0f
+        )
+        {
             return;
+        }
 
-        float healthPercent = currentHealth / maxHealth;
+
+        float healthPercent =
+            currentHealth /
+            maxHealth;
+
 
         if (healthPercent <= lowHealthPercent)
         {
@@ -125,33 +214,148 @@ public class HUDFeedback : MonoBehaviour
         }
     }
 
+
     private void StartLowHealthPulse()
     {
-        if (pulseTween != null && pulseTween.IsActive())
+        if (healthBar == null)
             return;
 
-        pulseTween = healthBar.transform
-            .DOScale(
-                originalScale * pulseScale,
-                pulseDuration
-            )
-            .SetLoops(-1, LoopType.Yoyo)
-            .SetEase(Ease.InOutSine);
+
+        if (
+            pulseTween != null &&
+            pulseTween.IsActive()
+        )
+        {
+            return;
+        }
+
+
+        // На всякий случай убираем tween возврата,
+        // если здоровье снова стало низким
+        // до завершения возврата масштаба.
+        returnScaleTween?.Kill();
+        returnScaleTween = null;
+
+
+        healthBar.transform.DOKill();
+
+
+        pulseTween =
+            healthBar.transform
+                .DOScale(
+                    originalScale * pulseScale,
+                    pulseDuration
+                )
+                .SetLoops(
+                    -1,
+                    LoopType.Yoyo
+                )
+                .SetEase(
+                    Ease.InOutSine
+                )
+                .SetLink(
+                    healthBar.gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        pulseTween = null;
+                    }
+                );
     }
+
 
     private void StopLowHealthPulse()
     {
-        if (pulseTween == null)
+        if (healthBar == null)
             return;
 
-        pulseTween.Kill();
+
+        if (
+            pulseTween != null &&
+            pulseTween.IsActive()
+        )
+        {
+            pulseTween.Kill();
+        }
+
         pulseTween = null;
 
-        healthBar.transform
-            .DOScale(
-                originalScale,
-                pulseDuration
-            )
-            .SetEase(Ease.OutSine);
+
+        healthBar.transform.DOKill();
+
+
+        returnScaleTween =
+            healthBar.transform
+                .DOScale(
+                    originalScale,
+                    pulseDuration
+                )
+                .SetEase(
+                    Ease.OutSine
+                )
+                .SetLink(
+                    healthBar.gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        returnScaleTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        returnScaleTween = null;
+                    }
+                );
+    }
+
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
+
+    private void KillAllTweens()
+    {
+        shakeTween?.Kill();
+        shakeTween = null;
+
+
+        pulseTween?.Kill();
+        pulseTween = null;
+
+
+        returnScaleTween?.Kill();
+        returnScaleTween = null;
+
+
+        if (hudShakeRoot != null)
+        {
+            hudShakeRoot.DOKill();
+        }
+
+
+        if (healthBar != null)
+        {
+            healthBar.transform.DOKill();
+        }
+    }
+
+
+    private void ResetVisualState()
+    {
+        if (hudShakeRoot != null)
+        {
+            hudShakeRoot.anchoredPosition =
+                originalShakePosition;
+        }
+
+
+        if (healthBar != null)
+        {
+            healthBar.transform.localScale =
+                originalScale;
+        }
     }
 }

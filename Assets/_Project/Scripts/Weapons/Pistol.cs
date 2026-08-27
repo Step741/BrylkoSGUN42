@@ -3,6 +3,10 @@ using Zenject;
 
 public class Pistol : WeaponBase
 {
+    // =========================================================
+    // REFERENCES
+    // =========================================================
+
     [Header("References")]
 
     [SerializeField]
@@ -12,8 +16,18 @@ public class Pistol : WeaponBase
     private ParticleSystem muzzleFlash;
 
     [SerializeField]
+    private Transform muzzlePoint;
+
+    [SerializeField]
+    private BulletTracer bulletTracer;
+
+    [SerializeField]
     private ShellEjector shellEjector;
 
+
+    // =========================================================
+    // WEAPON SOUNDS
+    // =========================================================
 
     [Header("Weapon Sounds")]
 
@@ -27,6 +41,10 @@ public class Pistol : WeaponBase
     private AudioClip reloadSound;
 
 
+    // =========================================================
+    // SOUND SETTINGS
+    // =========================================================
+
     [Header("Sound Settings")]
 
     [SerializeField]
@@ -37,11 +55,19 @@ public class Pistol : WeaponBase
     private float soundPitch = 1f;
 
 
+    // =========================================================
+    // EMPTY CLICK
+    // =========================================================
+
     [Header("Empty Click")]
 
     [SerializeField]
     private float emptyClickCooldown = 0.2f;
 
+
+    // =========================================================
+    // RECOIL
+    // =========================================================
 
     [Header("Recoil")]
 
@@ -49,11 +75,25 @@ public class Pistol : WeaponBase
     private WeaponRecoil weaponRecoil;
 
 
+    // =========================================================
+    // COMPONENTS
+    // =========================================================
+
     private Camera playerCamera;
 
+
+    // =========================================================
+    // STATE
+    // =========================================================
+
     private float nextFireTime;
+
     private float nextEmptyClickTime;
 
+
+    // =========================================================
+    // INJECTION
+    // =========================================================
 
     [Inject]
     private void Construct(
@@ -63,6 +103,10 @@ public class Pistol : WeaponBase
             playerCamera;
     }
 
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     protected override void Awake()
     {
@@ -84,7 +128,10 @@ public class Pistol : WeaponBase
 
     public override bool Shoot()
     {
-        // Пустой магазин
+        // =====================================================
+        // EMPTY MAGAZINE
+        // =====================================================
+
         if (currentAmmo <= 0)
         {
             PlayEmptyClick();
@@ -92,6 +139,10 @@ public class Pistol : WeaponBase
             return false;
         }
 
+
+        // =====================================================
+        // CAN SHOOT
+        // =====================================================
 
         if (!CanShoot)
             return false;
@@ -105,39 +156,75 @@ public class Pistol : WeaponBase
             return false;
 
 
+        // =====================================================
+        // AMMO
+        // =====================================================
+
         currentAmmo--;
 
         NotifyAmmoChanged();
 
 
-        // Muzzle Flash
-        muzzleFlash?.Play();
+        // =====================================================
+        // MUZZLE FLASH
+        // =====================================================
+
+        MuzzleFlashPool.Instance?.Play(
+            muzzleFlash,
+            muzzlePoint
+        );
 
 
-        // Shell Ejection
+        // =====================================================
+        // SHELL EJECTION
+        // =====================================================
+
         shellEjector?.Eject();
 
 
-        // Shoot Sound
+        // =====================================================
+        // SHOOT SOUND
+        // =====================================================
+
         PlaySound(
             shootSound
         );
 
 
-        // Recoil
+        // =====================================================
+        // RECOIL
+        // =====================================================
+
         weaponRecoil?.AddRecoil();
 
+
+        // =====================================================
+        // FIRE RATE
+        // =====================================================
 
         nextFireTime =
             Time.time +
             1f / config.FireRate;
 
 
+        // =====================================================
+        // RAYCAST
+        // =====================================================
+
         Ray ray =
             new Ray(
                 playerCamera.transform.position,
                 playerCamera.transform.forward
             );
+
+
+        // По умолчанию трассер летит
+        // на максимальную дальность оружия.
+
+        Vector3 tracerEndPoint =
+            ray.origin +
+            ray.direction *
+            config.Range;
 
 
         if (
@@ -150,15 +237,26 @@ public class Pistol : WeaponBase
             )
         )
         {
-            // Surface Impact
+            // =================================================
+            // TRACER END POINT
+            // =================================================
+
+            tracerEndPoint =
+                hit.point;
+
+
+            // =================================================
+            // SURFACE IMPACT
+            // =================================================
+
             SurfaceImpactUtility.ProcessHit(
                 hit
             );
 
 
-            // ==========================================
+            // =================================================
             // DAMAGE HITBOX
-            // ==========================================
+            // =================================================
 
             DamageHitbox hitbox =
                 hit.collider.GetComponent<
@@ -175,9 +273,9 @@ public class Pistol : WeaponBase
             }
             else
             {
-                // ==========================================
+                // =============================================
                 // NORMAL DAMAGE
-                // ==========================================
+                // =============================================
 
                 IDamageable damageable =
                     hit.collider.GetComponentInParent<
@@ -199,6 +297,27 @@ public class Pistol : WeaponBase
             );
         }
 
+
+        // =====================================================
+        // BULLET TRACER
+        // =====================================================
+
+        if (
+            bulletTracer != null &&
+            muzzlePoint != null
+        )
+        {
+            BulletTracerPool.Instance?.Play(
+                bulletTracer,
+                muzzlePoint.position,
+                tracerEndPoint
+            );
+        }
+
+
+        // =====================================================
+        // DEBUG
+        // =====================================================
 
         Debug.DrawRay(
             ray.origin,
@@ -228,7 +347,10 @@ public class Pistol : WeaponBase
             return;
 
 
-        // Бесконечный боезапас
+        // =====================================================
+        // INFINITE AMMO
+        // =====================================================
+
         if (InfiniteAmmo)
         {
             currentAmmo =
@@ -250,7 +372,10 @@ public class Pistol : WeaponBase
         }
 
 
-        // Обычный боезапас
+        // =====================================================
+        // NORMAL AMMO
+        // =====================================================
+
         if (reserveAmmo <= 0)
             return;
 
@@ -307,6 +432,10 @@ public class Pistol : WeaponBase
         );
     }
 
+
+    // =========================================================
+    // EMPTY CLICK
+    // =========================================================
 
     private void PlayEmptyClick()
     {

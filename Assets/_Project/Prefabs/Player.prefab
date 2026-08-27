@@ -6030,8 +6030,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   surfaceType: 4
-  impactVfx: {fileID: 19800006, guid: 94a130fb17f1cae4388a8fe1d8bd3055, type: 3}
-  decalPrefab: {fileID: 0}
+  impactVfx: {fileID: 0}
+  decalPrefab: {fileID: 5145229514821273470, guid: a3b3fd28b7e8fcc4b8d187816da7eb35, type: 3}
   decalLifetime: 8
   concreteImpactSound: {fileID: 8300000, guid: 7e384a0899a189349b1de7c84e8d2efd, type: 3}
   metalImpactSound: {fileID: 8300000, guid: af634d8d446811c4cbdb9d3c3920528b, type: 3}
@@ -23685,7 +23685,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 11712
   muzzleFlash: {fileID: 4589178281936611862}
+  muzzlePoint: {fileID: 0}
+  bulletTracer: {fileID: 0}
   shellEjector: {fileID: 7984420697212854686}
+  tracersPerShot: 3
   shootSound: {fileID: 8300000, guid: d967e4face0ce1741bc2aa727b5bcd60, type: 3}
   emptyClickSound: {fileID: 8300000, guid: 89a8d818603ebb74591237254d6c1b44, type: 3}
   reloadSound: {fileID: 8300000, guid: 36b2adecd8b0fad40ac7abdecbaf2b92, type: 3}
@@ -29422,6 +29425,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 11712
   muzzleFlash: {fileID: 2964553444750249151}
+  muzzlePoint: {fileID: 0}
+  bulletTracer: {fileID: 0}
   shellEjector: {fileID: 3569348882082384120}
   shootSound: {fileID: 8300000, guid: a4af8e4a9b333c440aa277cda7a78276, type: 3}
   emptyClickSound: {fileID: 8300000, guid: 89a8d818603ebb74591237254d6c1b44, type: 3}
@@ -29540,6 +29545,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 11712
   muzzleFlash: {fileID: 7919816221108215579}
+  muzzlePoint: {fileID: 0}
+  bulletTracer: {fileID: 0}
   shellEjector: {fileID: 7530923127978950353}
   shootSound: {fileID: 8300000, guid: 3ff0bc4828c92ef4985b7af350d3fe52, type: 3}
   emptyClickSound: {fileID: 8300000, guid: 89a8d818603ebb74591237254d6c1b44, type: 3}

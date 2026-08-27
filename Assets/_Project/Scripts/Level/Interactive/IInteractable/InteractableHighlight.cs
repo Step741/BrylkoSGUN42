@@ -4,6 +4,7 @@ using UnityEngine;
 public class InteractableHighlight : MonoBehaviour
 {
     [Header("Highlight")]
+
     [SerializeField]
     private Color highlightColor = Color.yellow;
 
@@ -11,7 +12,9 @@ public class InteractableHighlight : MonoBehaviour
     [Range(0f, 1f)]
     private float highlightStrength = 0.8f;
 
+
     [Header("Animation")]
+
     [SerializeField]
     private float fadeDuration = 0.2f;
 
@@ -20,6 +23,7 @@ public class InteractableHighlight : MonoBehaviour
 
     [SerializeField]
     private float pulseStrength = 0.08f;
+
 
     private Renderer[] renderers;
 
@@ -31,6 +35,7 @@ public class InteractableHighlight : MonoBehaviour
     private float currentStrength;
     private bool isHighlighted;
 
+
     private static readonly int BaseColorId =
         Shader.PropertyToID("_BaseColor");
 
@@ -39,6 +44,11 @@ public class InteractableHighlight : MonoBehaviour
 
     private static readonly int EmissionColorId =
         Shader.PropertyToID("_EmissionColor");
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
@@ -53,20 +63,46 @@ public class InteractableHighlight : MonoBehaviour
         ApplyHighlight(0f);
     }
 
+
+    private void OnDisable()
+    {
+        KillTweens();
+
+        currentStrength = 0f;
+        isHighlighted = false;
+
+        ApplyHighlight(0f);
+    }
+
+
+    private void OnDestroy()
+    {
+        KillTweens();
+    }
+
+
+    // =========================================================
+    // HIGHLIGHT
+    // =========================================================
+
     public void SetHighlighted(bool highlighted)
     {
         if (isHighlighted == highlighted)
             return;
 
+
         isHighlighted = highlighted;
 
-        highlightTween?.Kill();
-        pulseTween?.Kill();
+
+        // Останавливаем предыдущие анимации.
+        KillTweens();
+
 
         float targetStrength =
             highlighted
                 ? highlightStrength
                 : 0f;
+
 
         highlightTween =
             DOTween
@@ -80,7 +116,25 @@ public class InteractableHighlight : MonoBehaviour
                     targetStrength,
                     fadeDuration
                 )
-                .SetEase(Ease.OutQuad);
+                .SetEase(
+                    Ease.OutQuad
+                )
+                .SetLink(
+                    gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        highlightTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        highlightTween = null;
+                    }
+                );
+
 
         if (highlighted)
         {
@@ -88,8 +142,19 @@ public class InteractableHighlight : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // PULSE
+    // =========================================================
+
     private void StartPulse()
     {
+        // На всякий случай убеждаемся,
+        // что старый pulse уже остановлен.
+
+        KillPulseTween();
+
+
         pulseTween =
             DOTween
                 .To(
@@ -102,24 +167,51 @@ public class InteractableHighlight : MonoBehaviour
                     highlightStrength + pulseStrength,
                     pulseDuration
                 )
-                .SetEase(Ease.InOutSine)
-                .SetLoops(-1, LoopType.Yoyo);
+                .SetEase(
+                    Ease.InOutSine
+                )
+                .SetLoops(
+                    -1,
+                    LoopType.Yoyo
+                )
+                .SetLink(
+                    gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        pulseTween = null;
+                    }
+                );
     }
 
-    private void ApplyHighlight(float strength)
+
+    // =========================================================
+    // APPLY HIGHLIGHT
+    // =========================================================
+
+    private void ApplyHighlight(
+        float strength
+    )
     {
         if (renderers == null)
             return;
 
+
         Color emission =
             highlightColor * strength;
+
 
         foreach (Renderer renderer in renderers)
         {
             if (renderer == null)
                 continue;
 
-            renderer.GetPropertyBlock(propertyBlock);
+
+            renderer.GetPropertyBlock(
+                propertyBlock
+            );
+
 
             propertyBlock.SetColor(
                 BaseColorId,
@@ -130,6 +222,7 @@ public class InteractableHighlight : MonoBehaviour
                 )
             );
 
+
             propertyBlock.SetColor(
                 ColorId,
                 Color.Lerp(
@@ -139,10 +232,12 @@ public class InteractableHighlight : MonoBehaviour
                 )
             );
 
+
             propertyBlock.SetColor(
                 EmissionColorId,
                 emission
             );
+
 
             renderer.SetPropertyBlock(
                 propertyBlock
@@ -150,15 +245,42 @@ public class InteractableHighlight : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
+
+    private void KillTweens()
     {
-        highlightTween?.Kill();
-        pulseTween?.Kill();
+        KillHighlightTween();
+        KillPulseTween();
     }
 
-    private void OnDestroy()
+
+    private void KillHighlightTween()
     {
-        highlightTween?.Kill();
-        pulseTween?.Kill();
+        if (
+            highlightTween != null &&
+            highlightTween.IsActive()
+        )
+        {
+            highlightTween.Kill();
+        }
+
+        highlightTween = null;
+    }
+
+
+    private void KillPulseTween()
+    {
+        if (
+            pulseTween != null &&
+            pulseTween.IsActive()
+        )
+        {
+            pulseTween.Kill();
+        }
+
+        pulseTween = null;
     }
 }

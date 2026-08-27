@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class MissionCompleteController : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private ComputerInteractable computerInteractable;
 
@@ -87,6 +88,8 @@ public class MissionCompleteController : MonoBehaviour
 
     private RectTransform mainMenuButtonTransform;
 
+    private Sequence missionCompleteSequence;
+
     private bool isMissionCompleteShown;
 
 
@@ -155,6 +158,12 @@ public class MissionCompleteController : MonoBehaviour
     }
 
 
+    private void OnDisable()
+    {
+        KillTweens();
+    }
+
+
     private void OnDestroy()
     {
         if (computerInteractable != null)
@@ -210,9 +219,11 @@ public class MissionCompleteController : MonoBehaviour
         {
             canvasGroup.alpha = 0f;
 
-            canvasGroup.interactable = false;
+            canvasGroup.interactable =
+                false;
 
-            canvasGroup.blocksRaycasts = false;
+            canvasGroup.blocksRaycasts =
+                false;
         }
     }
 
@@ -326,6 +337,9 @@ public class MissionCompleteController : MonoBehaviour
         // ПОКАЗЫВАЕМ ЭКРАН ПОБЕДЫ
         // -----------------------------------------------------
 
+        KillTweens();
+
+
         missionCompletePanel.SetActive(
             true
         );
@@ -335,9 +349,11 @@ public class MissionCompleteController : MonoBehaviour
         {
             canvasGroup.alpha = 0f;
 
-            canvasGroup.interactable = false;
+            canvasGroup.interactable =
+                false;
 
-            canvasGroup.blocksRaycasts = false;
+            canvasGroup.blocksRaycasts =
+                false;
         }
 
 
@@ -348,7 +364,7 @@ public class MissionCompleteController : MonoBehaviour
         // ANIMATION
         // =====================================================
 
-        Sequence sequence =
+        missionCompleteSequence =
             DOTween.Sequence()
                 .SetUpdate(true)
                 .SetLink(gameObject);
@@ -360,7 +376,7 @@ public class MissionCompleteController : MonoBehaviour
 
         if (canvasGroup != null)
         {
-            sequence.Append(
+            missionCompleteSequence.Append(
                 canvasGroup
                     .DOFade(
                         1f,
@@ -379,7 +395,7 @@ public class MissionCompleteController : MonoBehaviour
 
         if (missionCompleteText != null)
         {
-            sequence.Join(
+            missionCompleteSequence.Join(
                 missionCompleteText
                     .DOScale(
                         Vector3.one,
@@ -396,7 +412,7 @@ public class MissionCompleteController : MonoBehaviour
         // DELAY
         // -----------------------------------------------------
 
-        sequence.AppendInterval(
+        missionCompleteSequence.AppendInterval(
             buttonsDelay
         );
 
@@ -407,7 +423,7 @@ public class MissionCompleteController : MonoBehaviour
 
         if (restartButtonTransform != null)
         {
-            sequence.Append(
+            missionCompleteSequence.Append(
                 restartButtonTransform
                     .DOScale(
                         Vector3.one,
@@ -426,7 +442,7 @@ public class MissionCompleteController : MonoBehaviour
 
         if (mainMenuButtonTransform != null)
         {
-            sequence.Append(
+            missionCompleteSequence.Append(
                 mainMenuButtonTransform
                     .DOScale(
                         Vector3.one,
@@ -443,7 +459,7 @@ public class MissionCompleteController : MonoBehaviour
         // ENABLE UI
         // -----------------------------------------------------
 
-        sequence.OnComplete(
+        missionCompleteSequence.OnComplete(
             () =>
             {
                 if (canvasGroup != null)
@@ -454,6 +470,8 @@ public class MissionCompleteController : MonoBehaviour
                     canvasGroup.blocksRaycasts =
                         true;
                 }
+
+                missionCompleteSequence = null;
             }
         );
     }
@@ -493,6 +511,9 @@ public class MissionCompleteController : MonoBehaviour
 
     public void RestartLevel()
     {
+        KillTweens();
+
+
         Time.timeScale = 1f;
 
 
@@ -512,12 +533,17 @@ public class MissionCompleteController : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
+        KillTweens();
+
+
         Time.timeScale = 1f;
+
 
         MusicTransitionManager.StartMenuTransition(
             GameMusic.Instance,
             1.5f
         );
+
 
         SceneManager.LoadScene(
             mainMenuSceneName
@@ -531,11 +557,17 @@ public class MissionCompleteController : MonoBehaviour
 
     private void KillTweens()
     {
-        if (missionCompletePanel != null)
+        if (missionCompleteSequence != null)
         {
-            DOTween.Kill(
-                missionCompletePanel
-            );
+            missionCompleteSequence.Kill();
+
+            missionCompleteSequence = null;
+        }
+
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.DOKill();
         }
 
 

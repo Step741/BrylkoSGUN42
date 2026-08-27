@@ -168,6 +168,12 @@ public class DynamicCrosshair : MonoBehaviour
     }
 
 
+    private void OnDestroy()
+    {
+        KillCrosshairTweens();
+    }
+
+
     // =========================================================
     // INITIAL POSITIONS
     // =========================================================
@@ -280,6 +286,9 @@ public class DynamicCrosshair : MonoBehaviour
             )
             .SetEase(
                 Ease.OutQuad
+            )
+            .SetLink(
+                part.gameObject
             );
     }
 
@@ -430,11 +439,12 @@ public class DynamicCrosshair : MonoBehaviour
             .DOPunchScale(
                 Vector3.one *
                 firePunchScale,
-
                 firePunchDuration,
-
                 1,
                 0.5f
+            )
+            .SetLink(
+                part.gameObject
             );
     }
 

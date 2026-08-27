@@ -5,6 +5,7 @@ using DG.Tweening;
 public class HealthBarUI : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private Health health;
 
@@ -13,6 +14,7 @@ public class HealthBarUI : MonoBehaviour
 
 
     [Header("DOTween Animation")]
+
     [SerializeField]
     [Tooltip("Длительность анимации изменения здоровья.")]
     private float healthAnimationDuration = 0.25f;
@@ -23,6 +25,7 @@ public class HealthBarUI : MonoBehaviour
 
 
     [Header("Colors")]
+
     [SerializeField]
     private Color highHealthColor = Color.green;
 
@@ -42,11 +45,15 @@ public class HealthBarUI : MonoBehaviour
 
     private void Awake()
     {
-        if (healthSlider != null &&
-            healthSlider.fillRect != null)
+        if (
+            healthSlider != null &&
+            healthSlider.fillRect != null
+        )
         {
             fillImage =
-                healthSlider.fillRect.GetComponent<Image>();
+                healthSlider
+                    .fillRect
+                    .GetComponent<Image>();
         }
     }
 
@@ -55,7 +62,8 @@ public class HealthBarUI : MonoBehaviour
     {
         if (health != null)
         {
-            health.HealthChanged += OnHealthChanged;
+            health.HealthChanged +=
+                OnHealthChanged;
         }
     }
 
@@ -70,6 +78,7 @@ public class HealthBarUI : MonoBehaviour
 
             return;
         }
+
 
         if (healthSlider == null)
         {
@@ -98,6 +107,7 @@ public class HealthBarUI : MonoBehaviour
                 health.MaxHealth
             );
 
+
         if (fillImage != null)
         {
             fillImage.color =
@@ -110,9 +120,19 @@ public class HealthBarUI : MonoBehaviour
     {
         if (health != null)
         {
-            health.HealthChanged -= OnHealthChanged;
+            health.HealthChanged -=
+                OnHealthChanged;
         }
 
+
+        KillTweens();
+    }
+
+
+    private void OnDestroy()
+    {
+        // Дополнительная страховка при уничтожении
+        // объекта вместе со сценой.
         KillTweens();
     }
 
@@ -147,7 +167,12 @@ public class HealthBarUI : MonoBehaviour
                 currentHealth,
                 healthAnimationDuration
             )
-            .SetEase(Ease.OutQuad);
+            .SetEase(
+                Ease.OutQuad
+            )
+            .SetLink(
+                healthSlider.gameObject
+            );
 
 
         // =====================================================
@@ -174,7 +199,12 @@ public class HealthBarUI : MonoBehaviour
                     targetColor,
                     colorAnimationDuration
                 )
-                .SetEase(Ease.OutQuad);
+                .SetEase(
+                    Ease.OutQuad
+                )
+                .SetLink(
+                    fillImage.gameObject
+                );
         }
     }
 

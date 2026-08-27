@@ -4,6 +4,7 @@ using UnityEngine;
 public class KeyCardHUD : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private PlayerInventory playerInventory;
 
@@ -13,7 +14,9 @@ public class KeyCardHUD : MonoBehaviour
     [SerializeField]
     private CanvasGroup canvasGroup;
 
+
     [Header("Animation")]
+
     [SerializeField]
     private float showDuration = 0.25f;
 
@@ -23,17 +26,26 @@ public class KeyCardHUD : MonoBehaviour
     [SerializeField]
     private float startScale = 0.8f;
 
+
     private Vector3 originalScale;
 
     private Tween fadeTween;
     private Tween scaleTween;
 
 
+    // =========================================================
+    // UNITY
+    // =========================================================
+
     private void Awake()
     {
-        originalScale = keyCardIcon.transform.localScale;
+        if (keyCardIcon != null)
+        {
+            originalScale =
+                keyCardIcon.transform.localScale;
 
-        keyCardIcon.SetActive(false);
+            keyCardIcon.SetActive(false);
+        }
     }
 
 
@@ -41,7 +53,8 @@ public class KeyCardHUD : MonoBehaviour
     {
         if (playerInventory != null)
         {
-            playerInventory.KeyCardChanged += OnKeyCardChanged;
+            playerInventory.KeyCardChanged +=
+                OnKeyCardChanged;
         }
     }
 
@@ -61,14 +74,27 @@ public class KeyCardHUD : MonoBehaviour
     {
         if (playerInventory != null)
         {
-            playerInventory.KeyCardChanged -= OnKeyCardChanged;
+            playerInventory.KeyCardChanged -=
+                OnKeyCardChanged;
         }
 
         KillTweens();
     }
 
 
-    private void OnKeyCardChanged(bool hasKeyCard)
+    private void OnDestroy()
+    {
+        KillTweens();
+    }
+
+
+    // =========================================================
+    // KEY CARD STATE
+    // =========================================================
+
+    private void OnKeyCardChanged(
+        bool hasKeyCard
+    )
     {
         if (hasKeyCard)
         {
@@ -81,22 +107,57 @@ public class KeyCardHUD : MonoBehaviour
     }
 
 
+    // =========================================================
+    // SHOW
+    // =========================================================
+
     private void Show()
     {
-        fadeTween?.Kill();
-        scaleTween?.Kill();
+        if (
+            keyCardIcon == null ||
+            canvasGroup == null
+        )
+        {
+            return;
+        }
+
+
+        KillTweens();
 
         keyCardIcon.SetActive(true);
 
         canvasGroup.alpha = 0f;
 
         keyCardIcon.transform.localScale =
-            originalScale * startScale;
+            originalScale *
+            startScale;
+
 
         fadeTween =
             canvasGroup
-                .DOFade(1f, showDuration)
-                .SetEase(Ease.OutQuad);
+                .DOFade(
+                    1f,
+                    showDuration
+                )
+                .SetEase(
+                    Ease.OutQuad
+                )
+                .SetLink(
+                    canvasGroup.gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        fadeTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        fadeTween = null;
+                    }
+                );
+
 
         scaleTween =
             keyCardIcon.transform
@@ -104,40 +165,126 @@ public class KeyCardHUD : MonoBehaviour
                     originalScale,
                     showDuration
                 )
-                .SetEase(Ease.OutBack);
+                .SetEase(
+                    Ease.OutBack
+                )
+                .SetLink(
+                    keyCardIcon
+                )
+                .OnKill(
+                    () =>
+                    {
+                        scaleTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        scaleTween = null;
+                    }
+                );
     }
 
 
+    // =========================================================
+    // HIDE
+    // =========================================================
+
     private void Hide()
     {
-        fadeTween?.Kill();
-        scaleTween?.Kill();
+        if (
+            keyCardIcon == null ||
+            canvasGroup == null
+        )
+        {
+            return;
+        }
+
+
+        KillTweens();
+
 
         fadeTween =
             canvasGroup
-                .DOFade(0f, hideDuration)
-                .SetEase(Ease.InQuad);
+                .DOFade(
+                    0f,
+                    hideDuration
+                )
+                .SetEase(
+                    Ease.InQuad
+                )
+                .SetLink(
+                    canvasGroup.gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        fadeTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        fadeTween = null;
+                    }
+                );
+
 
         scaleTween =
             keyCardIcon.transform
                 .DOScale(
-                    originalScale * startScale,
+                    originalScale *
+                    startScale,
                     hideDuration
                 )
-                .SetEase(Ease.InQuad)
-                .OnComplete(() =>
-                {
-                    keyCardIcon.SetActive(false);
-                });
+                .SetEase(
+                    Ease.InQuad
+                )
+                .SetLink(
+                    keyCardIcon
+                )
+                .OnKill(
+                    () =>
+                    {
+                        scaleTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        scaleTween = null;
+
+                        if (keyCardIcon != null)
+                        {
+                            keyCardIcon.SetActive(false);
+                        }
+                    }
+                );
     }
 
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
 
     private void KillTweens()
     {
         fadeTween?.Kill();
-        scaleTween?.Kill();
-
         fadeTween = null;
+
+        scaleTween?.Kill();
         scaleTween = null;
+
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.DOKill();
+        }
+
+
+        if (keyCardIcon != null)
+        {
+            keyCardIcon.transform.DOKill();
+        }
     }
 }

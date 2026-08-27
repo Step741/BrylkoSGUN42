@@ -203,7 +203,10 @@ public class GrenadeLauncher : WeaponBase
         // MUZZLE FLASH
         // ==================================================
 
-        muzzleFlash?.Play();
+        MuzzleFlashPool.Instance?.Play(
+            muzzleFlash,
+            muzzlePoint
+        );
 
 
         // ==================================================

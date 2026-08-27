@@ -5,32 +5,44 @@ using UnityEngine;
 public class InteractionPromptAnimator : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private CanvasGroup canvasGroup;
 
     [SerializeField]
     private TMP_Text promptText;
 
+
     [Header("Show Animation")]
+
     [SerializeField]
     private float showDuration = 0.18f;
 
     [SerializeField]
     private float startScale = 0.85f;
 
+
     [Header("Hide Animation")]
+
     [SerializeField]
     private float hideDuration = 0.12f;
+
 
     private Vector3 originalScale;
 
     private Tween fadeTween;
     private Tween scaleTween;
 
+
+    // =========================================================
+    // UNITY
+    // =========================================================
+
     private void Awake()
     {
         originalScale =
             transform.localScale;
+
 
         if (canvasGroup == null)
         {
@@ -38,14 +50,33 @@ public class InteractionPromptAnimator : MonoBehaviour
                 GetComponent<CanvasGroup>();
         }
 
+
         if (canvasGroup != null)
         {
             canvasGroup.alpha = 0f;
         }
 
+
         transform.localScale =
             originalScale * startScale;
     }
+
+
+    private void OnDisable()
+    {
+        KillTweens();
+    }
+
+
+    private void OnDestroy()
+    {
+        KillTweens();
+    }
+
+
+    // =========================================================
+    // SHOW
+    // =========================================================
 
     public void Show(string text)
     {
@@ -54,10 +85,32 @@ public class InteractionPromptAnimator : MonoBehaviour
             promptText.text = text;
         }
 
-        fadeTween?.Kill();
-        scaleTween?.Kill();
 
-        gameObject.SetActive(true);
+        // Останавливаем предыдущие анимации.
+        KillTweens();
+
+
+        // Если объект был скрыт после Hide(),
+        // снова включаем его перед запуском анимации.
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+        }
+
+
+        transform.localScale =
+            originalScale * startScale;
+
+
+        // =====================================================
+        // FADE IN
+        // =====================================================
 
         if (canvasGroup != null)
         {
@@ -67,11 +120,30 @@ public class InteractionPromptAnimator : MonoBehaviour
                         1f,
                         showDuration
                     )
-                    .SetEase(Ease.OutQuad);
+                    .SetEase(
+                        Ease.OutQuad
+                    )
+                    .SetLink(
+                        gameObject
+                    )
+                    .OnKill(
+                        () =>
+                        {
+                            fadeTween = null;
+                        }
+                    )
+                    .OnComplete(
+                        () =>
+                        {
+                            fadeTween = null;
+                        }
+                    );
         }
 
-        transform.localScale =
-            originalScale * startScale;
+
+        // =====================================================
+        // SCALE IN
+        // =====================================================
 
         scaleTween =
             transform
@@ -79,13 +151,35 @@ public class InteractionPromptAnimator : MonoBehaviour
                     originalScale,
                     showDuration
                 )
-                .SetEase(Ease.OutBack);
+                .SetEase(
+                    Ease.OutBack
+                )
+                .SetLink(
+                    gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        scaleTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        scaleTween = null;
+                    }
+                );
     }
+
+
+    // =========================================================
+    // HIDE
+    // =========================================================
 
     public void Hide()
     {
-        fadeTween?.Kill();
-        scaleTween?.Kill();
+        KillTweens();
+
 
         if (canvasGroup == null)
         {
@@ -93,17 +187,48 @@ public class InteractionPromptAnimator : MonoBehaviour
             return;
         }
 
+
+        // =====================================================
+        // FADE OUT
+        // =====================================================
+
         fadeTween =
             canvasGroup
                 .DOFade(
                     0f,
                     hideDuration
                 )
-                .SetEase(Ease.InQuad)
-                .OnComplete(() =>
-                {
-                    gameObject.SetActive(false);
-                });
+                .SetEase(
+                    Ease.InQuad
+                )
+                .SetLink(
+                    gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        fadeTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        fadeTween = null;
+
+
+                        // Если объект всё ещё существует,
+                        // отключаем его после анимации.
+                        if (this != null)
+                        {
+                            gameObject.SetActive(false);
+                        }
+                    }
+                );
+
+
+        // =====================================================
+        // SCALE OUT
+        // =====================================================
 
         scaleTween =
             transform
@@ -111,18 +236,61 @@ public class InteractionPromptAnimator : MonoBehaviour
                     originalScale * startScale,
                     hideDuration
                 )
-                .SetEase(Ease.InQuad);
+                .SetEase(
+                    Ease.InQuad
+                )
+                .SetLink(
+                    gameObject
+                )
+                .OnKill(
+                    () =>
+                    {
+                        scaleTween = null;
+                    }
+                )
+                .OnComplete(
+                    () =>
+                    {
+                        scaleTween = null;
+                    }
+                );
     }
 
-    private void OnDisable()
-    {
-        fadeTween?.Kill();
-        scaleTween?.Kill();
-    }
 
-    private void OnDestroy()
+    // =========================================================
+    // CLEANUP
+    // =========================================================
+
+    private void KillTweens()
     {
-        fadeTween?.Kill();
-        scaleTween?.Kill();
+        if (
+            fadeTween != null &&
+            fadeTween.IsActive()
+        )
+        {
+            fadeTween.Kill();
+        }
+
+        fadeTween = null;
+
+
+        if (
+            scaleTween != null &&
+            scaleTween.IsActive()
+        )
+        {
+            scaleTween.Kill();
+        }
+
+        scaleTween = null;
+
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.DOKill();
+        }
+
+
+        transform.DOKill();
     }
 }

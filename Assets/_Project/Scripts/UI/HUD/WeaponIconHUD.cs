@@ -5,11 +5,13 @@ using DG.Tweening;
 public class WeaponIconHUD : MonoBehaviour
 {
     [Header("Weapon System")]
+
     [SerializeField]
     private WeaponSwitcher weaponSwitcher;
 
 
     [Header("Weapon Icons")]
+
     [SerializeField]
     private Image pistolIcon;
 
@@ -30,6 +32,7 @@ public class WeaponIconHUD : MonoBehaviour
 
 
     [Header("Colors")]
+
     [SerializeField]
     private Color inactiveColor =
         new Color(1f, 1f, 1f, 0.35f);
@@ -40,6 +43,7 @@ public class WeaponIconHUD : MonoBehaviour
 
 
     [Header("DOTween Animation")]
+
     [SerializeField]
     [Tooltip("Максимальное увеличение активной иконки.")]
     private float activeScale = 1.15f;
@@ -55,6 +59,19 @@ public class WeaponIconHUD : MonoBehaviour
     [SerializeField]
     [Tooltip("Длительность плавного изменения цвета.")]
     private float colorDuration = 0.15f;
+
+
+    // =========================================================
+    // SEQUENCES
+    // Отдельная Sequence для каждой иконки.
+    // =========================================================
+
+    private Sequence pistolSequence;
+    private Sequence rifleSequence;
+    private Sequence shotgunSequence;
+    private Sequence grenadeLauncherSequence;
+    private Sequence railgunSequence;
+    private Sequence katanaSequence;
 
 
     // =========================================================
@@ -91,6 +108,12 @@ public class WeaponIconHUD : MonoBehaviour
     }
 
 
+    private void OnDestroy()
+    {
+        KillAllTweens();
+    }
+
+
     // =========================================================
     // WEAPON CHANGED
     // =========================================================
@@ -98,7 +121,10 @@ public class WeaponIconHUD : MonoBehaviour
     private void OnWeaponChanged(
         WeaponBase weapon)
     {
-        UpdateIcons(weapon, true);
+        UpdateIcons(
+            weapon,
+            true
+        );
     }
 
 
@@ -128,6 +154,7 @@ public class WeaponIconHUD : MonoBehaviour
         bool animate)
     {
         // Сначала выключаем выделение у всех.
+
         SetIconState(
             pistolIcon,
             false,
@@ -238,9 +265,9 @@ public class WeaponIconHUD : MonoBehaviour
             return;
 
 
-        // Останавливаем предыдущие анимации этой иконки.
-        icon.DOKill();
-        icon.transform.DOKill();
+        // Останавливаем предыдущие анимации
+        // именно этой иконки.
+        KillIconTween(icon);
 
 
         // =====================================================
@@ -273,14 +300,25 @@ public class WeaponIconHUD : MonoBehaviour
                     inactiveColor,
                     colorDuration
                 )
-                .SetEase(Ease.OutQuad);
+                .SetEase(
+                    Ease.OutQuad
+                )
+                .SetLink(
+                    icon.gameObject
+                );
+
 
             icon.transform
                 .DOScale(
                     Vector3.one,
                     returnDuration
                 )
-                .SetEase(Ease.OutQuad);
+                .SetEase(
+                    Ease.OutQuad
+                )
+                .SetLink(
+                    icon.gameObject
+                );
 
             return;
         }
@@ -291,37 +329,135 @@ public class WeaponIconHUD : MonoBehaviour
         // =====================================================
 
         Sequence sequence =
-            DOTween.Sequence();
+            DOTween.Sequence()
+                .SetLink(
+                    icon.gameObject
+                );
+
 
         // Сначала плавно меняем цвет.
+
         sequence.Join(
             icon
                 .DOColor(
                     activeColor,
                     colorDuration
                 )
-                .SetEase(Ease.OutQuad)
+                .SetEase(
+                    Ease.OutQuad
+                )
         );
 
+
         // Увеличиваем.
+
         sequence.Append(
             icon.transform
                 .DOScale(
                     Vector3.one * activeScale,
                     punchDuration
                 )
-                .SetEase(Ease.OutQuad)
+                .SetEase(
+                    Ease.OutQuad
+                )
         );
 
+
         // И мягко возвращаем обратно.
+
         sequence.Append(
             icon.transform
                 .DOScale(
                     Vector3.one,
                     returnDuration
                 )
-                .SetEase(Ease.OutBack)
+                .SetEase(
+                    Ease.OutBack
+                )
         );
+
+
+        StoreSequence(
+            icon,
+            sequence
+        );
+    }
+
+
+    // =========================================================
+    // SEQUENCE STORAGE
+    // =========================================================
+
+    private void StoreSequence(
+        Image icon,
+        Sequence sequence)
+    {
+        if (icon == pistolIcon)
+        {
+            pistolSequence = sequence;
+
+            sequence.OnKill(
+                () =>
+                {
+                    pistolSequence = null;
+                }
+            );
+        }
+        else if (icon == rifleIcon)
+        {
+            rifleSequence = sequence;
+
+            sequence.OnKill(
+                () =>
+                {
+                    rifleSequence = null;
+                }
+            );
+        }
+        else if (icon == shotgunIcon)
+        {
+            shotgunSequence = sequence;
+
+            sequence.OnKill(
+                () =>
+                {
+                    shotgunSequence = null;
+                }
+            );
+        }
+        else if (icon == grenadeLauncherIcon)
+        {
+            grenadeLauncherSequence = sequence;
+
+            sequence.OnKill(
+                () =>
+                {
+                    grenadeLauncherSequence = null;
+                }
+            );
+        }
+        else if (icon == railgunIcon)
+        {
+            railgunSequence = sequence;
+
+            sequence.OnKill(
+                () =>
+                {
+                    railgunSequence = null;
+                }
+            );
+        }
+        else if (icon == katanaIcon)
+        {
+            katanaSequence = sequence;
+
+            sequence.OnKill(
+                () =>
+                {
+                    katanaSequence = null;
+                }
+            );
+        }
     }
 
 
@@ -331,12 +467,84 @@ public class WeaponIconHUD : MonoBehaviour
 
     private void KillAllTweens()
     {
-        KillIconTween(pistolIcon);
-        KillIconTween(rifleIcon);
-        KillIconTween(shotgunIcon);
-        KillIconTween(grenadeLauncherIcon);
-        KillIconTween(railgunIcon);
-        KillIconTween(katanaIcon);
+        KillSequence(
+            pistolSequence
+        );
+
+        pistolSequence = null;
+
+
+        KillSequence(
+            rifleSequence
+        );
+
+        rifleSequence = null;
+
+
+        KillSequence(
+            shotgunSequence
+        );
+
+        shotgunSequence = null;
+
+
+        KillSequence(
+            grenadeLauncherSequence
+        );
+
+        grenadeLauncherSequence = null;
+
+
+        KillSequence(
+            railgunSequence
+        );
+
+        railgunSequence = null;
+
+
+        KillSequence(
+            katanaSequence
+        );
+
+        katanaSequence = null;
+
+
+        KillIconTween(
+            pistolIcon
+        );
+
+        KillIconTween(
+            rifleIcon
+        );
+
+        KillIconTween(
+            shotgunIcon
+        );
+
+        KillIconTween(
+            grenadeLauncherIcon
+        );
+
+        KillIconTween(
+            railgunIcon
+        );
+
+        KillIconTween(
+            katanaIcon
+        );
+    }
+
+
+    private void KillSequence(
+        Sequence sequence)
+    {
+        if (
+            sequence != null &&
+            sequence.IsActive()
+        )
+        {
+            sequence.Kill();
+        }
     }
 
 
@@ -345,6 +553,60 @@ public class WeaponIconHUD : MonoBehaviour
     {
         if (icon == null)
             return;
+
+
+        // Убиваем сохранённую Sequence,
+        // соответствующую конкретной иконке.
+
+        if (icon == pistolIcon)
+        {
+            KillSequence(
+                pistolSequence
+            );
+
+            pistolSequence = null;
+        }
+        else if (icon == rifleIcon)
+        {
+            KillSequence(
+                rifleSequence
+            );
+
+            rifleSequence = null;
+        }
+        else if (icon == shotgunIcon)
+        {
+            KillSequence(
+                shotgunSequence
+            );
+
+            shotgunSequence = null;
+        }
+        else if (icon == grenadeLauncherIcon)
+        {
+            KillSequence(
+                grenadeLauncherSequence
+            );
+
+            grenadeLauncherSequence = null;
+        }
+        else if (icon == railgunIcon)
+        {
+            KillSequence(
+                railgunSequence
+            );
+
+            railgunSequence = null;
+        }
+        else if (icon == katanaIcon)
+        {
+            KillSequence(
+                katanaSequence
+            );
+
+            katanaSequence = null;
+        }
+
 
         icon.DOKill();
         icon.transform.DOKill();

@@ -4,15 +4,28 @@ using UnityEngine;
 public class DoorController : MonoBehaviour
 {
     [Header("Door Panels")]
-    [SerializeField] private Transform leftPanel;
-    [SerializeField] private Transform rightPanel;
+
+    [SerializeField]
+    private Transform leftPanel;
+
+    [SerializeField]
+    private Transform rightPanel;
+
 
     [Header("Movement")]
-    [SerializeField] private float openDistance = 2.5f;
-    [SerializeField] private float openDuration = 0.8f;
+
+    [SerializeField]
+    private float openDistance = 2.5f;
+
+    [SerializeField]
+    private float openDuration = 0.8f;
+
 
     [Header("Sound")]
-    [SerializeField] private DoorSoundController doorSoundController;
+
+    [SerializeField]
+    private DoorSoundController doorSoundController;
+
 
     private Vector3 leftClosedPosition;
     private Vector3 rightClosedPosition;
@@ -20,22 +33,59 @@ public class DoorController : MonoBehaviour
     private Vector3 leftOpenPosition;
     private Vector3 rightOpenPosition;
 
+
     private bool isOpen;
     private int playersInside;
 
+
+    // Текущая анимация открытия или закрытия двери.
+    private Sequence doorSequence;
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
+
     private void Awake()
     {
-        leftClosedPosition = leftPanel.localPosition;
-        rightClosedPosition = rightPanel.localPosition;
+        if (leftPanel != null)
+        {
+            leftClosedPosition =
+                leftPanel.localPosition;
 
-        leftOpenPosition =
-            leftClosedPosition +
-            Vector3.left * openDistance;
+            leftOpenPosition =
+                leftClosedPosition +
+                Vector3.left * openDistance;
+        }
 
-        rightOpenPosition =
-            rightClosedPosition +
-            Vector3.right * openDistance;
+
+        if (rightPanel != null)
+        {
+            rightClosedPosition =
+                rightPanel.localPosition;
+
+            rightOpenPosition =
+                rightClosedPosition +
+                Vector3.right * openDistance;
+        }
     }
+
+
+    private void OnDisable()
+    {
+        KillTweens();
+    }
+
+
+    private void OnDestroy()
+    {
+        KillTweens();
+    }
+
+
+    // =========================================================
+    // PLAYER ENTER / EXIT
+    // =========================================================
 
     public void PlayerEntered()
     {
@@ -43,6 +93,7 @@ public class DoorController : MonoBehaviour
 
         Open();
     }
+
 
     public void PlayerExited()
     {
@@ -52,41 +103,75 @@ public class DoorController : MonoBehaviour
                 playersInside - 1
             );
 
+
         if (playersInside == 0)
         {
             Close();
         }
     }
 
+
+    // =========================================================
+    // OPEN
+    // =========================================================
+
     private void Open()
     {
         if (isOpen)
             return;
 
+
         isOpen = true;
 
         KillTweens();
 
-        Sequence sequence =
-            DOTween.Sequence();
 
-        sequence.Join(
-            leftPanel.DOLocalMove(
-                leftOpenPosition,
-                openDuration
+        doorSequence =
+            DOTween.Sequence()
+                .SetLink(
+                    gameObject
+                );
+
+
+        if (leftPanel != null)
+        {
+            doorSequence.Join(
+                leftPanel.DOLocalMove(
+                    leftOpenPosition,
+                    openDuration
+                )
+            );
+        }
+
+
+        if (rightPanel != null)
+        {
+            doorSequence.Join(
+                rightPanel.DOLocalMove(
+                    rightOpenPosition,
+                    openDuration
+                )
+            );
+        }
+
+
+        doorSequence
+            .SetEase(
+                Ease.InOutQuad
             )
-        );
-
-        sequence.Join(
-            rightPanel.DOLocalMove(
-                rightOpenPosition,
-                openDuration
+            .OnKill(
+                () =>
+                {
+                    doorSequence = null;
+                }
             )
-        );
+            .OnComplete(
+                () =>
+                {
+                    doorSequence = null;
+                }
+            );
 
-        sequence
-            .SetEase(Ease.InOutQuad)
-            .SetLink(gameObject);
 
         if (doorSoundController != null)
         {
@@ -94,35 +179,68 @@ public class DoorController : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // CLOSE
+    // =========================================================
+
     private void Close()
     {
         if (!isOpen)
             return;
 
+
         isOpen = false;
 
         KillTweens();
 
-        Sequence sequence =
-            DOTween.Sequence();
 
-        sequence.Join(
-            leftPanel.DOLocalMove(
-                leftClosedPosition,
-                openDuration
+        doorSequence =
+            DOTween.Sequence()
+                .SetLink(
+                    gameObject
+                );
+
+
+        if (leftPanel != null)
+        {
+            doorSequence.Join(
+                leftPanel.DOLocalMove(
+                    leftClosedPosition,
+                    openDuration
+                )
+            );
+        }
+
+
+        if (rightPanel != null)
+        {
+            doorSequence.Join(
+                rightPanel.DOLocalMove(
+                    rightClosedPosition,
+                    openDuration
+                )
+            );
+        }
+
+
+        doorSequence
+            .SetEase(
+                Ease.InOutQuad
             )
-        );
-
-        sequence.Join(
-            rightPanel.DOLocalMove(
-                rightClosedPosition,
-                openDuration
+            .OnKill(
+                () =>
+                {
+                    doorSequence = null;
+                }
             )
-        );
+            .OnComplete(
+                () =>
+                {
+                    doorSequence = null;
+                }
+            );
 
-        sequence
-            .SetEase(Ease.InOutQuad)
-            .SetLink(gameObject);
 
         if (doorSoundController != null)
         {
@@ -130,21 +248,33 @@ public class DoorController : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
+
     private void KillTweens()
     {
+        if (
+            doorSequence != null &&
+            doorSequence.IsActive()
+        )
+        {
+            doorSequence.Kill();
+        }
+
+        doorSequence = null;
+
+
         if (leftPanel != null)
         {
             leftPanel.DOKill();
         }
 
+
         if (rightPanel != null)
         {
             rightPanel.DOKill();
         }
-    }
-
-    private void OnDestroy()
-    {
-        KillTweens();
     }
 }

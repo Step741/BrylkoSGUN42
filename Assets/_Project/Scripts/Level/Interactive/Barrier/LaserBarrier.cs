@@ -15,109 +15,236 @@ public class LaserBarrier : MonoBehaviour
     [Header("Block")]
     [SerializeField] private Collider _blockCollider;
 
+
     private Sequence _laserSequence;
     private bool _isDisabled;
 
     private Vector3 _leftStartPosition;
     private Vector3 _rightStartPosition;
 
+
+    // =========================================================
+    // UNITY
+    // =========================================================
+
     private void Awake()
     {
-        _leftStartPosition = _leftEmitter.localPosition;
-        _rightStartPosition = _rightEmitter.localPosition;
+        if (_leftEmitter != null)
+        {
+            _leftStartPosition =
+                _leftEmitter.localPosition;
+        }
+
+        if (_rightEmitter != null)
+        {
+            _rightStartPosition =
+                _rightEmitter.localPosition;
+        }
     }
+
 
     private void Start()
     {
         CreateLaserAnimation();
     }
 
+
+    private void OnDisable()
+    {
+        KillLaserAnimation();
+    }
+
+
+    private void OnDestroy()
+    {
+        KillLaserAnimation();
+    }
+
+
+    // =========================================================
+    // LASER ANIMATION
+    // =========================================================
+
     private void CreateLaserAnimation()
     {
         if (_isDisabled)
             return;
 
-        DOTween.Kill(_leftEmitter);
-        DOTween.Kill(_rightEmitter);
 
-        _laserSequence = DOTween.Sequence();
+        if (
+            _leftEmitter == null ||
+            _rightEmitter == null
+        )
+        {
+            return;
+        }
 
-        _laserSequence.Append(
-            _leftEmitter.DOLocalMoveY(
-                _leftStartPosition.y + _moveDistance,
-                _moveDuration
-            ).SetEase(Ease.InOutSine)
-        );
 
-        _laserSequence.Join(
-            _rightEmitter.DOLocalMoveY(
-                _rightStartPosition.y + _moveDistance,
-                _moveDuration
-            ).SetEase(Ease.InOutSine)
-        );
+        // На всякий случай полностью очищаем
+        // предыдущую анимацию перед созданием новой.
+        KillLaserAnimation();
 
-        _laserSequence.Append(
-            _leftEmitter.DOLocalMoveY(
-                _leftStartPosition.y - _moveDistance,
-                _moveDuration * 2f
-            ).SetEase(Ease.InOutSine)
-        );
 
-        _laserSequence.Join(
-            _rightEmitter.DOLocalMoveY(
-                _rightStartPosition.y - _moveDistance,
-                _moveDuration * 2f
-            ).SetEase(Ease.InOutSine)
-        );
+        _laserSequence =
+            DOTween.Sequence()
+                .SetLink(
+                    gameObject
+                );
+
 
         _laserSequence.Append(
-            _leftEmitter.DOLocalMove(
-                _leftStartPosition,
-                _moveDuration
-            ).SetEase(Ease.InOutSine)
+            _leftEmitter
+                .DOLocalMoveY(
+                    _leftStartPosition.y +
+                    _moveDistance,
+                    _moveDuration
+                )
+                .SetEase(
+                    Ease.InOutSine
+                )
         );
+
 
         _laserSequence.Join(
-            _rightEmitter.DOLocalMove(
-                _rightStartPosition,
-                _moveDuration
-            ).SetEase(Ease.InOutSine)
+            _rightEmitter
+                .DOLocalMoveY(
+                    _rightStartPosition.y +
+                    _moveDistance,
+                    _moveDuration
+                )
+                .SetEase(
+                    Ease.InOutSine
+                )
         );
 
-        _laserSequence.SetLoops(-1, LoopType.Restart);
-        _laserSequence.SetLink(gameObject);
+
+        _laserSequence.Append(
+            _leftEmitter
+                .DOLocalMoveY(
+                    _leftStartPosition.y -
+                    _moveDistance,
+                    _moveDuration * 2f
+                )
+                .SetEase(
+                    Ease.InOutSine
+                )
+        );
+
+
+        _laserSequence.Join(
+            _rightEmitter
+                .DOLocalMoveY(
+                    _rightStartPosition.y -
+                    _moveDistance,
+                    _moveDuration * 2f
+                )
+                .SetEase(
+                    Ease.InOutSine
+                )
+        );
+
+
+        _laserSequence.Append(
+            _leftEmitter
+                .DOLocalMove(
+                    _leftStartPosition,
+                    _moveDuration
+                )
+                .SetEase(
+                    Ease.InOutSine
+                )
+        );
+
+
+        _laserSequence.Join(
+            _rightEmitter
+                .DOLocalMove(
+                    _rightStartPosition,
+                    _moveDuration
+                )
+                .SetEase(
+                    Ease.InOutSine
+                )
+        );
+
+
+        _laserSequence
+            .SetLoops(
+                -1,
+                LoopType.Restart
+            )
+            .OnKill(
+                () =>
+                {
+                    _laserSequence = null;
+                }
+            );
     }
+
+
+    // =========================================================
+    // DISABLE BARRIER
+    // =========================================================
 
     public void DisableBarrier()
     {
         if (_isDisabled)
             return;
 
+
         _isDisabled = true;
 
-        if (_laserSequence != null)
-        {
-            _laserSequence.Kill();
-            _laserSequence = null;
-        }
 
-        DOTween.Kill(_leftEmitter);
-        DOTween.Kill(_rightEmitter);
+        KillLaserAnimation();
 
-        foreach (LineRenderer laserLine in _laserLines)
+
+        foreach (
+            LineRenderer laserLine
+            in _laserLines
+        )
         {
             if (laserLine != null)
-                laserLine.enabled = false;
+            {
+                laserLine.enabled =
+                    false;
+            }
         }
 
+
         if (_blockCollider != null)
-            _blockCollider.enabled = false;
+        {
+            _blockCollider.enabled =
+                false;
+        }
     }
 
-    private void OnDestroy()
+
+    // =========================================================
+    // CLEANUP
+    // =========================================================
+
+    private void KillLaserAnimation()
     {
-        _laserSequence?.Kill();
-        DOTween.Kill(_leftEmitter);
-        DOTween.Kill(_rightEmitter);
+        if (
+            _laserSequence != null &&
+            _laserSequence.IsActive()
+        )
+        {
+            _laserSequence.Kill();
+        }
+
+        _laserSequence = null;
+
+
+        if (_leftEmitter != null)
+        {
+            _leftEmitter.DOKill();
+        }
+
+
+        if (_rightEmitter != null)
+        {
+            _rightEmitter.DOKill();
+        }
     }
 }

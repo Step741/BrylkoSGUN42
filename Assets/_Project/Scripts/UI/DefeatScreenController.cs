@@ -24,6 +24,7 @@ public class DefeatScreenController : MonoBehaviour
     [SerializeField]
     private Button mainMenuButton;
 
+
     [Header("Scene")]
     [SerializeField]
     private string mainMenuSceneName = "MainMenu";
@@ -55,6 +56,8 @@ public class DefeatScreenController : MonoBehaviour
     private RectTransform restartButtonTransform;
     private RectTransform mainMenuButtonTransform;
 
+    private Sequence defeatSequence;
+
     private bool isDefeatShown;
 
 
@@ -65,11 +68,13 @@ public class DefeatScreenController : MonoBehaviour
             health = FindFirstObjectByType<Health>();
         }
 
+
         if (restartButton != null)
         {
             restartButtonTransform =
                 restartButton.GetComponent<RectTransform>();
         }
+
 
         if (mainMenuButton != null)
         {
@@ -77,7 +82,9 @@ public class DefeatScreenController : MonoBehaviour
                 mainMenuButton.GetComponent<RectTransform>();
         }
 
+
         PrepareDefeatScreen();
+
 
         if (restartButton != null)
         {
@@ -85,6 +92,7 @@ public class DefeatScreenController : MonoBehaviour
                 RestartLevel
             );
         }
+
 
         if (mainMenuButton != null)
         {
@@ -111,9 +119,30 @@ public class DefeatScreenController : MonoBehaviour
             health.Died -= ShowDefeatScreen;
         }
 
-        DOTween.Kill(
-            defeatPanel
-        );
+
+        KillDefeatTween();
+    }
+
+
+    private void OnDestroy()
+    {
+        KillDefeatTween();
+
+
+        if (restartButton != null)
+        {
+            restartButton.onClick.RemoveListener(
+                RestartLevel
+            );
+        }
+
+
+        if (mainMenuButton != null)
+        {
+            mainMenuButton.onClick.RemoveListener(
+                ReturnToMainMenu
+            );
+        }
     }
 
 
@@ -122,21 +151,28 @@ public class DefeatScreenController : MonoBehaviour
         if (defeatPanel == null)
             return;
 
+
         if (canvasGroup == null)
         {
             canvasGroup =
                 defeatPanel.GetComponent<CanvasGroup>();
         }
 
+
         defeatPanel.SetActive(
             false
         );
 
+
         if (canvasGroup != null)
         {
             canvasGroup.alpha = 0f;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
+
+            canvasGroup.interactable =
+                false;
+
+            canvasGroup.blocksRaycasts =
+                false;
         }
     }
 
@@ -146,43 +182,60 @@ public class DefeatScreenController : MonoBehaviour
         if (isDefeatShown)
             return;
 
+
         isDefeatShown = true;
+
 
         if (defeatPanel == null)
             return;
+
+
+        KillDefeatTween();
+
 
         defeatPanel.SetActive(
             true
         );
 
+
         if (canvasGroup != null)
         {
             canvasGroup.alpha = 0f;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
+
+            canvasGroup.interactable =
+                false;
+
+            canvasGroup.blocksRaycasts =
+                false;
         }
 
 
         PrepareAnimationState();
 
 
-        Sequence sequence =
-            DOTween.Sequence();
+        defeatSequence =
+            DOTween.Sequence()
+                .SetLink(gameObject);
 
-        sequence.Append(
-            canvasGroup
-                .DOFade(
-                    1f,
-                    panelFadeDuration
-                )
-                .SetEase(
-                    panelEase
-                )
-        );
+
+        if (canvasGroup != null)
+        {
+            defeatSequence.Append(
+                canvasGroup
+                    .DOFade(
+                        1f,
+                        panelFadeDuration
+                    )
+                    .SetEase(
+                        panelEase
+                    )
+            );
+        }
+
 
         if (gameOverText != null)
         {
-            sequence.Join(
+            defeatSequence.Join(
                 gameOverText
                     .DOScale(
                         Vector3.one,
@@ -194,13 +247,15 @@ public class DefeatScreenController : MonoBehaviour
             );
         }
 
-        sequence.AppendInterval(
+
+        defeatSequence.AppendInterval(
             buttonsDelay
         );
 
+
         if (restartButtonTransform != null)
         {
-            sequence.Append(
+            defeatSequence.Append(
                 restartButtonTransform
                     .DOScale(
                         Vector3.one,
@@ -212,9 +267,10 @@ public class DefeatScreenController : MonoBehaviour
             );
         }
 
+
         if (mainMenuButtonTransform != null)
         {
-            sequence.Append(
+            defeatSequence.Append(
                 mainMenuButtonTransform
                     .DOScale(
                         Vector3.one,
@@ -226,14 +282,20 @@ public class DefeatScreenController : MonoBehaviour
             );
         }
 
-        sequence.OnComplete(
+
+        defeatSequence.OnComplete(
             () =>
             {
                 if (canvasGroup != null)
                 {
-                    canvasGroup.interactable = true;
-                    canvasGroup.blocksRaycasts = true;
+                    canvasGroup.interactable =
+                        true;
+
+                    canvasGroup.blocksRaycasts =
+                        true;
                 }
+
+                defeatSequence = null;
             }
         );
     }
@@ -247,11 +309,13 @@ public class DefeatScreenController : MonoBehaviour
                 Vector3.zero;
         }
 
+
         if (restartButtonTransform != null)
         {
             restartButtonTransform.localScale =
                 Vector3.zero;
         }
+
 
         if (mainMenuButtonTransform != null)
         {
@@ -261,10 +325,25 @@ public class DefeatScreenController : MonoBehaviour
     }
 
 
+    private void KillDefeatTween()
+    {
+        if (defeatSequence != null)
+        {
+            defeatSequence.Kill();
+
+            defeatSequence = null;
+        }
+    }
+
+
     public void RestartLevel()
     {
+        KillDefeatTween();
+
+
         Scene currentScene =
             SceneManager.GetActiveScene();
+
 
         SceneManager.LoadScene(
             currentScene.name
@@ -274,10 +353,14 @@ public class DefeatScreenController : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
+        KillDefeatTween();
+
+
         MusicTransitionManager.StartMenuTransition(
             GameMusic.Instance,
             1.5f
         );
+
 
         SceneManager.LoadScene(
             mainMenuSceneName

@@ -7,9 +7,5 @@ public class ProjectInstaller : MonoInstaller
         Container
             .BindInterfacesAndSelfTo<InputService>()
             .AsSingle();
-
-        Container
-            .Bind<EnemyStateMachine>()
-            .AsTransient();
     }
 }

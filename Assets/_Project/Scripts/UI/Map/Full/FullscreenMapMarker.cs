@@ -3,6 +3,7 @@ using UnityEngine;
 public class FullscreenMapMarker : MonoBehaviour
 {
     [Header("Marker")]
+
     [SerializeField]
     private Sprite icon;
 

@@ -49,10 +49,10 @@ MonoBehaviour:
   railgunHeatPerShot: 25
   railgunMaxHeat: 100
   railgunChargeTime: 1
-  railgunBeamDuration: 0.08
+  railgunBeamDuration: 0.3
   railgunHitMask:
     serializedVersion: 2
-    m_Bits: 11712
+    m_Bits: 1280
   katanaAttackRange: 2
   katanaAttackRadius: 1.2
   katanaAttackCooldown: 0.8

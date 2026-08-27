@@ -7,6 +7,7 @@ using DG.Tweening;
 public class AmmoHUD : MonoBehaviour
 {
     [Header("References")]
+
     [SerializeField]
     private WeaponSwitcher weaponSwitcher;
 
@@ -15,6 +16,7 @@ public class AmmoHUD : MonoBehaviour
 
 
     [Header("Railgun Heat")]
+
     [SerializeField]
     private Slider railgunHeatBar;
 
@@ -23,6 +25,7 @@ public class AmmoHUD : MonoBehaviour
 
 
     [Header("Ammo DOTween Animation")]
+
     [SerializeField]
     [Tooltip("Сила лёгкого эффекта при изменении патронов.")]
     private float ammoPunchScale = 0.08f;
@@ -33,6 +36,7 @@ public class AmmoHUD : MonoBehaviour
 
 
     [Header("Railgun Heat DOTween Animation")]
+
     [SerializeField]
     [Tooltip("Длительность анимации изменения перегрева.")]
     private float heatAnimationDuration = 0.15f;
@@ -161,6 +165,12 @@ public class AmmoHUD : MonoBehaviour
         KillAllTweens();
 
         HideRailgunHeat();
+    }
+
+
+    private void OnDestroy()
+    {
+        KillAllTweens();
     }
 
 
@@ -370,6 +380,9 @@ public class AmmoHUD : MonoBehaviour
                 ammoPunchDuration,
                 1,
                 0.5f
+            )
+            .SetLink(
+                ammoText.gameObject
             );
     }
 
@@ -464,6 +477,7 @@ public class AmmoHUD : MonoBehaviour
 
         railgunHeatBar.DOKill();
 
+
         if (railgunHeatFill != null)
         {
             railgunHeatFill.DOKill();
@@ -514,6 +528,9 @@ public class AmmoHUD : MonoBehaviour
             )
             .SetEase(
                 Ease.OutQuad
+            )
+            .SetLink(
+                railgunHeatBar.gameObject
             );
 
 
@@ -529,6 +546,9 @@ public class AmmoHUD : MonoBehaviour
                 )
                 .SetEase(
                     Ease.OutQuad
+                )
+                .SetLink(
+                    railgunHeatFill.gameObject
                 );
         }
     }

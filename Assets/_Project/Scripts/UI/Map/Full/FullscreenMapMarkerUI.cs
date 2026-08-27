@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class FullscreenMapMarkerUI : MonoBehaviour
 {
@@ -16,17 +17,39 @@ public class FullscreenMapMarkerUI : MonoBehaviour
     }
 
 
-    public void Setup(Sprite icon)
+    public void Setup(
+        Sprite icon)
     {
         if (iconImage != null)
         {
-            iconImage.sprite = icon;
+            iconImage.sprite =
+                icon;
         }
     }
 
 
-    public void SetVisible(bool value)
+    public void SetVisible(
+        bool value)
     {
-        gameObject.SetActive(value);
+        if (gameObject == null)
+            return;
+
+
+        gameObject.SetActive(
+            value
+        );
+    }
+
+
+    private void OnDestroy()
+    {
+        RectTransform rectTransform =
+            RectTransform;
+
+
+        if (rectTransform != null)
+        {
+            rectTransform.DOKill();
+        }
     }
 }
