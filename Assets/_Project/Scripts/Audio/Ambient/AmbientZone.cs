@@ -50,8 +50,7 @@ public class AmbientZone : MonoBehaviour
         Collider other
     )
     {
-        // Проверяем слой объекта,
-        // который вошёл в Ambient Zone
+        // Проверяет слой объекта, который вошёл в Ambient Zone
         if (((1 << other.gameObject.layer) & playerLayer) == 0)
             return;
 

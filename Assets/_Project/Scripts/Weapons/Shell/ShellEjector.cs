@@ -47,8 +47,6 @@ public class ShellEjector : MonoBehaviour
         if (shell == null)
             return;
 
-
-        // Полностью подготавливаем гильзу
         shell.Activate(
             ejectPoint.position,
             ejectPoint.rotation,
@@ -62,36 +60,26 @@ public class ShellEjector : MonoBehaviour
         if (rb == null)
             return;
 
-
-        // На всякий случай будим Rigidbody
         rb.WakeUp();
 
-
-        // Основное направление выброса
         Vector3 force =
             ejectPoint.forward * ejectForce;
 
-        // Немного вверх
         force +=
             ejectPoint.up * upwardForce;
 
-        // Случайный разброс
         force +=
             Random.insideUnitSphere *
             randomForce;
-
 
         rb.AddForce(
             force,
             ForceMode.Impulse
         );
 
-
-        // Случайное вращение
         Vector3 torque =
             Random.insideUnitSphere *
             randomTorque;
-
 
         rb.AddTorque(
             torque,

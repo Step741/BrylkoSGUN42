@@ -42,21 +42,11 @@ public class DestructibleBox : MonoBehaviour
 
     private bool destroyed;
 
-
-    // =========================================================
-    // ZENJECT
-    // =========================================================
-
     [Inject]
     private void Construct(DropTable dropTable)
     {
         this.dropTable = dropTable;
     }
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -86,11 +76,6 @@ public class DestructibleBox : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // DESTRUCTION
-    // =========================================================
-
     private void OnDied()
     {
         if (destroyed)
@@ -98,34 +83,14 @@ public class DestructibleBox : MonoBehaviour
 
         destroyed = true;
 
-
-        // -----------------------------------------------------
-        // DROP
-        // -----------------------------------------------------
-
         SpawnDrop();
 
-
-        // -----------------------------------------------------
-        // BREAK SOUND
-        // -----------------------------------------------------
-
         PlayBreakSound();
-
-
-        // -----------------------------------------------------
-        // DEBRIS
-        // -----------------------------------------------------
 
         SpawnDebris();
 
         Destroy(gameObject);
     }
-
-
-    // =========================================================
-    // BREAK SOUND
-    // =========================================================
 
     private void PlayBreakSound()
     {
@@ -146,30 +111,15 @@ public class DestructibleBox : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // DROP
-    // =========================================================
-
     private void SpawnDrop()
     {
         if (dropTable == null)
         {
-            Debug.LogWarning(
-                $"[{name}] DropTable is not injected.",
-                this
-            );
-
             return;
         }
 
         if (dropConfig == null)
         {
-            Debug.LogWarning(
-                $"[{name}] DropConfig is not assigned.",
-                this
-            );
-
             return;
         }
 
@@ -178,11 +128,6 @@ public class DestructibleBox : MonoBehaviour
             transform.position
         );
     }
-
-
-    // =========================================================
-    // DEBRIS
-    // =========================================================
 
     private void SpawnDebris()
     {

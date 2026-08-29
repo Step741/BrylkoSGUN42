@@ -49,11 +49,6 @@ public class UIButtonSound :
         isPointerInside = false;
     }
 
-
-    // ==========================================
-    // HOVER
-    // ==========================================
-
     public void OnPointerEnter(
         PointerEventData eventData)
     {
@@ -84,11 +79,6 @@ public class UIButtonSound :
         isPointerInside = false;
     }
 
-
-    // ==========================================
-    // CLICK
-    // ==========================================
-
     public void OnPointerDown(
         PointerEventData eventData)
     {
@@ -113,11 +103,6 @@ public class UIButtonSound :
         );
     }
 
-
-    // ==========================================
-    // PLAY SOUND
-    // ==========================================
-
     private void PlayUI(
         AudioClip clip,
         float volume)
@@ -138,11 +123,6 @@ public class UIButtonSound :
             1f
         );
     }
-
-
-    // ==========================================
-    // CHECK BUTTON
-    // ==========================================
 
     private bool IsInteractable()
     {

@@ -4,11 +4,6 @@ public static class MusicTransitionManager
 
     public static bool IsReturningToMenu { get; private set; }
 
-
-    // ==========================================
-    // MAIN MENU → GAME
-    // ==========================================
-
     public static void StartGameTransition(
         float fadeDuration = 1.5f
     )
@@ -22,11 +17,6 @@ public static class MusicTransitionManager
                 .FadeOutAndDestroy(fadeDuration);
         }
     }
-
-
-    // ==========================================
-    // GAME → MAIN MENU
-    // ==========================================
 
     public static void StartMenuTransition(
         GameMusic gameMusic,
@@ -42,11 +32,6 @@ public static class MusicTransitionManager
                 .FadeOutAndDestroy(fadeDuration);
         }
     }
-
-
-    // ==========================================
-    // TRANSITION COMPLETE
-    // ==========================================
 
     public static void CompleteTransition()
     {

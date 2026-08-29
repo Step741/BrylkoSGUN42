@@ -98,11 +98,6 @@ public class GasDamageZone : MonoBehaviour
             );
         }
 
-
-        // ==========================================
-        // GAS SOUND
-        // ==========================================
-
         if (gasSoundController != null)
         {
             gasSoundController
@@ -111,11 +106,6 @@ public class GasDamageZone : MonoBehaviour
 
 
         CheckExistingTargets();
-
-
-        Debug.Log(
-            "[GasDamageZone] Gas activated."
-        );
     }
 
 
@@ -136,11 +126,6 @@ public class GasDamageZone : MonoBehaviour
             );
         }
 
-
-        // ==========================================
-        // GAS SOUND
-        // ==========================================
-
         if (gasSoundController != null)
         {
             gasSoundController
@@ -149,11 +134,6 @@ public class GasDamageZone : MonoBehaviour
 
 
         StopAllDamage();
-
-
-        Debug.Log(
-            "[GasDamageZone] Gas deactivated."
-        );
     }
 
 
@@ -284,14 +264,11 @@ public class GasDamageZone : MonoBehaviour
     {
         while (isActive)
         {
-            // Наносим урон
+            //Наносиь урон
             damageable.TakeDamage(
                 damage
             );
 
-
-            // Если объект является Player,
-            // проигрываем кашель
             Component component =
                 damageable as Component;
 

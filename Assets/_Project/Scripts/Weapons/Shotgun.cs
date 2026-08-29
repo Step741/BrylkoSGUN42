@@ -4,10 +4,6 @@ using Zenject;
 
 public class Shotgun : WeaponBase
 {
-    // =========================================================
-    // REFERENCES
-    // =========================================================
-
     [Header("References")]
 
     [SerializeField]
@@ -25,21 +21,11 @@ public class Shotgun : WeaponBase
     [SerializeField]
     private ShellEjector shellEjector;
 
-
-    // =========================================================
-    // TRACER SETTINGS
-    // =========================================================
-
     [Header("Tracer Settings")]
 
     [SerializeField]
     [Min(0)]
     private int tracersPerShot = 3;
-
-
-    // =========================================================
-    // WEAPON SOUNDS
-    // =========================================================
 
     [Header("Weapon Sounds")]
 
@@ -52,11 +38,6 @@ public class Shotgun : WeaponBase
     [SerializeField]
     private AudioClip reloadSound;
 
-
-    // =========================================================
-    // SOUND SETTINGS
-    // =========================================================
-
     [Header("Sound Settings")]
 
     [SerializeField]
@@ -66,20 +47,10 @@ public class Shotgun : WeaponBase
     [SerializeField]
     private float soundPitch = 1f;
 
-
-    // =========================================================
-    // EMPTY CLICK
-    // =========================================================
-
     [Header("Empty Click")]
 
     [SerializeField]
     private float emptyClickCooldown = 0.2f;
-
-
-    // =========================================================
-    // RECOIL
-    // =========================================================
 
     [Header("Recoil")]
 
@@ -89,38 +60,15 @@ public class Shotgun : WeaponBase
     [SerializeField]
     private CameraController cameraController;
 
-
-    // =========================================================
-    // COMPONENTS
-    // =========================================================
-
     private Camera playerCamera;
-
-
-    // =========================================================
-    // STATE
-    // =========================================================
 
     private float nextFireTime;
 
     private float nextEmptyClickTime;
 
-
-    // =========================================================
-    // STUNNED TARGETS
-    // =========================================================
-
-    // Цели, которые уже были оглушены
-    // текущим выстрелом.
-
     private readonly HashSet<IStunnable>
         stunnedTargets =
             new HashSet<IStunnable>();
-
-
-    // =========================================================
-    // INJECTION
-    // =========================================================
 
     [Inject]
     private void Construct(
@@ -130,54 +78,19 @@ public class Shotgun : WeaponBase
             playerCamera;
     }
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     protected override void Awake()
     {
         base.Awake();
-
-
-        if (playerCamera == null)
-        {
-            Debug.LogError(
-                $"{name}: Player Camera is missing."
-            );
-        }
-
-
-        if (cameraController == null)
-        {
-            Debug.LogWarning(
-                $"{name}: CameraController is not assigned."
-            );
-        }
     }
-
-
-    // =========================================================
-    // SHOOT
-    // =========================================================
 
     public override bool Shoot()
     {
-        // =====================================================
-        // EMPTY MAGAZINE
-        // =====================================================
-
         if (currentAmmo <= 0)
         {
             PlayEmptyClick();
 
             return false;
         }
-
-
-        // =====================================================
-        // CAN SHOOT
-        // =====================================================
 
         if (!CanShoot)
             return false;
@@ -190,87 +103,37 @@ public class Shotgun : WeaponBase
         if (Time.time < nextFireTime)
             return false;
 
-
-        // =====================================================
-        // AMMO
-        // =====================================================
-
         currentAmmo--;
 
         NotifyAmmoChanged();
-
-
-        // =====================================================
-        // MUZZLE FLASH
-        // =====================================================
 
         MuzzleFlashPool.Instance?.Play(
             muzzleFlash,
             muzzlePoint
         );
 
-
-        // =====================================================
-        // SHELL EJECTION
-        // =====================================================
-
         shellEjector?.Eject();
-
-
-        // =====================================================
-        // SHOOT SOUND
-        // =====================================================
 
         PlaySound(
             shootSound
         );
 
-
-        // =====================================================
-        // WEAPON RECOIL
-        // =====================================================
-
         weaponRecoil?.AddRecoil();
 
-
-        // =====================================================
-        // CAMERA RECOIL
-        // =====================================================
-
         cameraController?.AddRecoil();
-
-
-        // =====================================================
-        // FIRE RATE
-        // =====================================================
 
         nextFireTime =
             Time.time +
             1f /
             config.FireRate;
 
-
-        // =====================================================
-        // NEW STUN TARGETS
-        // =====================================================
-
         stunnedTargets.Clear();
-
-
-        // =====================================================
-        // FIRE PELLETS
-        // =====================================================
 
         FirePellets();
 
 
         return true;
     }
-
-
-    // =========================================================
-    // PELLETS
-    // =========================================================
 
     private void FirePellets()
     {
@@ -284,10 +147,6 @@ public class Shotgun : WeaponBase
             i++
         )
         {
-            // =================================================
-            // PELLET DIRECTION
-            // =================================================
-
             Vector3 direction =
                 GetPelletDirection();
 
@@ -298,20 +157,10 @@ public class Shotgun : WeaponBase
                     direction
                 );
 
-
-            // =================================================
-            // TRACER END POINT
-            // =================================================
-
             Vector3 tracerEndPoint =
                 ray.origin +
                 ray.direction *
                 config.Range;
-
-
-            // =================================================
-            // HIT
-            // =================================================
 
             if (
                 Physics.Raycast(
@@ -326,39 +175,19 @@ public class Shotgun : WeaponBase
                 tracerEndPoint =
                     hit.point;
 
-
-                // =============================================
-                // SURFACE IMPACT
-                // =============================================
-
                 SurfaceImpactUtility.ProcessHit(
                     hit
                 );
 
-
-                // =============================================
-                // DAMAGE
-                // =============================================
-
                 ApplyPelletDamage(
                     hit
                 );
-
-
-                // =============================================
-                // KNOCKBACK
-                // =============================================
 
                 ApplyKnockback(
                     hit,
                     direction
                 );
             }
-
-
-            // =================================================
-            // BULLET TRACER
-            // =================================================
 
             if (
                 tracersCreated <
@@ -376,26 +205,8 @@ public class Shotgun : WeaponBase
 
                 tracersCreated++;
             }
-
-
-            // =================================================
-            // DEBUG
-            // =================================================
-
-            Debug.DrawRay(
-                ray.origin,
-                ray.direction *
-                config.Range,
-                Color.red,
-                1f
-            );
         }
     }
-
-
-    // =========================================================
-    // SPREAD
-    // =========================================================
 
     private Vector3 GetPelletDirection()
     {
@@ -418,11 +229,6 @@ public class Shotgun : WeaponBase
         return direction.normalized;
     }
 
-
-    // =========================================================
-    // DAMAGE
-    // =========================================================
-
     private void ApplyPelletDamage(
         RaycastHit hit)
     {
@@ -435,11 +241,6 @@ public class Shotgun : WeaponBase
         float damage =
             config.Damage *
             distanceMultiplier;
-
-
-        // =====================================================
-        // DAMAGE HITBOX
-        // =====================================================
 
         DamageHitbox hitbox =
             hit.collider.GetComponent<
@@ -456,10 +257,6 @@ public class Shotgun : WeaponBase
         }
         else
         {
-            // =================================================
-            // NORMAL DAMAGE
-            // =================================================
-
             IDamageable damageable =
                 hit.collider.GetComponentInParent<
                     IDamageable
@@ -473,11 +270,6 @@ public class Shotgun : WeaponBase
                 );
             }
         }
-
-
-        // =====================================================
-        // STUN
-        // =====================================================
 
         IStunnable stunnable =
             hit.collider.GetComponentInParent<
@@ -496,11 +288,6 @@ public class Shotgun : WeaponBase
         }
     }
 
-
-    // =========================================================
-    // DAMAGE MULTIPLIER
-    // =========================================================
-
     private float GetDamageMultiplier(
         float distance)
     {
@@ -517,11 +304,6 @@ public class Shotgun : WeaponBase
             normalizedDistance
         );
     }
-
-
-    // =========================================================
-    // KNOCKBACK
-    // =========================================================
 
     private void ApplyKnockback(
         RaycastHit hit,
@@ -544,12 +326,18 @@ public class Shotgun : WeaponBase
         );
     }
 
-
-    // =========================================================
-    // RELOAD
-    // =========================================================
-
     public override void Reload()
+    {
+        if (!CanReload)
+            return;
+
+        StartReload(
+            CompleteReload
+        );
+    }
+
+
+    private void CompleteReload()
     {
         int missingAmmo =
             config.MagazineSize -
@@ -558,11 +346,6 @@ public class Shotgun : WeaponBase
 
         if (missingAmmo <= 0)
             return;
-
-
-        // =====================================================
-        // INFINITE AMMO
-        // =====================================================
 
         if (InfiniteAmmo)
         {
@@ -576,19 +359,8 @@ public class Shotgun : WeaponBase
                 reloadSound
             );
 
-
-            Debug.Log(
-                $"Shotgun reload: " +
-                $"{currentAmmo}/∞"
-            );
-
             return;
         }
-
-
-        // =====================================================
-        // NORMAL AMMO
-        // =====================================================
 
         if (reserveAmmo <= 0)
             return;
@@ -615,17 +387,7 @@ public class Shotgun : WeaponBase
             reloadSound
         );
 
-
-        Debug.Log(
-            $"Shotgun reload: " +
-            $"{currentAmmo}/{reserveAmmo}"
-        );
     }
-
-
-    // =========================================================
-    // SOUND
-    // =========================================================
 
     private void PlaySound(
         AudioClip clip)
@@ -645,11 +407,6 @@ public class Shotgun : WeaponBase
             soundPitch
         );
     }
-
-
-    // =========================================================
-    // EMPTY CLICK
-    // =========================================================
 
     private void PlayEmptyClick()
     {

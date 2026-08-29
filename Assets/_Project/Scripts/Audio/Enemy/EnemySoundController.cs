@@ -100,10 +100,6 @@ public class EnemySoundController : MonoBehaviour
     private bool isDead;
 
 
-    // ==========================================
-    // ZENJECT
-    // ==========================================
-
     [Inject]
     private void Construct(
         ISoundService soundService)
@@ -111,10 +107,6 @@ public class EnemySoundController : MonoBehaviour
         this.soundService = soundService;
     }
 
-
-    // ==========================================
-    // UNITY
-    // ==========================================
 
     private void Awake()
     {
@@ -170,10 +162,6 @@ public class EnemySoundController : MonoBehaviour
     }
 
 
-    // ==========================================
-    // FOOTSTEPS
-    // ==========================================
-
     private void UpdateFootsteps()
     {
         if (
@@ -215,10 +203,6 @@ public class EnemySoundController : MonoBehaviour
     }
 
 
-    // ==========================================
-    // IDLE SOUNDS
-    // ==========================================
-
     private void UpdateIdleSounds()
     {
         if (
@@ -257,10 +241,6 @@ public class EnemySoundController : MonoBehaviour
     }
 
 
-    // ==========================================
-    // HEALTH EVENTS
-    // ==========================================
-
     private void HandleDamageReceived(
         Vector3 damageSourcePosition)
     {
@@ -284,10 +264,6 @@ public class EnemySoundController : MonoBehaviour
         PlayDeath();
     }
 
-
-    // ==========================================
-    // PUBLIC SOUND METHODS
-    // ==========================================
 
     public void PlayAlert()
     {
@@ -340,10 +316,6 @@ public class EnemySoundController : MonoBehaviour
         );
     }
 
-
-    // ==========================================
-    // PLAY SOUND
-    // ==========================================
 
     private void PlayRandomSound(
         AudioClip[] sounds)

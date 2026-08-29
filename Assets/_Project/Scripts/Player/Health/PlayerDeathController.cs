@@ -22,6 +22,9 @@ public class PlayerDeathController : MonoBehaviour
     [SerializeField]
     private ADSController adsController;
 
+    [SerializeField]
+    private WeaponSwitcher weaponSwitcher;
+
     [Header("HUD")]
 
     [SerializeField]
@@ -37,9 +40,7 @@ public class PlayerDeathController : MonoBehaviour
     [SerializeField]
     private string deathTrigger = "Death";
 
-
     private bool isDead;
-
 
     private void Awake()
     {
@@ -49,19 +50,27 @@ public class PlayerDeathController : MonoBehaviour
                 GetComponent<Health>();
         }
 
+
         if (characterController == null)
         {
             characterController =
                 GetComponent<CharacterController>();
         }
 
+
         if (playerController == null)
         {
             playerController =
                 GetComponent<PlayerController>();
         }
-    }
 
+
+        if (weaponSwitcher == null)
+        {
+            weaponSwitcher =
+                GetComponent<WeaponSwitcher>();
+        }
+    }
 
     private void OnEnable()
     {
@@ -82,16 +91,18 @@ public class PlayerDeathController : MonoBehaviour
         }
     }
 
-
     private void HandleDeath()
     {
         if (isDead)
             return;
 
+
         isDead = true;
 
 
-        // Скрываем весь HUD.
+        weaponSwitcher
+            ?.CancelCurrentWeaponReload();
+
         if (hud != null)
         {
             hud.SetActive(
@@ -99,33 +110,24 @@ public class PlayerDeathController : MonoBehaviour
             );
         }
 
-
-        // Отключаем управление персонажем.
         if (playerController != null)
         {
             playerController.enabled =
                 false;
         }
 
-
-        // Отключаем управление камерой.
         if (cameraController != null)
         {
             cameraController.enabled =
                 false;
         }
 
-
-        // Отключаем ADS.
         if (adsController != null)
         {
             adsController.enabled =
                 false;
         }
 
-
-        // Отключаем стрельбу, катану,
-        // смену оружия и другие действия.
         if (componentsToDisable != null)
         {
             foreach (
@@ -141,8 +143,6 @@ public class PlayerDeathController : MonoBehaviour
             }
         }
 
-
-        // Запускаем Death-анимацию.
         if (animator != null)
         {
             animator.SetTrigger(
@@ -150,17 +150,10 @@ public class PlayerDeathController : MonoBehaviour
             );
         }
 
-
-        // Освобождаем курсор.
         Cursor.lockState =
             CursorLockMode.None;
 
         Cursor.visible =
             true;
-
-
-        Debug.Log(
-            "PLAYER DIED"
-        );
     }
 }

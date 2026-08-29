@@ -57,11 +57,6 @@ public class AudioSnapshotController : MonoBehaviour
         SetOutdoorImmediate();
     }
 
-
-    // ==========================================
-    // INDOOR ZONES
-    // ==========================================
-
     public void EnterIndoorZone()
     {
         activeIndoorZones++;
@@ -90,11 +85,6 @@ public class AudioSnapshotController : MonoBehaviour
             TransitionToOutdoor();
         }
     }
-
-
-    // ==========================================
-    // SNAPSHOT SWITCHING
-    // ==========================================
 
     public void SetIndoor()
     {
@@ -147,11 +137,6 @@ public class AudioSnapshotController : MonoBehaviour
         );
     }
 
-
-    // ==========================================
-    // IMMEDIATE SWITCHING
-    // ==========================================
-
     public void SetIndoorImmediate()
     {
         activeIndoorZones = 1;
@@ -180,11 +165,6 @@ public class AudioSnapshotController : MonoBehaviour
             0f
         );
     }
-
-
-    // ==========================================
-    // CLEANUP
-    // ==========================================
 
     private void OnDestroy()
     {

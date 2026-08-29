@@ -22,11 +22,6 @@ public class LaserBarrier : MonoBehaviour
     private Vector3 _leftStartPosition;
     private Vector3 _rightStartPosition;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         if (_leftEmitter != null)
@@ -61,10 +56,6 @@ public class LaserBarrier : MonoBehaviour
     }
 
 
-    // =========================================================
-    // LASER ANIMATION
-    // =========================================================
-
     private void CreateLaserAnimation()
     {
         if (_isDisabled)
@@ -79,9 +70,6 @@ public class LaserBarrier : MonoBehaviour
             return;
         }
 
-
-        // На всякий случай полностью очищаем
-        // предыдущую анимацию перед созданием новой.
         KillLaserAnimation();
 
 
@@ -181,11 +169,6 @@ public class LaserBarrier : MonoBehaviour
             );
     }
 
-
-    // =========================================================
-    // DISABLE BARRIER
-    // =========================================================
-
     public void DisableBarrier()
     {
         if (_isDisabled)
@@ -218,11 +201,7 @@ public class LaserBarrier : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillLaserAnimation()
     {
         if (

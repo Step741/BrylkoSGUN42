@@ -16,10 +16,9 @@ public class GameInputController : MonoBehaviour
 
     private void Start()
     {
-        // Включаем игровой Input.
         inputService.EnablePlayerInput();
 
-        // Блокируем курсор для управления камерой.
+        //Блокирует курсор для управления камерой
         Cursor.lockState =
             CursorLockMode.Locked;
 

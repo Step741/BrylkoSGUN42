@@ -33,11 +33,6 @@ public class HUDFeedback : MonoBehaviour
     private Tween pulseTween;
     private Tween returnScaleTween;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         if (healthBar != null)
@@ -58,10 +53,6 @@ public class HUDFeedback : MonoBehaviour
     {
         if (health == null)
         {
-            Debug.LogError(
-                "HUDFeedback: Health reference is missing."
-            );
-
             return;
         }
 
@@ -106,11 +97,6 @@ public class HUDFeedback : MonoBehaviour
         KillAllTweens();
     }
 
-
-    // =========================================================
-    // HEALTH CHANGED
-    // =========================================================
-
     private void OnHealthChanged(
         float currentHealth,
         float maxHealth)
@@ -131,18 +117,11 @@ public class HUDFeedback : MonoBehaviour
             currentHealth;
     }
 
-
-    // =========================================================
-    // DAMAGE SHAKE
-    // =========================================================
-
     private void ShakeHUD()
     {
         if (hudShakeRoot == null)
             return;
 
-
-        // Останавливаем предыдущую тряску.
         hudShakeRoot.DOKill();
 
         shakeTween?.Kill();
@@ -180,11 +159,6 @@ public class HUDFeedback : MonoBehaviour
                     }
                 );
     }
-
-
-    // =========================================================
-    // LOW HEALTH PULSE
-    // =========================================================
 
     private void UpdateLowHealthPulse(
         float currentHealth,
@@ -229,10 +203,6 @@ public class HUDFeedback : MonoBehaviour
             return;
         }
 
-
-        // На всякий случай убираем tween возврата,
-        // если здоровье снова стало низким
-        // до завершения возврата масштаба.
         returnScaleTween?.Kill();
         returnScaleTween = null;
 
@@ -311,11 +281,7 @@ public class HUDFeedback : MonoBehaviour
                 );
     }
 
-
-    // =========================================================
     // CLEANUP
-    // =========================================================
-
     private void KillAllTweens()
     {
         shakeTween?.Kill();

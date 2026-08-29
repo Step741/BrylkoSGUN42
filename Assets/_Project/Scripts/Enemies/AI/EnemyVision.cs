@@ -3,10 +3,6 @@ using Zenject;
 
 public class EnemyVision : MonoBehaviour
 {
-    // =========================================================
-    // VISION
-    // =========================================================
-
     [Header("Vision")]
 
     [SerializeField]
@@ -25,37 +21,17 @@ public class EnemyVision : MonoBehaviour
     [SerializeField]
     private float playerTargetHeight = 1f;
 
-
-    // =========================================================
-    // LINE OF SIGHT
-    // =========================================================
-
     [Header("Line Of Sight")]
 
     [SerializeField]
     private LayerMask obstacleMask;
-
-
-    // =========================================================
-    // GIZMOS
-    // =========================================================
 
     [Header("Gizmos")]
 
     [SerializeField]
     private bool showGizmos = true;
 
-
-    // =========================================================
-    // PLAYER
-    // =========================================================
-
     private Transform player;
-
-
-    // =========================================================
-    // ZENJECT
-    // =========================================================
 
     [Inject]
     private void Construct(
@@ -66,24 +42,10 @@ public class EnemyVision : MonoBehaviour
             playerTarget.Transform;
     }
 
-
-    // =========================================================
-    // CAN SEE PLAYER
-    // =========================================================
-
     public bool CanSeePlayer()
     {
-        // =====================================================
-        // NO PLAYER
-        // =====================================================
-
         if (player == null)
             return false;
-
-
-        // =====================================================
-        // POSITIONS
-        // =====================================================
 
         Vector3 enemyPosition =
             transform.position;
@@ -91,11 +53,6 @@ public class EnemyVision : MonoBehaviour
 
         Vector3 playerPosition =
             player.position;
-
-
-        // =====================================================
-        // DISTANCE
-        // =====================================================
 
         Vector3 directionToPlayer =
             playerPosition -
@@ -108,11 +65,6 @@ public class EnemyVision : MonoBehaviour
 
         if (distanceToPlayer > viewRadius)
             return false;
-
-
-        // =====================================================
-        // VIEW ANGLE
-        // =====================================================
 
         Vector3 flatDirection =
             directionToPlayer;
@@ -144,11 +96,6 @@ public class EnemyVision : MonoBehaviour
             return false;
         }
 
-
-        // =====================================================
-        // LINE OF SIGHT
-        // =====================================================
-
         Vector3 origin =
             transform.position +
             Vector3.up *
@@ -176,11 +123,6 @@ public class EnemyVision : MonoBehaviour
 
         direction.Normalize();
 
-
-        // =====================================================
-        // OBSTACLE CHECK
-        // =====================================================
-
         if (
             Physics.Raycast(
                 origin,
@@ -193,29 +135,14 @@ public class EnemyVision : MonoBehaviour
         {
             return false;
         }
-
-
-        // =====================================================
-        // PLAYER IS VISIBLE
-        // =====================================================
-
         return true;
     }
 
-
-    // =========================================================
-    // GIZMOS
-    // =========================================================
-
+    //GIZMOS
     private void OnDrawGizmosSelected()
     {
         if (!showGizmos)
             return;
-
-
-        // =====================================================
-        // VIEW RADIUS
-        // =====================================================
 
         Gizmos.color =
             Color.yellow;
@@ -225,11 +152,6 @@ public class EnemyVision : MonoBehaviour
             transform.position,
             viewRadius
         );
-
-
-        // =====================================================
-        // CENTER DIRECTION
-        // =====================================================
 
         Gizmos.color =
             Color.blue;
@@ -241,20 +163,10 @@ public class EnemyVision : MonoBehaviour
             viewRadius
         );
 
-
-        // =====================================================
-        // LEFT BOUNDARY
-        // =====================================================
-
         Vector3 leftBoundary =
             DirectionFromAngle(
                 -viewAngle * 0.5f
             );
-
-
-        // =====================================================
-        // RIGHT BOUNDARY
-        // =====================================================
 
         Vector3 rightBoundary =
             DirectionFromAngle(
@@ -278,11 +190,6 @@ public class EnemyVision : MonoBehaviour
             rightBoundary *
             viewRadius
         );
-
-
-        // =====================================================
-        // LINE TO PLAYER
-        // =====================================================
 
         if (player != null)
         {
@@ -333,11 +240,6 @@ public class EnemyVision : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // DIRECTION FROM ANGLE
-    // =========================================================
-
     private Vector3 DirectionFromAngle(
         float angle
     )
@@ -354,11 +256,6 @@ public class EnemyVision : MonoBehaviour
             rotation *
             transform.forward;
     }
-
-
-    // =========================================================
-    // PUBLIC ACCESS
-    // =========================================================
 
     public float ViewRadius =>
         viewRadius;

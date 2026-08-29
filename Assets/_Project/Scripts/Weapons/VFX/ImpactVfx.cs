@@ -3,23 +3,9 @@ using UnityEngine;
 
 public class ImpactVfx : MonoBehaviour
 {
-    // =========================================================
-    // COMPONENTS
-    // =========================================================
-
     private ParticleSystem[] particleSystems;
 
-
-    // =========================================================
-    // STATE
-    // =========================================================
-
     private Coroutine returnCoroutine;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -29,19 +15,10 @@ public class ImpactVfx : MonoBehaviour
             );
     }
 
-
-    // =========================================================
-    // PLAY
-    // =========================================================
-
     public void Play(
         Vector3 position,
         Quaternion rotation)
     {
-        // =====================================================
-        // STOP PREVIOUS RETURN
-        // =====================================================
-
         if (returnCoroutine != null)
         {
             StopCoroutine(
@@ -52,29 +29,14 @@ public class ImpactVfx : MonoBehaviour
                 null;
         }
 
-
-        // =====================================================
-        // POSITION
-        // =====================================================
-
         transform.SetPositionAndRotation(
             position,
             rotation
         );
 
-
-        // =====================================================
-        // ACTIVATE
-        // =====================================================
-
         gameObject.SetActive(
             true
         );
-
-
-        // =====================================================
-        // RESET AND PLAY
-        // =====================================================
 
         foreach (
             ParticleSystem particleSystem
@@ -96,21 +58,11 @@ public class ImpactVfx : MonoBehaviour
             );
         }
 
-
-        // =====================================================
-        // WAIT FOR FINISH
-        // =====================================================
-
         returnCoroutine =
             StartCoroutine(
                 ReturnWhenFinished()
             );
     }
-
-
-    // =========================================================
-    // WAIT FOR PARTICLES
-    // =========================================================
 
     private IEnumerator ReturnWhenFinished()
     {
@@ -133,11 +85,6 @@ public class ImpactVfx : MonoBehaviour
             this
         );
     }
-
-
-    // =========================================================
-    // CHECK PARTICLES
-    // =========================================================
 
     private bool AreParticlesAlive()
     {
@@ -169,11 +116,6 @@ public class ImpactVfx : MonoBehaviour
 
         return false;
     }
-
-
-    // =========================================================
-    // RETURN TO POOL
-    // =========================================================
 
     public void ReturnToPool()
     {
@@ -211,11 +153,6 @@ public class ImpactVfx : MonoBehaviour
             false
         );
     }
-
-
-    // =========================================================
-    // DISABLE
-    // =========================================================
 
     private void OnDisable()
     {

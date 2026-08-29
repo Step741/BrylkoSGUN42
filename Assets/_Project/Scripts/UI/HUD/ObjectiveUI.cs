@@ -40,28 +40,20 @@ public class ObjectiveUI : MonoBehaviour
     [Header("DOTween Animation")]
 
     [SerializeField]
-    [Tooltip("Длительность исчезновения старого текста.")]
     private float fadeOutDuration = 0.15f;
 
     [SerializeField]
-    [Tooltip("Длительность появления нового текста.")]
     private float fadeInDuration = 0.25f;
 
     [SerializeField]
-    [Tooltip("Небольшое смещение текста перед появлением.")]
     private float slideOffset = 15f;
 
 
-    // Исходная позиция текста.
+    //Исходная позиция текста
     private Vector3 originalLocalPosition;
 
-    // Текущая последовательность анимации текста.
+    //Текущая последовательность анимации текста
     private Sequence textSequence;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -70,8 +62,6 @@ public class ObjectiveUI : MonoBehaviour
             originalLocalPosition =
                 objectiveText.transform.localPosition;
 
-            // Начальный текст устанавливаем сразу,
-            // без анимации.
             SetTextInstant(
                 findKeyCardText
             );
@@ -123,11 +113,6 @@ public class ObjectiveUI : MonoBehaviour
         KillTextTween();
     }
 
-
-    // =========================================================
-    // OBJECTIVES
-    // =========================================================
-
     private void OnKeyCardPickedUp()
     {
         ShowActivateComputer();
@@ -138,11 +123,6 @@ public class ObjectiveUI : MonoBehaviour
     {
         ShowCompleted();
     }
-
-
-    // =========================================================
-    // UI
-    // =========================================================
 
     private void ShowFindKeyCard()
     {
@@ -167,28 +147,15 @@ public class ObjectiveUI : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // DOTWEEN TEXT ANIMATION
-    // =========================================================
-
     private void SetText(
         string newText
     )
     {
         if (objectiveText == null)
         {
-            Debug.LogWarning(
-                "[ObjectiveUI] Objective Text is not assigned.",
-                this
-            );
-
             return;
         }
 
-
-        // Останавливаем предыдущую анимацию,
-        // если задача меняется слишком быстро.
         KillTextTween();
 
 
@@ -198,8 +165,6 @@ public class ObjectiveUI : MonoBehaviour
                     gameObject
                 );
 
-
-        // Плавно скрываем текущий текст.
         textSequence.Append(
             objectiveText
                 .DOFade(
@@ -211,8 +176,6 @@ public class ObjectiveUI : MonoBehaviour
                 )
         );
 
-
-        // Меняем текст после исчезновения.
         textSequence.AppendCallback(
             () =>
             {
@@ -223,8 +186,6 @@ public class ObjectiveUI : MonoBehaviour
                 objectiveText.text =
                     newText;
 
-
-                // Немного смещаем текст вниз.
                 objectiveText.transform.localPosition =
                     originalLocalPosition -
                     new Vector3(
@@ -235,9 +196,6 @@ public class ObjectiveUI : MonoBehaviour
             }
         );
 
-
-        // Параллельно возвращаем текст
-        // в исходную позицию и показываем его.
         textSequence.Append(
             objectiveText
                 .DOFade(
@@ -278,11 +236,6 @@ public class ObjectiveUI : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // INITIAL STATE
-    // =========================================================
-
     private void SetTextInstant(
         string text
     )
@@ -306,11 +259,6 @@ public class ObjectiveUI : MonoBehaviour
             originalLocalPosition;
     }
 
-
-    // =========================================================
-    // RESET
-    // =========================================================
-
     private void ResetTextState()
     {
         if (objectiveText == null)
@@ -325,11 +273,7 @@ public class ObjectiveUI : MonoBehaviour
             originalLocalPosition;
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillTextTween()
     {
         if (

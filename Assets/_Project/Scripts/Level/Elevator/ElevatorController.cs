@@ -45,23 +45,13 @@ public class ElevatorController : MonoBehaviour
 
     private Coroutine returnCoroutine;
 
-    // Текущий tween движения лифта.
+    //Текущий tween движения лифта
     private Tween movementTween;
-
-
-    // ==========================================
-    // UNITY
-    // ==========================================
 
     private void Awake()
     {
         if (platform == null)
         {
-            Debug.LogError(
-                "[Elevator] Platform is not assigned.",
-                this
-            );
-
             return;
         }
 
@@ -88,18 +78,11 @@ public class ElevatorController : MonoBehaviour
         KillMovementTween();
     }
 
-
-    // ==========================================
-    // PLAYER
-    // ==========================================
-
     public void SetPlayer(
         Transform target)
     {
         player = target;
 
-        // Если игрок снова зашёл на платформу,
-        // отменяем уже запланированный возврат.
         CancelReturn();
     }
 
@@ -113,11 +96,6 @@ public class ElevatorController : MonoBehaviour
         }
     }
 
-
-    // ==========================================
-    // ACTIVATE
-    // ==========================================
-
     public void Activate()
     {
         if (isMoving)
@@ -129,11 +107,6 @@ public class ElevatorController : MonoBehaviour
         MoveUp();
     }
 
-
-    // ==========================================
-    // MOVE UP
-    // ==========================================
-
     private void MoveUp()
     {
         if (platform == null)
@@ -144,9 +117,6 @@ public class ElevatorController : MonoBehaviour
 
         CancelReturn();
         KillMovementTween();
-
-
-        // 🔊 SOUND UP
 
         if (elevatorSoundController != null)
         {
@@ -196,11 +166,6 @@ public class ElevatorController : MonoBehaviour
                 );
     }
 
-
-    // ==========================================
-    // MOVE DOWN
-    // ==========================================
-
     public void ReturnDown()
     {
         if (isMoving)
@@ -218,18 +183,10 @@ public class ElevatorController : MonoBehaviour
         CancelReturn();
         KillMovementTween();
 
-
-        // 🔊 SOUND DOWN
-
         if (elevatorSoundController != null)
         {
             elevatorSoundController.PlayMoveDown();
         }
-
-
-        // Если игрок всё ещё на платформе,
-        // оставляем его дочерним объектом.
-        // Он поедет вниз вместе с лифтом.
 
         movementTween =
             platform
@@ -272,11 +229,6 @@ public class ElevatorController : MonoBehaviour
                 );
     }
 
-
-    // ==========================================
-    // RETURN TIMER
-    // ==========================================
-
     private void StartReturnTimer()
     {
         CancelReturn();
@@ -312,11 +264,7 @@ public class ElevatorController : MonoBehaviour
         returnCoroutine = null;
     }
 
-
-    // ==========================================
-    // TWEEN CLEANUP
-    // ==========================================
-
+    //CLEANUP
     private void KillMovementTween()
     {
         if (
@@ -335,11 +283,6 @@ public class ElevatorController : MonoBehaviour
             platform.DOKill();
         }
     }
-
-
-    // ==========================================
-    // STATE
-    // ==========================================
 
     public bool IsMoving()
     {

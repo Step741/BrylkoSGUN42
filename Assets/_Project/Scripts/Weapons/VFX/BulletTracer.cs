@@ -5,10 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class BulletTracer : MonoBehaviour
 {
-    // =========================================================
-    // SETTINGS
-    // =========================================================
-
     [Header("Tracer Settings")]
 
     [SerializeField]
@@ -17,17 +13,7 @@ public class BulletTracer : MonoBehaviour
     [SerializeField]
     private float tailLength = 1.5f;
 
-
-    // =========================================================
-    // COMPONENTS
-    // =========================================================
-
     private LineRenderer lineRenderer;
-
-
-    // =========================================================
-    // STATE
-    // =========================================================
 
     private Vector3 startPoint;
 
@@ -41,18 +27,7 @@ public class BulletTracer : MonoBehaviour
 
     private bool isPlaying;
 
-
-    // =========================================================
-    // EVENT
-    // =========================================================
-
     public event Action<BulletTracer> Finished;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         lineRenderer =
@@ -72,11 +47,6 @@ public class BulletTracer : MonoBehaviour
         isPlaying =
             false;
     }
-
-
-    // =========================================================
-    // PLAY
-    // =========================================================
 
     public void Play(
         Vector3 start,
@@ -133,11 +103,6 @@ public class BulletTracer : MonoBehaviour
             startPoint
         );
     }
-
-
-    // =========================================================
-    // UPDATE
-    // =========================================================
 
     private void Update()
     {
@@ -196,11 +161,6 @@ public class BulletTracer : MonoBehaviour
             Finish();
         }
     }
-
-
-    // =========================================================
-    // FINISH
-    // =========================================================
 
     private void Finish()
     {

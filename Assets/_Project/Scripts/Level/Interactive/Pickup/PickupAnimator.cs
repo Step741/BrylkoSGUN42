@@ -30,11 +30,6 @@ public class PickupAnimator : MonoBehaviour
 
     private bool isPickedUp;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         startPosition =
@@ -59,11 +54,6 @@ public class PickupAnimator : MonoBehaviour
         KillTweens();
     }
 
-
-    // =========================================================
-    // IDLE ANIMATION
-    // =========================================================
-
     private void CreateIdleAnimation()
     {
         if (isPickedUp)
@@ -71,11 +61,6 @@ public class PickupAnimator : MonoBehaviour
 
 
         KillTweens();
-
-
-        // =========================
-        // ПЛАВНОЕ ПОКАЧИВАНИЕ
-        // =========================
 
         floatTween =
             transform
@@ -99,11 +84,6 @@ public class PickupAnimator : MonoBehaviour
                         floatTween = null;
                     }
                 );
-
-
-        // =========================
-        // ПОСТОЯННОЕ ВРАЩЕНИЕ
-        // =========================
 
         rotationTween =
             transform
@@ -134,11 +114,6 @@ public class PickupAnimator : MonoBehaviour
                 );
     }
 
-
-    // =========================================================
-    // PICKUP ANIMATION
-    // =========================================================
-
     public void PlayPickupAnimation(
         Transform target,
         Action onComplete
@@ -154,17 +129,8 @@ public class PickupAnimator : MonoBehaviour
         isPickedUp = true;
 
 
-        // Останавливаем idle-анимации.
+        //Останавливает idle-анимации
         KillIdleTweens();
-
-
-        // =========================
-        // ПОДБОР
-        // =========================
-        //
-        // Никакого движения к игроку.
-        // Только плавное уменьшение.
-        //
 
         pickupTween =
             transform
@@ -197,11 +163,7 @@ public class PickupAnimator : MonoBehaviour
                 );
     }
 
-
-    // =========================================================
     // CLEANUP
-    // =========================================================
-
     private void KillTweens()
     {
         KillIdleTweens();

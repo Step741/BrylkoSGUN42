@@ -49,8 +49,6 @@ public class MainMenuController : MonoBehaviour
     private RectTransform percentTextRect;
     private RectTransform loadingBarRect;
 
-
-    // Сохраняем позиции, которые выставлены вручную в Unity
     private Vector2 mainMenuStartPosition;
     private Vector2 settingsStartPosition;
 
@@ -67,11 +65,6 @@ public class MainMenuController : MonoBehaviour
     private Tween loadingTextTween;
     private Tween percentTextTween;
     private Tween loadingBarPunchTween;
-
-
-    // =========================
-    // UNITY
-    // =========================
 
     private void Awake()
     {
@@ -168,11 +161,8 @@ public class MainMenuController : MonoBehaviour
 
     private void Start()
     {
-        // На случай запуска после паузы
         Time.timeScale = 1f;
 
-
-        // Главное меню — сохраняем позицию из Unity
         if (mainMenuPanel != null)
         {
             mainMenuPanel.SetActive(true);
@@ -184,8 +174,6 @@ public class MainMenuController : MonoBehaviour
             }
         }
 
-
-        // Настройки скрыты
         if (settingsPanel != null)
         {
             settingsPanel.SetActive(false);
@@ -197,23 +185,14 @@ public class MainMenuController : MonoBehaviour
             }
         }
 
-
-        // LoadingBar скрыт
         if (loadingBarObject != null)
         {
             loadingCanvasGroup.alpha = 0f;
             loadingBarObject.SetActive(false);
         }
 
-
-        // Начальные значения Loading UI
         ResetLoadingVisuals();
     }
-
-
-    // =========================
-    // PLAY
-    // =========================
 
     public void PlayGame()
     {
@@ -230,31 +209,19 @@ public class MainMenuController : MonoBehaviour
     {
         isLoading = true;
 
-
-        // Останавливаем анимации панелей
         mainMenuRect?.DOKill();
         settingsRect?.DOKill();
 
-
-        // Скрываем меню
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(false);
 
-
-        // Скрываем настройки
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
 
-
-        // Показываем LoadingBar
         yield return StartCoroutine(ShowLoadingBar());
 
-
-        // Запускаем плавный переход музыки
         MusicTransitionManager.StartGameTransition(1.5f);
 
-
-        // Асинхронная загрузка сцены
         AsyncOperation operation =
             SceneManager.LoadSceneAsync(gameSceneName);
 
@@ -264,8 +231,6 @@ public class MainMenuController : MonoBehaviour
         float timer = 0f;
         float displayedProgress = 0f;
 
-
-        // Реальный прогресс загрузки Unity
         while (operation.progress < 0.9f)
         {
             timer += Time.unscaledDeltaTime;
@@ -276,8 +241,6 @@ public class MainMenuController : MonoBehaviour
                     operation.progress / 0.9f
                 );
 
-
-            // Плавно догоняем реальный прогресс
             displayedProgress =
                 Mathf.MoveTowards(
                     displayedProgress,
@@ -291,8 +254,6 @@ public class MainMenuController : MonoBehaviour
             yield return null;
         }
 
-
-        // Минимальное время отображения загрузки
         while (timer < minimumLoadingTime)
         {
             timer += Time.unscaledDeltaTime;
@@ -303,8 +264,6 @@ public class MainMenuController : MonoBehaviour
                     timer / minimumLoadingTime
                 );
 
-
-            // Не позволяем полоске двигаться назад
             displayedProgress =
                 Mathf.Max(
                     displayedProgress,
@@ -317,8 +276,6 @@ public class MainMenuController : MonoBehaviour
             yield return null;
         }
 
-
-        // Плавно доводим до 100%
         if (loadingBar != null)
         {
             loadingProgressTween?.Kill();
@@ -348,8 +305,6 @@ public class MainMenuController : MonoBehaviour
             UpdatePercentText(1f);
         }
 
-
-        // Небольшой акцент при завершении
         if (loadingBarRect != null)
         {
             loadingBarPunchTween?.Kill();
@@ -370,19 +325,10 @@ public class MainMenuController : MonoBehaviour
                 loadingBarPunchTween.WaitForCompletion();
         }
 
-
-        // Небольшая пауза на 100%
         yield return new WaitForSecondsRealtime(0.15f);
 
-
-        // Переходим в игровую сцену
         operation.allowSceneActivation = true;
     }
-
-
-    // =========================
-    // LOADING BAR
-    // =========================
 
     private IEnumerator ShowLoadingBar()
     {
@@ -395,15 +341,11 @@ public class MainMenuController : MonoBehaviour
 
         loadingBarObject.SetActive(true);
 
-
-        // Основной контейнер
         if (loadingCanvasGroup != null)
         {
             loadingCanvasGroup.alpha = 0f;
         }
 
-
-        // LoadingText начинает чуть ниже
         if (loadingTextRect != null)
         {
             loadingTextRect.anchoredPosition =
@@ -412,18 +354,12 @@ public class MainMenuController : MonoBehaviour
                 loadingTextSlideDistance;
         }
 
-
-        // Прячем текст
         if (loadingTextCanvasGroup != null)
             loadingTextCanvasGroup.alpha = 0f;
 
-
-        // Процент появляется чуть позже
         if (percentTextCanvasGroup != null)
             percentTextCanvasGroup.alpha = 0f;
 
-
-        // Анимация появления всего блока
         Sequence sequence =
             DOTween.Sequence()
                 .SetUpdate(true);
@@ -441,8 +377,6 @@ public class MainMenuController : MonoBehaviour
             );
         }
 
-
-        // Loading...
         if (
             loadingTextRect != null &&
             loadingTextCanvasGroup != null
@@ -468,8 +402,6 @@ public class MainMenuController : MonoBehaviour
             );
         }
 
-
-        // Процент появляется с небольшой задержкой
         if (percentTextCanvasGroup != null)
         {
             sequence.Insert(
@@ -559,11 +491,6 @@ public class MainMenuController : MonoBehaviour
             percent + "%";
     }
 
-
-    // =========================
-    // SETTINGS
-    // =========================
-
     public void OpenSettings()
     {
         if (isLoading || isPanelAnimating)
@@ -590,13 +517,8 @@ public class MainMenuController : MonoBehaviour
         mainMenuRect.DOKill();
         settingsRect.DOKill();
 
-
-        // Включаем Settings
         settingsPanel.SetActive(true);
 
-
-        // Settings начинает СЛЕВА
-        // относительно своей позиции в Unity
         settingsRect.anchoredPosition =
             settingsStartPosition +
             Vector2.left * panelSlideDistance;
@@ -606,8 +528,6 @@ public class MainMenuController : MonoBehaviour
             DOTween.Sequence()
                 .SetUpdate(true);
 
-
-        // Главное меню уезжает ВПРАВО
         sequence.Join(
             mainMenuRect
                 .DOAnchorPos(
@@ -618,8 +538,6 @@ public class MainMenuController : MonoBehaviour
                 .SetEase(Ease.InOutQuad)
         );
 
-
-        // Settings въезжает СЛЕВА
         sequence.Join(
             settingsRect
                 .DOAnchorPos(
@@ -632,13 +550,8 @@ public class MainMenuController : MonoBehaviour
 
         yield return sequence.WaitForCompletion();
 
-
-        // Скрываем главное меню
         mainMenuPanel.SetActive(false);
 
-
-        // Оставляем его справа,
-        // чтобы потом вернуть обратной анимацией
         mainMenuRect.anchoredPosition =
             mainMenuStartPosition +
             Vector2.right * panelSlideDistance;
@@ -674,13 +587,8 @@ public class MainMenuController : MonoBehaviour
         mainMenuRect.DOKill();
         settingsRect.DOKill();
 
-
-        // Включаем главное меню
         mainMenuPanel.SetActive(true);
 
-
-        // Главное меню начинает справа
-        // относительно своей исходной позиции
         mainMenuRect.anchoredPosition =
             mainMenuStartPosition +
             Vector2.right * panelSlideDistance;
@@ -690,8 +598,6 @@ public class MainMenuController : MonoBehaviour
             DOTween.Sequence()
                 .SetUpdate(true);
 
-
-        // Settings уезжают ВПРАВО
         sequence.Join(
             settingsRect
                 .DOAnchorPos(
@@ -702,9 +608,6 @@ public class MainMenuController : MonoBehaviour
                 .SetEase(Ease.InOutQuad)
         );
 
-
-        // Главное меню возвращается справа
-        // в свою исходную позицию
         sequence.Join(
             mainMenuRect
                 .DOAnchorPos(
@@ -717,23 +620,14 @@ public class MainMenuController : MonoBehaviour
 
         yield return sequence.WaitForCompletion();
 
-
-        // Скрываем Settings
         settingsPanel.SetActive(false);
 
-
-        // Возвращаем исходную позицию
         settingsRect.anchoredPosition =
             settingsStartPosition;
 
 
         isPanelAnimating = false;
     }
-
-
-    // =========================
-    // BUTTON SELECTION
-    // =========================
 
     private void ClearButtonSelection()
     {
@@ -743,11 +637,6 @@ public class MainMenuController : MonoBehaviour
         EventSystem.current
             .SetSelectedGameObject(null);
     }
-
-
-    // =========================
-    // EXIT
-    // =========================
 
     public void ExitGame()
     {
@@ -763,11 +652,6 @@ public class MainMenuController : MonoBehaviour
         Application.Quit();
 #endif
     }
-
-
-    // =========================
-    // CLEANUP
-    // =========================
 
     private void OnDestroy()
     {

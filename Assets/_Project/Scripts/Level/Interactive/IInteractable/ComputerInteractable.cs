@@ -21,11 +21,6 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
 
     public event Action Activated;
 
-
-    // =========================================================
-    // INTERACTION
-    // =========================================================
-
     public void Interact()
     {
         if (isActivated)
@@ -34,38 +29,24 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
 
         if (playerInventory == null)
         {
-            Debug.LogWarning(
-                $"[{name}] PlayerInventory is not assigned.",
-                this
-            );
-
             return;
         }
 
 
-        // Нет ключ-карты.
+        //Нет ключ-карты
         if (!playerInventory.HasKeyCard)
         {
-            Debug.Log(
-                $"[{name}] Access denied. Key card required."
-            );
-
             return;
         }
 
 
-        // Пытаемся забрать карту из инвентаря.
+        //Забрать карту из инвентаря
         if (!playerInventory.TryRemoveKeyCard())
             return;
 
 
         Activate();
     }
-
-
-    // =========================================================
-    // ACTIVATION
-    // =========================================================
 
     private void Activate()
     {
@@ -75,24 +56,11 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
 
         isActivated = true;
 
-
-        Debug.Log(
-            $"[{name}] Computer activated."
-        );
-
-
         Activated?.Invoke();
     }
 
-
-    // =========================================================
-    // INTERACTION TEXT
-    // =========================================================
-
     public string GetInteractionText()
     {
-        // После активации компьютера
-        // больше ничего не показываем.
         if (isActivated)
             return string.Empty;
 
@@ -107,11 +75,6 @@ public class ComputerInteractable : MonoBehaviour, IInteractable
 
         return interactionText;
     }
-
-
-    // =========================================================
-    // STATE
-    // =========================================================
 
     public bool IsActivated =>
         isActivated;

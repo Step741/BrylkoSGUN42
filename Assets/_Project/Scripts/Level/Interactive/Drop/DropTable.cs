@@ -4,20 +4,10 @@ public class DropTable
 {
     private readonly IPickupFactory pickupFactory;
 
-
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
-
     public DropTable(IPickupFactory pickupFactory)
     {
         this.pickupFactory = pickupFactory;
     }
-
-
-    // =========================================================
-    // ROLL
-    // =========================================================
 
     public GameObject Roll(
         DropConfig config,
@@ -25,27 +15,14 @@ public class DropTable
     {
         if (config == null)
         {
-            Debug.LogWarning(
-                "[DropTable] DropConfig is not assigned."
-            );
-
             return null;
         }
 
         if (config.Drops == null ||
             config.Drops.Count == 0)
         {
-            Debug.LogWarning(
-                "[DropTable] DropConfig contains no drops."
-            );
-
             return null;
         }
-
-
-        // -----------------------------------------------------
-        // Calculate total weight
-        // -----------------------------------------------------
 
         float totalChance = 0f;
 
@@ -63,27 +40,13 @@ public class DropTable
 
         if (totalChance <= 0f)
         {
-            Debug.LogWarning(
-                "[DropTable] Total drop chance is 0."
-            );
-
             return null;
         }
-
-
-        // -----------------------------------------------------
-        // Random roll
-        // -----------------------------------------------------
 
         float roll =
             Random.Range(0f, totalChance);
 
         float currentChance = 0f;
-
-
-        // -----------------------------------------------------
-        // Find result
-        // -----------------------------------------------------
 
         foreach (DropConfig.DropEntry entry in config.Drops)
         {
@@ -109,11 +72,6 @@ public class DropTable
 
         return null;
     }
-
-
-    // =========================================================
-    // CREATE PICKUP
-    // =========================================================
 
     private GameObject CreatePickup(
         DropConfig.PickupType pickupType,
@@ -174,10 +132,6 @@ public class DropTable
 
 
             default:
-                Debug.LogWarning(
-                    $"[DropTable] Unsupported pickup type: {pickupType}"
-                );
-
                 return null;
         }
     }

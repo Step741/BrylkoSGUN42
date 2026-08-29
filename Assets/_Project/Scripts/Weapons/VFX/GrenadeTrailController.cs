@@ -5,27 +5,13 @@ using UnityEngine;
 [RequireComponent(typeof(TrailRenderer))]
 public class GrenadeTrailController : MonoBehaviour
 {
-    // =========================================================
-    // SETTINGS
-    // =========================================================
-
     [Header("Trail Settings")]
 
     [SerializeField]
     [Min(0f)]
     private float startDelay = 0.5f;
 
-
-    // =========================================================
-    // COMPONENTS
-    // =========================================================
-
     private TrailRenderer trail;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -53,11 +39,6 @@ public class GrenadeTrailController : MonoBehaviour
         DisableAndClearTrail();
     }
 
-
-    // =========================================================
-    // ENABLE DELAY
-    // =========================================================
-
     private IEnumerator EnableTrailAfterDelay()
     {
         if (startDelay > 0f)
@@ -77,11 +58,7 @@ public class GrenadeTrailController : MonoBehaviour
             true;
     }
 
-
-    // =========================================================
-    // CLEAR
-    // =========================================================
-
+    //CLEAR
     private void DisableAndClearTrail()
     {
         if (trail == null)

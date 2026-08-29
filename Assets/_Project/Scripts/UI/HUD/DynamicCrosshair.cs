@@ -72,22 +72,18 @@ public class DynamicCrosshair : MonoBehaviour
     [Header("DOTween - Fire Punch")]
 
     [SerializeField]
-    [Tooltip("Сила лёгкого PunchScale при выстреле.")]
     private float firePunchScale = 0.08f;
 
     [SerializeField]
-    [Tooltip("Длительность PunchScale.")]
     private float firePunchDuration = 0.12f;
 
 
     [Header("DOTween - ADS Transition")]
 
     [SerializeField]
-    [Tooltip("Небольшой масштаб прицела в ADS.")]
     private float adsVisualScale = 0.9f;
 
     [SerializeField]
-    [Tooltip("Длительность визуального перехода ADS.")]
     private float adsTransitionDuration = 0.12f;
 
 
@@ -96,26 +92,13 @@ public class DynamicCrosshair : MonoBehaviour
 
     private bool wasAiming;
 
-
-    // =========================================================
-    // INITIAL POSITIONS
-    // Сохраняем размер прицела, настроенный вручную в сцене.
-    // =========================================================
-
     private Vector2 topBasePosition;
     private Vector2 bottomBasePosition;
     private Vector2 leftBasePosition;
     private Vector2 rightBasePosition;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
-        // Сохраняем исходные позиции частей прицела.
-        // Именно эти позиции будут соответствовать idleSpread.
         SaveInitialPositions();
 
         currentBaseSpread = idleSpread;
@@ -173,11 +156,6 @@ public class DynamicCrosshair : MonoBehaviour
         KillCrosshairTweens();
     }
 
-
-    // =========================================================
-    // INITIAL POSITIONS
-    // =========================================================
-
     private void SaveInitialPositions()
     {
         if (top != null)
@@ -207,11 +185,6 @@ public class DynamicCrosshair : MonoBehaviour
                 right.anchoredPosition;
         }
     }
-
-
-    // =========================================================
-    // ADS STATE
-    // =========================================================
 
     private void CheckADSState()
     {
@@ -292,11 +265,6 @@ public class DynamicCrosshair : MonoBehaviour
             );
     }
 
-
-    // =========================================================
-    // MOVEMENT SPREAD
-    // =========================================================
-
     private void UpdateBaseSpread()
     {
         float targetBaseSpread =
@@ -327,14 +295,11 @@ public class DynamicCrosshair : MonoBehaviour
 
     private float GetBaseSpread()
     {
-        // Прыжок / нахождение в воздухе.
         if (!playerController.IsGrounded)
         {
             return airSpread;
         }
 
-
-        // ADS.
         if (
             adsController != null &&
             adsController.IsAiming
@@ -343,36 +308,23 @@ public class DynamicCrosshair : MonoBehaviour
             return adsSpread;
         }
 
-
-        // Приседание.
         if (playerController.IsCrouching)
         {
             return crouchSpread;
         }
 
-
-        // Бег.
         if (playerController.IsSprinting)
         {
             return sprintSpread;
         }
 
-
-        // Ходьба.
         if (playerController.IsMoving)
         {
             return moveSpread;
         }
 
-
-        // Idle.
         return idleSpread;
     }
-
-
-    // =========================================================
-    // FIRE SPREAD
-    // =========================================================
 
     private void UpdateFireSpread()
     {
@@ -448,27 +400,10 @@ public class DynamicCrosshair : MonoBehaviour
             );
     }
 
-
-    // =========================================================
-    // CROSSHAIR POSITION
-    // =========================================================
-
     private void UpdateCrosshair(
         float spread
     )
     {
-        // Вычисляем изменение относительно idleSpread.
-        //
-        // spread = idleSpread:
-        // части остаются точно там,
-        // где ты разместил их в сцене.
-        //
-        // spread > idleSpread:
-        // прицел расширяется.
-        //
-        // spread < idleSpread:
-        // прицел сужается.
-
         float spreadOffset =
             spread -
             idleSpread;
@@ -509,11 +444,6 @@ public class DynamicCrosshair : MonoBehaviour
                 spreadOffset;
         }
     }
-
-
-    // =========================================================
-    // HELPERS
-    // =========================================================
 
     private void SetPartsScale(
         float scale

@@ -24,11 +24,6 @@ public class EnemyMinimapMarker : MonoBehaviour
 
     private float lastTimeSeen = float.NegativeInfinity;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         if (minimapMarker == null)
@@ -55,27 +50,17 @@ public class EnemyMinimapMarker : MonoBehaviour
 
     private void Start()
     {
-        // В начале игры враг ещё не обнаружил игрока.
         SetMarkerVisible(false);
     }
 
 
     private void Update()
     {
-        // =====================================================
-        // DEATH CHECK
-        // =====================================================
-
         if (health != null && health.IsDead)
         {
             SetMarkerVisible(false);
             return;
         }
-
-
-        // =====================================================
-        // VISION CHECK
-        // =====================================================
 
         if (enemyVision == null)
         {
@@ -87,11 +72,6 @@ public class EnemyMinimapMarker : MonoBehaviour
         bool canSeePlayer =
             enemyVision.CanSeePlayer();
 
-
-        // -----------------------------------------------------
-        // Враг видит игрока.
-        // -----------------------------------------------------
-
         if (canSeePlayer)
         {
             lastTimeSeen = Time.time;
@@ -100,14 +80,6 @@ public class EnemyMinimapMarker : MonoBehaviour
 
             return;
         }
-
-
-        // -----------------------------------------------------
-        // Враг потерял игрока.
-        //
-        // Маркер остаётся видимым hideDelay секунд
-        // после последнего обнаружения.
-        // -----------------------------------------------------
 
         bool shouldRemainVisible =
             Time.time - lastTimeSeen <= hideDelay;
@@ -127,20 +99,10 @@ public class EnemyMinimapMarker : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // DEATH
-    // =========================================================
-
     private void OnEnemyDied()
     {
         SetMarkerVisible(false);
     }
-
-
-    // =========================================================
-    // VISIBILITY
-    // =========================================================
 
     private void SetMarkerVisible(bool value)
     {

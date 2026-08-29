@@ -42,11 +42,6 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float recoilSnappiness = 20f;
 
-
-    // =========================
-    // SETTINGS
-    // =========================
-
     private const string MouseSensitivityKey =
         "MouseSensitivity";
 
@@ -68,27 +63,12 @@ public class CameraController : MonoBehaviour
 
     private bool invertYAxis;
 
-
-    // =========================
-    // REFERENCES
-    // =========================
-
     private IInputService inputService;
-
-
-    // =========================
-    // CAMERA STATE
-    // =========================
 
     private float horizontalAngle;
     private float verticalAngle;
 
     private bool wasAiming;
-
-
-    // =========================
-    // RECOIL
-    // =========================
 
     private float currentRecoil;
     private float targetRecoil;
@@ -138,11 +118,6 @@ public class CameraController : MonoBehaviour
         UpdateRecoil();
     }
 
-
-    // =========================
-    // SETTINGS
-    // =========================
-
     private void LoadSettings()
     {
         settingsSensitivity =
@@ -170,12 +145,6 @@ public class CameraController : MonoBehaviour
                 InvertYAxisKey,
                 0
             ) == 1;
-
-
-        Debug.Log(
-            "MOUSE SENSITIVITY: " +
-            settingsSensitivity
-        );
     }
 
 
@@ -198,11 +167,6 @@ public class CameraController : MonoBehaviour
                 0
             ) == 1;
     }
-
-
-    // =========================
-    // CAMERA ROTATION
-    // =========================
 
     private void RotateCamera()
     {
@@ -302,11 +266,6 @@ public class CameraController : MonoBehaviour
             isAiming;
     }
 
-
-    // =========================
-    // RECOIL
-    // =========================
-
     private void UpdateRecoil()
     {
         targetRecoil =
@@ -341,11 +300,6 @@ public class CameraController : MonoBehaviour
                 10f
             );
     }
-
-
-    // =========================
-    // ADS
-    // =========================
 
     private void EnterADS()
     {

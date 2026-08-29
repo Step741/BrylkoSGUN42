@@ -4,10 +4,6 @@ using UnityEngine.Pool;
 
 public class SpitProjectilePool : MonoBehaviour
 {
-    // ==========================================
-    // POOL
-    // ==========================================
-
     [Header("Pool")]
 
     [SerializeField]
@@ -19,26 +15,12 @@ public class SpitProjectilePool : MonoBehaviour
     [SerializeField]
     private int maxSize = 50;
 
-
-    // ==========================================
-    // POOL INSTANCE
-    // ==========================================
-
     private ObjectPool<SpitProjectile> pool;
-
-
-    // ==========================================
-    // UNITY
-    // ==========================================
 
     private void Awake()
     {
         if (projectilePrefab == null)
         {
-            Debug.LogError(
-                $"[{name}] Spit Projectile Prefab is missing."
-            );
-
             return;
         }
 
@@ -54,11 +36,6 @@ public class SpitProjectilePool : MonoBehaviour
                 maxSize: maxSize
             );
     }
-
-
-    // ==========================================
-    // CREATE
-    // ==========================================
 
     private SpitProjectile CreateProjectile()
     {
@@ -82,25 +59,11 @@ public class SpitProjectilePool : MonoBehaviour
         return projectile;
     }
 
-
-    // ==========================================
-    // ON GET
-    // ==========================================
-
     private void OnGetProjectile(
         SpitProjectile projectile
     )
     {
-        // Важно:
-        // Здесь специально ничего не активируем.
-        // Сначала объект будет перемещён
-        // в SpitOrigin, затем включён.
     }
-
-
-    // ==========================================
-    // ON RELEASE
-    // ==========================================
 
     private void OnReleaseProjectile(
         SpitProjectile projectile
@@ -115,11 +78,6 @@ public class SpitProjectilePool : MonoBehaviour
         );
     }
 
-
-    // ==========================================
-    // ON DESTROY
-    // ==========================================
-
     private void OnDestroyProjectile(
         SpitProjectile projectile
     )
@@ -132,11 +90,6 @@ public class SpitProjectilePool : MonoBehaviour
         }
     }
 
-
-    // ==========================================
-    // GET PROJECTILE
-    // ==========================================
-
     public SpitProjectile GetProjectile(
         Vector3 position,
         Quaternion rotation
@@ -144,10 +97,6 @@ public class SpitProjectilePool : MonoBehaviour
     {
         if (pool == null)
         {
-            Debug.LogError(
-                $"[{name}] Spit Projectile Pool is not initialized."
-            );
-
             return null;
         }
 
@@ -159,20 +108,10 @@ public class SpitProjectilePool : MonoBehaviour
         if (projectile == null)
             return null;
 
-
-        // ==========================================
-        // СНАЧАЛА СТАВИМ В НУЖНУЮ ПОЗИЦИЮ
-        // ==========================================
-
         projectile.transform.SetPositionAndRotation(
             position,
             rotation
         );
-
-
-        // ==========================================
-        // И ТОЛЬКО ПОТОМ АКТИВИРУЕМ
-        // ==========================================
 
         projectile.gameObject.SetActive(
             true
@@ -181,11 +120,6 @@ public class SpitProjectilePool : MonoBehaviour
 
         return projectile;
     }
-
-
-    // ==========================================
-    // RELEASE
-    // ==========================================
 
     public void Release(
         SpitProjectile projectile

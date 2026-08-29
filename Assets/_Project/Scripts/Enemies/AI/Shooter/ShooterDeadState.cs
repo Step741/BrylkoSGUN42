@@ -16,19 +16,13 @@ public class ShooterDeadState : EnemyState
         {
             shooter.StopMoving();
         }
-
-        Debug.Log(
-            $"[{enemy.name}] State: Dead"
-        );
     }
 
     public override void Tick()
     {
-        // В состоянии Dead враг ничего не делает.
     }
 
     public override void Exit()
     {
-        // Из Dead пока не выходим.
     }
 }

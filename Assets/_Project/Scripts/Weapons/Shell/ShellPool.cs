@@ -24,10 +24,6 @@ public class ShellPool : MonoBehaviour
     {
         if (shellPrefab == null)
         {
-            Debug.LogError(
-                $"{name}: Shell Prefab is missing."
-            );
-
             return;
         }
 
@@ -42,11 +38,6 @@ public class ShellPool : MonoBehaviour
             maxSize
         );
     }
-
-
-    // =========================================================
-    // CREATE
-    // =========================================================
 
     private ShellCasing CreateShell()
     {
@@ -63,28 +54,17 @@ public class ShellPool : MonoBehaviour
         return shell;
     }
 
-
-    // =========================================================
-    // GET
-    // =========================================================
-
     private void OnGetShell(
         ShellCasing shell)
     {
-        // Сначала ставим гильзу в новую позицию
+        //Ставит гильзу в новую позицию
         shell.transform.SetPositionAndRotation(
             spawnPosition,
             spawnRotation
         );
 
-        // Только потом активируем
         shell.gameObject.SetActive(true);
     }
-
-
-    // =========================================================
-    // RELEASE
-    // =========================================================
 
     private void OnReleaseShell(
         ShellCasing shell)
@@ -95,11 +75,6 @@ public class ShellPool : MonoBehaviour
         shell.gameObject.SetActive(false);
     }
 
-
-    // =========================================================
-    // DESTROY
-    // =========================================================
-
     private void OnDestroyShell(
         ShellCasing shell)
     {
@@ -109,26 +84,15 @@ public class ShellPool : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // PUBLIC API
-    // =========================================================
-
     public ShellCasing GetShell(
         Vector3 position,
         Quaternion rotation)
     {
         if (pool == null)
         {
-            Debug.LogError(
-                $"{name}: Shell Pool is not initialized."
-            );
-
             return null;
         }
 
-
-        // Сохраняем новую позицию ДО pool.Get()
         spawnPosition = position;
         spawnRotation = rotation;
 

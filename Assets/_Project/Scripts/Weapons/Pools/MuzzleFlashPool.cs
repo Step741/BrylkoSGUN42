@@ -4,31 +4,17 @@ using UnityEngine;
 
 public class MuzzleFlashPool : MonoBehaviour
 {
-    // =========================================================
-    // SINGLETON
-    // =========================================================
-
     public static MuzzleFlashPool Instance
     {
         get;
         private set;
     }
 
-
-    // =========================================================
-    // POOL
-    // =========================================================
-
     private class Pool
     {
         public Queue<PooledFlash> Available =
             new Queue<PooledFlash>();
     }
-
-
-    // =========================================================
-    // POOLED FLASH
-    // =========================================================
 
     private class PooledFlash
     {
@@ -37,19 +23,9 @@ public class MuzzleFlashPool : MonoBehaviour
         public ParticleSystem[] ParticleSystems;
     }
 
-
-    // =========================================================
-    // POOLS
-    // =========================================================
-
     private readonly Dictionary<int, Pool>
         pools =
             new Dictionary<int, Pool>();
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -70,11 +46,6 @@ public class MuzzleFlashPool : MonoBehaviour
             this;
     }
 
-
-    // =========================================================
-    // PLAY
-    // =========================================================
-
     public void Play(
         ParticleSystem template,
         Transform muzzlePoint)
@@ -86,18 +57,8 @@ public class MuzzleFlashPool : MonoBehaviour
         if (muzzlePoint == null)
             return;
 
-
-        // =====================================================
-        // GET POOL ID
-        // =====================================================
-
         int poolId =
             template.GetInstanceID();
-
-
-        // =====================================================
-        // GET OR CREATE POOL
-        // =====================================================
 
         if (
             !pools.TryGetValue(
@@ -116,67 +77,32 @@ public class MuzzleFlashPool : MonoBehaviour
             );
         }
 
-
-        // =====================================================
-        // GET FLASH
-        // =====================================================
-
         PooledFlash flash =
             GetFlash(
                 template,
                 pool
             );
 
-
-        // =====================================================
-        // SET POSITION
-        // =====================================================
-
         flash.GameObject.transform.SetPositionAndRotation(
             muzzlePoint.position,
             muzzlePoint.rotation
         );
 
-
-        // =====================================================
-        // SET SCALE
-        // =====================================================
-
         flash.GameObject.transform.localScale =
             muzzlePoint.lossyScale;
-
-
-        // =====================================================
-        // ACTIVATE
-        // =====================================================
 
         flash.GameObject.SetActive(
             true
         );
 
-
-        // =====================================================
-        // PLAY PARTICLES
-        // =====================================================
-
         PlayParticles(
             flash
         );
-
-
-        // =====================================================
-        // GET DURATION
-        // =====================================================
 
         float duration =
             GetDuration(
                 flash
             );
-
-
-        // =====================================================
-        // RETURN TO POOL
-        // =====================================================
 
         StartCoroutine(
             ReturnAfterDelay(
@@ -187,19 +113,10 @@ public class MuzzleFlashPool : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // GET FLASH
-    // =========================================================
-
     private PooledFlash GetFlash(
         ParticleSystem template,
         Pool pool)
     {
-        // =====================================================
-        // GET FROM POOL
-        // =====================================================
-
         if (
             pool.Available.Count > 0
         )
@@ -207,11 +124,6 @@ public class MuzzleFlashPool : MonoBehaviour
             return
                 pool.Available.Dequeue();
         }
-
-
-        // =====================================================
-        // CREATE NEW
-        // =====================================================
 
         GameObject flashObject =
             Instantiate(
@@ -224,19 +136,9 @@ public class MuzzleFlashPool : MonoBehaviour
             template.name +
             "_Pooled";
 
-
-        // =====================================================
-        // DISABLE BEFORE USE
-        // =====================================================
-
         flashObject.SetActive(
             false
         );
-
-
-        // =====================================================
-        // CREATE POOLED FLASH
-        // =====================================================
 
         PooledFlash flash =
             new PooledFlash
@@ -255,11 +157,6 @@ public class MuzzleFlashPool : MonoBehaviour
 
         return flash;
     }
-
-
-    // =========================================================
-    // PLAY PARTICLES
-    // =========================================================
 
     private void PlayParticles(
         PooledFlash flash)
@@ -285,11 +182,6 @@ public class MuzzleFlashPool : MonoBehaviour
             );
         }
     }
-
-
-    // =========================================================
-    // DURATION
-    // =========================================================
 
     private float GetDuration(
         PooledFlash flash)
@@ -333,11 +225,6 @@ public class MuzzleFlashPool : MonoBehaviour
             0.05f;
     }
 
-
-    // =========================================================
-    // RETURN TO POOL
-    // =========================================================
-
     private IEnumerator ReturnAfterDelay(
         PooledFlash flash,
         Pool pool,
@@ -356,11 +243,6 @@ public class MuzzleFlashPool : MonoBehaviour
             yield break;
         }
 
-
-        // =====================================================
-        // STOP PARTICLES
-        // =====================================================
-
         foreach (
             ParticleSystem particle
             in flash.ParticleSystems
@@ -377,29 +259,14 @@ public class MuzzleFlashPool : MonoBehaviour
             );
         }
 
-
-        // =====================================================
-        // DISABLE
-        // =====================================================
-
         flash.GameObject.SetActive(
             false
         );
-
-
-        // =====================================================
-        // RETURN TO POOL
-        // =====================================================
 
         pool.Available.Enqueue(
             flash
         );
     }
-
-
-    // =========================================================
-    // DESTROY
-    // =========================================================
 
     private void OnDestroy()
     {

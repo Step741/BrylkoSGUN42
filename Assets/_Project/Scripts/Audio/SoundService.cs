@@ -55,10 +55,6 @@ public class SoundService : MonoBehaviour, ISoundService
             null
         )
         {
-            Debug.LogError(
-                "AudioSourcePool is missing in scene."
-            );
-
             return;
         }
 
@@ -128,10 +124,6 @@ public class SoundService : MonoBehaviour, ISoundService
             null
         )
         {
-            Debug.LogError(
-                "AudioSourcePool is missing in scene."
-            );
-
             return;
         }
 
@@ -154,11 +146,6 @@ public class SoundService : MonoBehaviour, ISoundService
 
         source.pitch =
             pitch;
-
-
-        // ==========================================
-        // 3D SETTINGS
-        // ==========================================
 
         source.spatialBlend =
             1f;

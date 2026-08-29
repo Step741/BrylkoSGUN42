@@ -20,10 +20,6 @@ public class ProjectilePool : MonoBehaviour
     {
         if (projectilePrefab == null)
         {
-            Debug.LogError(
-                $"{name}: Projectile Prefab is missing."
-            );
-
             return;
         }
 
@@ -88,10 +84,6 @@ public class ProjectilePool : MonoBehaviour
     {
         if (pool == null)
         {
-            Debug.LogError(
-                $"{name}: Projectile Pool is not initialized."
-            );
-
             return null;
         }
 

@@ -46,11 +46,6 @@ public class DebrisPiece : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-
-    // =========================================================
-    // EXPLOSION
-    // =========================================================
-
     public void Explode(Vector3 explosionPosition)
     {
         if (rb == null)
@@ -64,11 +59,6 @@ public class DebrisPiece : MonoBehaviour
             ForceMode.Impulse
         );
     }
-
-
-    // =========================================================
-    // COLLISION SOUND
-    // =========================================================
 
     private void OnCollisionEnter(
         Collision collision)

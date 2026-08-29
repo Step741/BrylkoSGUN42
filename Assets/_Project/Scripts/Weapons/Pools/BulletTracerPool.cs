@@ -9,12 +9,6 @@ public class BulletTracerPool : MonoBehaviour
         get;
         private set;
     }
-
-
-    // =========================================================
-    // POOL
-    // =========================================================
-
     private class Pool
     {
         public readonly Queue<BulletTracer>
@@ -31,11 +25,6 @@ public class BulletTracerPool : MonoBehaviour
     private readonly Dictionary<BulletTracer, Pool>
         tracerPools =
             new Dictionary<BulletTracer, Pool>();
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -65,11 +54,6 @@ public class BulletTracerPool : MonoBehaviour
                 null;
         }
     }
-
-
-    // =========================================================
-    // PLAY
-    // =========================================================
 
     public void Play(
         BulletTracer template,
@@ -126,11 +110,6 @@ public class BulletTracerPool : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // GET TRACER
-    // =========================================================
-
     private BulletTracer GetTracer(
         BulletTracer template,
         Pool pool)
@@ -179,11 +158,6 @@ public class BulletTracerPool : MonoBehaviour
 
         return newTracer;
     }
-
-
-    // =========================================================
-    // RETURN
-    // =========================================================
 
     private void ReturnToPool(
         BulletTracer tracer)

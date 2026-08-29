@@ -68,31 +68,10 @@ public class GrenadeLauncher : WeaponBase
     {
         base.Awake();
 
-
-        if (playerCamera == null)
-        {
-            Debug.LogError(
-                $"{name}: Player Camera is missing."
-            );
-        }
-
-
-        if (projectilePool == null)
-        {
-            Debug.LogError(
-                $"{name}: Projectile Pool is missing."
-            );
-        }
     }
-
-
-    // =========================================================
-    // SHOOT
-    // =========================================================
 
     public override bool Shoot()
     {
-        // Пустой магазин
         if (currentAmmo <= 0)
         {
             PlayEmptyClick();
@@ -111,20 +90,12 @@ public class GrenadeLauncher : WeaponBase
 
         if (config.ProjectilePrefab == null)
         {
-            Debug.LogError(
-                $"{name}: Projectile Prefab is missing in WeaponConfig."
-            );
-
             return false;
         }
 
 
         if (muzzlePoint == null)
         {
-            Debug.LogError(
-                $"{name}: Muzzle Point is missing."
-            );
-
             return false;
         }
 
@@ -144,16 +115,12 @@ public class GrenadeLauncher : WeaponBase
         if (shotPending)
             return false;
 
-
-        // Патрон расходуется
-        // в момент нажатия.
         currentAmmo--;
 
         NotifyAmmoChanged();
 
 
-        // Настоящий выстрел произойдёт
-        // через Animation Event.
+        //Выстрел произойдёт через Animation Event
         shotPending = true;
 
 
@@ -165,15 +132,6 @@ public class GrenadeLauncher : WeaponBase
         return true;
     }
 
-
-    // =========================================================
-    // FIRE PROJECTILE
-    // =========================================================
-
-    /// <summary>
-    /// Вызывается Animation Event
-    /// в кадре фактического выстрела.
-    /// </summary>
     public void FireProjectile()
     {
         if (!shotPending)
@@ -198,46 +156,18 @@ public class GrenadeLauncher : WeaponBase
         if (projectilePool == null)
             return;
 
-
-        // ==================================================
-        // MUZZLE FLASH
-        // ==================================================
-
         MuzzleFlashPool.Instance?.Play(
             muzzleFlash,
             muzzlePoint
         );
 
-
-        // ==================================================
-        // SHELL EJECTION
-        // ==================================================
-
         shellEjector?.Eject();
-
-
-        // ==================================================
-        // SHOOT SOUND
-        // ==================================================
 
         PlaySound(
             shootSound
         );
 
-
-        // ==================================================
-        // RECOIL
-        // ==================================================
-
         weaponRecoil?.AddRecoil();
-
-
-        // ==================================================
-        // DIRECTION
-        //
-        // Берём направление именно в момент
-        // Animation Event.
-        // ==================================================
 
         Vector3 direction =
             playerCamera.transform.forward;
@@ -248,11 +178,6 @@ public class GrenadeLauncher : WeaponBase
                 direction
             );
 
-
-        // ==================================================
-        // GET PROJECTILE
-        // ==================================================
-
         GrenadeProjectile projectile =
             projectilePool.GetProjectile(
                 muzzlePoint.position,
@@ -262,17 +187,8 @@ public class GrenadeLauncher : WeaponBase
 
         if (projectile == null)
         {
-            Debug.LogError(
-                $"{name}: Failed to get projectile from pool."
-            );
-
             return;
         }
-
-
-        // ==================================================
-        // FIRE PROJECTILE
-        // ==================================================
 
         projectile.Initialize(
             config,
@@ -280,17 +196,19 @@ public class GrenadeLauncher : WeaponBase
         );
     }
 
-
-    // =========================================================
-    // RELOAD
-    // =========================================================
-
     public override void Reload()
     {
-        if (config == null)
+        if (!CanReload)
             return;
 
+        StartReload(
+            CompleteReload
+        );
+    }
 
+
+    private void CompleteReload()
+    {
         int missingAmmo =
             config.MagazineSize -
             currentAmmo;
@@ -299,8 +217,6 @@ public class GrenadeLauncher : WeaponBase
         if (missingAmmo <= 0)
             return;
 
-
-        // Бесконечный боезапас
         if (InfiniteAmmo)
         {
             currentAmmo =
@@ -308,19 +224,13 @@ public class GrenadeLauncher : WeaponBase
 
             NotifyAmmoChanged();
 
+
             PlaySound(
                 reloadSound
             );
 
-
-            Debug.Log(
-                $"Grenade Launcher reload: " +
-                $"{currentAmmo}/∞"
-            );
-
             return;
         }
-
 
         if (reserveAmmo <= 0)
             return;
@@ -346,18 +256,7 @@ public class GrenadeLauncher : WeaponBase
         PlaySound(
             reloadSound
         );
-
-
-        Debug.Log(
-            $"Grenade Launcher reload: " +
-            $"{currentAmmo}/{reserveAmmo}"
-        );
     }
-
-
-    // =========================================================
-    // SOUND
-    // =========================================================
 
     private void PlaySound(
         AudioClip clip)
@@ -394,13 +293,10 @@ public class GrenadeLauncher : WeaponBase
         );
     }
 
-
-    // =========================================================
-    // DISABLE
-    // =========================================================
-
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
+
         shotPending = false;
     }
 }

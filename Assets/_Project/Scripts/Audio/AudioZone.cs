@@ -35,8 +35,7 @@ public class AudioZone : MonoBehaviour
             return;
 
 
-        // Защита от повторного входа,
-        // если у игрока несколько Collider.
+        //Защита от повторного входа, если у игрока несколько Collider.
         if (playerInside)
             return;
 
@@ -80,11 +79,6 @@ public class AudioZone : MonoBehaviour
 
         controller.ExitIndoorZone();
     }
-
-
-    // ==========================================
-    // PLAYER CHECK
-    // ==========================================
 
     private bool IsPlayer(
         Collider other)

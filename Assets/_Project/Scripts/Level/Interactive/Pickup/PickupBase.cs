@@ -23,11 +23,6 @@ public abstract class PickupBase : MonoBehaviour, IPickable
     protected Transform PickupPlayer =>
         pickupPlayer;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     protected virtual void Awake()
     {
         if (pickupAnimator == null)
@@ -50,21 +45,9 @@ public abstract class PickupBase : MonoBehaviour, IPickable
             return;
 
 
-        // Проверяем слой самого коллайдера игрока.
+        //Проверяет слой самого коллайдера игрока
         if (!IsPlayer(other.gameObject.layer))
             return;
-
-
-        // ВАЖНО:
-        // Не используем other.transform.root.
-        //
-        // После поездки на лифте Player становится
-        // дочерним объектом платформы.
-        //
-        // Поэтому root может оказаться ElevatorPlatform.
-        //
-        // Нам нужен непосредственно Transform,
-        // который вошёл в триггер.
 
         Transform player =
             other.transform;
@@ -91,11 +74,6 @@ public abstract class PickupBase : MonoBehaviour, IPickable
         TryPickUp(player);
     }
 
-
-    // =========================================================
-    // PICKUP
-    // =========================================================
-
     private void TryPickUp(Transform player)
     {
         if (isPickedUp)
@@ -105,9 +83,6 @@ public abstract class PickupBase : MonoBehaviour, IPickable
         if (player == null)
             return;
 
-
-        // Проверяем, можно ли подобрать объект
-        // ДО запуска анимации.
         if (!CanPickup(player))
             return;
 
@@ -116,17 +91,7 @@ public abstract class PickupBase : MonoBehaviour, IPickable
 
         pickupPlayer = player;
 
-
-        // =====================================================
-        // SUCCESS FEEDBACK
-        // =====================================================
-
         pickupFeedback?.Play();
-
-
-        // =====================================================
-        // PICKUP ANIMATION
-        // =====================================================
 
         if (pickupAnimator == null)
         {
@@ -141,11 +106,6 @@ public abstract class PickupBase : MonoBehaviour, IPickable
         );
     }
 
-
-    // =========================================================
-    // COMPLETE
-    // =========================================================
-
     private void CompletePickup()
     {
         ApplyPickup();
@@ -153,32 +113,13 @@ public abstract class PickupBase : MonoBehaviour, IPickable
         Destroy(gameObject);
     }
 
-
-    // =========================================================
-    // CAN PICKUP
-    // =========================================================
-
-    /// <summary>
-    /// Проверяет, можно ли подобрать объект.
-    /// По умолчанию любой Pickup можно подобрать.
-    /// </summary>
     protected virtual bool CanPickup(
         Transform player)
     {
         return true;
     }
 
-
-    // =========================================================
-    // APPLY
-    // =========================================================
-
     protected abstract void ApplyPickup();
-
-
-    // =========================================================
-    // PLAYER
-    // =========================================================
 
     private bool IsPlayer(int layer)
     {
@@ -196,10 +137,6 @@ public abstract class PickupBase : MonoBehaviour, IPickable
 
         if (collider == null)
             return null;
-
-
-        // Если сам Pickup находится в триггере
-        // и рядом находится Player, ищем его.
 
         Collider[] colliders =
             Physics.OverlapSphere(
@@ -219,11 +156,7 @@ public abstract class PickupBase : MonoBehaviour, IPickable
         return colliders[0].transform;
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void OnDisable()
     {
         isPickedUp = false;

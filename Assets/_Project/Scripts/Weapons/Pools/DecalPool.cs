@@ -3,20 +3,11 @@ using UnityEngine;
 
 public class DecalPool : MonoBehaviour
 {
-    // =========================================================
-    // SINGLETON
-    // =========================================================
-
     public static DecalPool Instance
     {
         get;
         private set;
     }
-
-
-    // =========================================================
-    // POOLS
-    // =========================================================
 
     private readonly Dictionary<
         GameObject,
@@ -27,11 +18,6 @@ public class DecalPool : MonoBehaviour
             Queue<ImpactDecal>
         >();
 
-
-    // =========================================================
-    // DECAL OWNERS
-    // =========================================================
-
     private readonly Dictionary<
         ImpactDecal,
         GameObject
@@ -40,11 +26,6 @@ public class DecalPool : MonoBehaviour
             ImpactDecal,
             GameObject
         >();
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -65,11 +46,6 @@ public class DecalPool : MonoBehaviour
             this;
     }
 
-
-    // =========================================================
-    // GET
-    // =========================================================
-
     public ImpactDecal Get(
         GameObject prefab,
         Vector3 position,
@@ -79,11 +55,6 @@ public class DecalPool : MonoBehaviour
     {
         if (prefab == null)
             return null;
-
-
-        // =====================================================
-        // CREATE POOL
-        // =====================================================
 
         if (
             !pools.ContainsKey(
@@ -105,11 +76,6 @@ public class DecalPool : MonoBehaviour
         ImpactDecal decal =
             null;
 
-
-        // =====================================================
-        // FIND AVAILABLE DECAL
-        // =====================================================
-
         while (
             pool.Count > 0 &&
             decal == null
@@ -125,11 +91,6 @@ public class DecalPool : MonoBehaviour
                     candidate;
             }
         }
-
-
-        // =====================================================
-        // CREATE NEW
-        // =====================================================
 
         if (decal == null)
         {
@@ -161,11 +122,6 @@ public class DecalPool : MonoBehaviour
                 prefab;
         }
 
-
-        // =====================================================
-        // ACTIVATE
-        // =====================================================
-
         decal.Activate(
             position,
             rotation,
@@ -176,11 +132,6 @@ public class DecalPool : MonoBehaviour
 
         return decal;
     }
-
-
-    // =========================================================
-    // RETURN
-    // =========================================================
 
     public void Return(
         ImpactDecal decal)

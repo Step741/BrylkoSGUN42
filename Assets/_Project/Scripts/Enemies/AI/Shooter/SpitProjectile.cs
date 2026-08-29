@@ -5,43 +5,19 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class SpitProjectile : MonoBehaviour
 {
-    // ==========================================
-    // PROJECTILE
-    // ==========================================
-
     [Header("Projectile")]
 
     [SerializeField]
     private float lifetime = 5f;
-
-
-    // ==========================================
-    // VFX
-    // ==========================================
 
     [Header("VFX")]
 
     [SerializeField]
     private ParticleSystem[] particleSystems;
 
-
-    // ==========================================
-    // COMPONENTS
-    // ==========================================
-
     private Rigidbody rb;
 
-
-    // ==========================================
-    // POOL
-    // ==========================================
-
     private SpitProjectilePool pool;
-
-
-    // ==========================================
-    // STATE
-    // ==========================================
 
     private bool hasHit;
     private bool isReleased;
@@ -50,17 +26,7 @@ public class SpitProjectile : MonoBehaviour
 
     private Coroutine lifetimeCoroutine;
 
-
-    // ==========================================
-    // DAMAGE
-    // ==========================================
-
     private float damageAmount;
-
-
-    // ==========================================
-    // UNITY
-    // ==========================================
 
     private void Awake()
     {
@@ -115,11 +81,6 @@ public class SpitProjectile : MonoBehaviour
         StopVFX();
     }
 
-
-    // ==========================================
-    // POOL
-    // ==========================================
-
     public void SetPool(
         SpitProjectilePool newPool
     )
@@ -128,11 +89,6 @@ public class SpitProjectile : MonoBehaviour
             newPool;
     }
 
-
-    // ==========================================
-    // LAUNCH
-    // ==========================================
-
     public void Launch(
         Vector3 direction,
         float speed,
@@ -140,10 +96,6 @@ public class SpitProjectile : MonoBehaviour
         Transform owner
     )
     {
-        // ==========================================
-        // RESET STATE
-        // ==========================================
-
         isReleased =
             false;
 
@@ -161,11 +113,6 @@ public class SpitProjectile : MonoBehaviour
         damageAmount =
             damage;
 
-
-        // ==========================================
-        // STOP OLD LIFETIME
-        // ==========================================
-
         if (lifetimeCoroutine != null)
         {
             StopCoroutine(
@@ -175,11 +122,6 @@ public class SpitProjectile : MonoBehaviour
             lifetimeCoroutine =
                 null;
         }
-
-
-        // ==========================================
-        // INVALID DIRECTION
-        // ==========================================
 
         if (
             direction.sqrMagnitude <=
@@ -194,20 +136,10 @@ public class SpitProjectile : MonoBehaviour
 
         direction.Normalize();
 
-
-        // ==========================================
-        // RESET ROTATION
-        // ==========================================
-
         transform.rotation =
             Quaternion.LookRotation(
                 direction
             );
-
-
-        // ==========================================
-        // STOP PHYSICS FIRST
-        // ==========================================
 
         if (rb != null)
         {
@@ -218,17 +150,7 @@ public class SpitProjectile : MonoBehaviour
                 Vector3.zero;
         }
 
-
-        // ==========================================
-        // FORCE RESET VFX
-        // ==========================================
-
         ResetAndPlayVFX();
-
-
-        // ==========================================
-        // LAUNCH ONLY AFTER VFX RESET
-        // ==========================================
 
         if (rb != null)
         {
@@ -236,21 +158,11 @@ public class SpitProjectile : MonoBehaviour
                 direction * speed;
         }
 
-
-        // ==========================================
-        // START LIFETIME
-        // ==========================================
-
         lifetimeCoroutine =
             StartCoroutine(
                 LifetimeRoutine()
             );
     }
-
-
-    // ==========================================
-    // VFX RESET + PLAY
-    // ==========================================
 
     private void ResetAndPlayVFX()
     {
@@ -295,11 +207,6 @@ public class SpitProjectile : MonoBehaviour
         }
     }
 
-
-    // ==========================================
-    // STOP VFX
-    // ==========================================
-
     private void StopVFX()
     {
         if (particleSystems == null)
@@ -330,11 +237,6 @@ public class SpitProjectile : MonoBehaviour
         }
     }
 
-
-    // ==========================================
-    // LIFETIME
-    // ==========================================
-
     private IEnumerator LifetimeRoutine()
     {
         yield return new WaitForSeconds(
@@ -344,11 +246,6 @@ public class SpitProjectile : MonoBehaviour
 
         Release();
     }
-
-
-    // ==========================================
-    // COLLISION
-    // ==========================================
 
     private void OnCollisionEnter(
         Collision collision
@@ -370,24 +267,12 @@ public class SpitProjectile : MonoBehaviour
         );
     }
 
-
-    // ==========================================
-    // TRIGGER
-    // ==========================================
-
     private void OnTriggerEnter(
         Collider other
     )
     {
         if (other == null)
             return;
-
-
-        // Trigger-коллайдеры обрабатываем
-        // только если это DamageHitbox.
-        //
-        // Это позволяет попадать в HeadHitbox,
-        // но не реагировать на другие Trigger-зоны.
 
         DamageHitbox hitbox =
             other.GetComponent<
@@ -403,11 +288,6 @@ public class SpitProjectile : MonoBehaviour
             other
         );
     }
-
-
-    // ==========================================
-    // HANDLE HIT
-    // ==========================================
 
     private void HandleHit(
         Collider hitCollider
@@ -429,11 +309,6 @@ public class SpitProjectile : MonoBehaviour
             return;
         }
 
-
-        // ==========================================
-        // IGNORE OWNER
-        // ==========================================
-
         if (
             ownerRoot != null &&
             hitCollider.transform.root ==
@@ -453,11 +328,6 @@ public class SpitProjectile : MonoBehaviour
                 ? ownerRoot.position
                 : transform.position;
 
-
-        // ==========================================
-        // DAMAGE HITBOX
-        // ==========================================
-
         DamageHitbox hitbox =
             hitCollider.GetComponent<
                 DamageHitbox
@@ -473,10 +343,6 @@ public class SpitProjectile : MonoBehaviour
         }
         else
         {
-            // ==========================================
-            // HEALTH
-            // ==========================================
-
             Health health =
                 hitCollider.GetComponentInParent<
                     Health
@@ -492,10 +358,6 @@ public class SpitProjectile : MonoBehaviour
             }
             else
             {
-                // ==========================================
-                // IDAMAGEABLE
-                // ==========================================
-
                 IDamageable damageable =
                     hitCollider.GetComponentInParent<
                         IDamageable
@@ -515,11 +377,6 @@ public class SpitProjectile : MonoBehaviour
         Release();
     }
 
-
-    // ==========================================
-    // DAMAGE
-    // ==========================================
-
     public void SetDamage(
         float damage
     )
@@ -527,11 +384,6 @@ public class SpitProjectile : MonoBehaviour
         damageAmount =
             damage;
     }
-
-
-    // ==========================================
-    // RELEASE
-    // ==========================================
 
     private void Release()
     {

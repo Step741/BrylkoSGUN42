@@ -17,11 +17,6 @@ public class ElevatorInteractable : MonoBehaviour, IInteractable
     {
         if (elevatorController == null)
         {
-            Debug.LogWarning(
-                $"[ElevatorInteractable] ElevatorController is not assigned on {gameObject.name}.",
-                this
-            );
-
             return;
         }
 

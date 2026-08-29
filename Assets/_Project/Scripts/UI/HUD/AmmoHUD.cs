@@ -14,7 +14,6 @@ public class AmmoHUD : MonoBehaviour
     [SerializeField]
     private TMP_Text ammoText;
 
-
     [Header("Railgun Heat")]
 
     [SerializeField]
@@ -23,26 +22,20 @@ public class AmmoHUD : MonoBehaviour
     [SerializeField]
     private GameObject railgunHeatRoot;
 
-
     [Header("Ammo DOTween Animation")]
 
     [SerializeField]
-    [Tooltip("Сила лёгкого эффекта при изменении патронов.")]
     private float ammoPunchScale = 0.08f;
 
     [SerializeField]
-    [Tooltip("Длительность анимации патронов.")]
     private float ammoPunchDuration = 0.18f;
-
 
     [Header("Railgun Heat DOTween Animation")]
 
     [SerializeField]
-    [Tooltip("Длительность анимации изменения перегрева.")]
     private float heatAnimationDuration = 0.15f;
 
     [SerializeField]
-    [Tooltip("Длительность плавной смены цвета перегрева.")]
     private float heatColorDuration = 0.12f;
 
     [SerializeField]
@@ -54,21 +47,13 @@ public class AmmoHUD : MonoBehaviour
     [SerializeField]
     private Color highHeatColor = Color.red;
 
-
     private WeaponBase currentWeapon;
+
     private Railgun currentRailgun;
 
     private Image railgunHeatFill;
 
-
-    // Последнее значение, которое уже было
-    // передано в HUD.
     private float lastHeat = -1f;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -84,7 +69,6 @@ public class AmmoHUD : MonoBehaviour
         }
     }
 
-
     private void OnEnable()
     {
         if (weaponSwitcher != null)
@@ -94,37 +78,18 @@ public class AmmoHUD : MonoBehaviour
         }
     }
 
-
     private void Start()
     {
         if (weaponSwitcher == null)
-        {
-            Debug.LogError(
-                "AmmoHUD: WeaponSwitcher reference is missing."
-            );
-
             return;
-        }
 
 
         if (ammoText == null)
-        {
-            Debug.LogError(
-                "AmmoHUD: Ammo Text reference is missing."
-            );
-
             return;
-        }
 
 
         if (railgunHeatBar == null)
-        {
-            Debug.LogError(
-                "AmmoHUD: Railgun Heat Bar reference is missing."
-            );
-
             return;
-        }
 
 
         if (
@@ -137,18 +102,15 @@ public class AmmoHUD : MonoBehaviour
         }
 
 
-        if (railgunHeatBar != null)
-        {
-            railgunHeatBar.minValue = 0f;
-            railgunHeatBar.maxValue = 1f;
-        }
+        railgunHeatBar.minValue = 0f;
+
+        railgunHeatBar.maxValue = 1f;
 
 
         OnCurrentWeaponChanged(
             weaponSwitcher.CurrentWeapon
         );
     }
-
 
     private void OnDisable()
     {
@@ -160,25 +122,20 @@ public class AmmoHUD : MonoBehaviour
 
 
         UnsubscribeFromWeapon();
+
         UnsubscribeFromRailgun();
+
 
         KillAllTweens();
 
+
         HideRailgunHeat();
     }
-
 
     private void OnDestroy()
     {
         KillAllTweens();
     }
-
-
-    // =========================================================
-    // UPDATE
-    // Только проверяем изменение HeatNormalized.
-    // DOTween не запускается каждый кадр.
-    // =========================================================
 
     private void Update()
     {
@@ -210,15 +167,11 @@ public class AmmoHUD : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // WEAPON CHANGED
-    // =========================================================
-
     private void OnCurrentWeaponChanged(
         WeaponBase newWeapon)
     {
         UnsubscribeFromWeapon();
+
         UnsubscribeFromRailgun();
 
         KillAllTweens();
@@ -232,15 +185,11 @@ public class AmmoHUD : MonoBehaviour
             ClearAmmoUI();
 
             HideAmmoText();
+
             HideRailgunHeat();
 
             return;
         }
-
-
-        // =====================================================
-        // РЕЛЬСОТРОН
-        // =====================================================
 
         if (currentWeapon is Railgun railgun)
         {
@@ -249,11 +198,10 @@ public class AmmoHUD : MonoBehaviour
 
 
             HideAmmoText();
+
             ShowRailgunHeat();
 
 
-            // Получаем текущее значение
-            // без стартовой анимации.
             float currentHeat =
                 currentRailgun.HeatNormalized;
 
@@ -270,25 +218,17 @@ public class AmmoHUD : MonoBehaviour
             return;
         }
 
-
-        // =====================================================
-        // KATANA
-        // =====================================================
-
         if (currentWeapon is Katana)
         {
             HideAmmoText();
+
             HideRailgunHeat();
 
             return;
         }
 
-
-        // =====================================================
-        // ОБЫЧНОЕ ОРУЖИЕ
-        // =====================================================
-
         ShowAmmoText();
+
         HideRailgunHeat();
 
 
@@ -296,18 +236,12 @@ public class AmmoHUD : MonoBehaviour
             OnAmmoChanged;
 
 
-        // Первичное отображение без анимации.
         UpdateAmmoUI(
             currentWeapon.CurrentAmmo,
             currentWeapon.ReserveAmmo,
             false
         );
     }
-
-
-    // =========================================================
-    // UNSUBSCRIBE
-    // =========================================================
 
     private void UnsubscribeFromWeapon()
     {
@@ -322,19 +256,12 @@ public class AmmoHUD : MonoBehaviour
         currentWeapon = null;
     }
 
-
     private void UnsubscribeFromRailgun()
     {
         currentRailgun = null;
 
         lastHeat = -1f;
     }
-
-
-    // =========================================================
-    // AMMO
-    // =========================================================
-
     private void OnAmmoChanged(
         int currentAmmo,
         int reserveAmmo)
@@ -346,7 +273,6 @@ public class AmmoHUD : MonoBehaviour
         );
     }
 
-
     private void UpdateAmmoUI(
         int currentAmmo,
         int reserveAmmo,
@@ -355,37 +281,32 @@ public class AmmoHUD : MonoBehaviour
         if (ammoText == null)
             return;
 
+        ammoText.transform.DOKill();
+
+        ammoText.transform.localScale =
+            Vector3.one;
 
         ammoText.text =
             $"{currentAmmo} / {reserveAmmo}";
 
-
         if (!animate)
-        {
-            ammoText.transform.localScale =
-                Vector3.one;
-
             return;
-        }
-
-
-        // Останавливаем предыдущую анимацию,
-        // если игрок быстро стреляет.
-        ammoText.transform.DOKill();
-
 
         ammoText.transform
             .DOPunchScale(
-                Vector3.one * ammoPunchScale,
+                Vector3.one *
+                ammoPunchScale,
+
                 ammoPunchDuration,
+
                 1,
+
                 0.5f
             )
             .SetLink(
                 ammoText.gameObject
             );
     }
-
 
     private void ClearAmmoUI()
     {
@@ -395,6 +316,7 @@ public class AmmoHUD : MonoBehaviour
 
         ammoText.transform.DOKill();
 
+
         ammoText.transform.localScale =
             Vector3.one;
 
@@ -402,11 +324,6 @@ public class AmmoHUD : MonoBehaviour
         ammoText.text =
             "— / —";
     }
-
-
-    // =========================================================
-    // AMMO TEXT
-    // =========================================================
 
     private void ShowAmmoText()
     {
@@ -418,12 +335,12 @@ public class AmmoHUD : MonoBehaviour
         }
     }
 
-
     private void HideAmmoText()
     {
         if (ammoText != null)
         {
             ammoText.transform.DOKill();
+
 
             ammoText.transform.localScale =
                 Vector3.one;
@@ -435,11 +352,6 @@ public class AmmoHUD : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // RAILGUN HEAT
-    // =========================================================
-
     private void ShowRailgunHeat()
     {
         if (railgunHeatRoot != null)
@@ -450,7 +362,6 @@ public class AmmoHUD : MonoBehaviour
         }
     }
 
-
     private void HideRailgunHeat()
     {
         if (railgunHeatRoot != null)
@@ -460,13 +371,6 @@ public class AmmoHUD : MonoBehaviour
             );
         }
     }
-
-
-    // =========================================================
-    // SET HEAT INSTANT
-    // Используется только при переключении
-    // на рейлган.
-    // =========================================================
 
     private void SetRailgunHeatInstant(
         float heat)
@@ -497,11 +401,6 @@ public class AmmoHUD : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // DOTWEEN RAILGUN HEAT
-    // =========================================================
-
     private void AnimateRailgunHeat(
         float targetHeat)
     {
@@ -515,9 +414,6 @@ public class AmmoHUD : MonoBehaviour
             );
 
 
-        // Убиваем предыдущую анимацию,
-        // чтобы при быстром изменении
-        // перегрева tween'ы не наслаивались.
         railgunHeatBar.DOKill();
 
 
@@ -553,42 +449,31 @@ public class AmmoHUD : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // HEAT COLOR
-    // =========================================================
-
     private Color GetHeatColor(
         float heatNormalized)
     {
-        // 0–2 выстрела
         if (heatNormalized <= 0.5f)
         {
             return lowHeatColor;
         }
 
 
-        // 3-й выстрел
         if (heatNormalized <= 0.75f)
         {
             return mediumHeatColor;
         }
 
 
-        // 4-й выстрел и критический перегрев
         return highHeatColor;
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillAllTweens()
     {
         if (ammoText != null)
         {
             ammoText.transform.DOKill();
+
 
             ammoText.transform.localScale =
                 Vector3.one;

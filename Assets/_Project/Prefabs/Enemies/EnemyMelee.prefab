@@ -277,6 +277,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 160
+  healTickInterval: 0.5
+  healPerTick: 5
 --- !u!114 &7577644401920481783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,7 +298,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   attackSectorAngle: 120
-  moveSpeed: 4.5
+  moveSpeed: 5
   chaseStoppingDistance: 3
   rotationSpeed: 8
   animator: {fileID: 1803442994854426805}

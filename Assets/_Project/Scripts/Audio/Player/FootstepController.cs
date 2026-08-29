@@ -118,20 +118,12 @@ public class FootstepController : MonoBehaviour
         bool isGrounded =
             playerController.IsGrounded;
 
-
-        // ==========================================
-        // AIR / LANDING DETECTION
-        // ==========================================
-
-        // Игрок только оторвался от земли
         if (!isGrounded && wasGrounded)
         {
             airStartY =
                 transform.position.y;
         }
 
-
-        // Игрок приземлился
         if (isGrounded && !wasGrounded)
         {
             float fallDistance =
@@ -144,11 +136,6 @@ public class FootstepController : MonoBehaviour
                 PlayFootstep();
             }
         }
-
-
-        // ==========================================
-        // NORMAL FOOTSTEPS
-        // ==========================================
 
         if (!isGrounded)
         {
@@ -188,11 +175,6 @@ public class FootstepController : MonoBehaviour
         wasGrounded = true;
     }
 
-
-    // ==========================================
-    // STEP INTERVAL
-    // ==========================================
-
     private float GetCurrentStepInterval()
     {
         if (playerController.IsCrouching)
@@ -207,11 +189,6 @@ public class FootstepController : MonoBehaviour
 
         return walkStepInterval;
     }
-
-
-    // ==========================================
-    // PLAY FOOTSTEP
-    // ==========================================
 
     private void PlayFootstep()
     {
@@ -254,11 +231,6 @@ public class FootstepController : MonoBehaviour
         );
     }
 
-
-    // ==========================================
-    // SURFACE SOUNDS
-    // ==========================================
-
     private AudioClip[] GetSurfaceSounds()
     {
         SurfaceType surfaceType =
@@ -277,11 +249,6 @@ public class FootstepController : MonoBehaviour
                 return concreteSounds;
         }
     }
-
-
-    // ==========================================
-    // SURFACE DETECTION
-    // ==========================================
 
     private SurfaceType GetSurfaceType()
     {
@@ -310,7 +277,7 @@ public class FootstepController : MonoBehaviour
 
         foreach (RaycastHit hit in hits)
         {
-            // Игнорируем коллайдеры самого Player
+            //Игнорирует коллайдеры самого Player
             if (
                 hit.collider.transform == transform ||
                 hit.collider.transform.IsChildOf(transform)
@@ -322,7 +289,6 @@ public class FootstepController : MonoBehaviour
             SurfaceIdentifier surfaceIdentifier =
                 hit.collider.GetComponent<SurfaceIdentifier>();
 
-            // Если скрипт висит на родительском объекте
             if (surfaceIdentifier == null)
             {
                 surfaceIdentifier =
@@ -337,11 +303,6 @@ public class FootstepController : MonoBehaviour
 
         return SurfaceType.Concrete;
     }
-
-
-    // ==========================================
-    // RAYCAST ORIGIN
-    // ==========================================
 
     private Vector3 GetRaycastOrigin()
     {

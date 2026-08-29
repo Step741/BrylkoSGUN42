@@ -38,13 +38,8 @@ public class DoorController : MonoBehaviour
     private int playersInside;
 
 
-    // Текущая анимация открытия или закрытия двери.
+    //Анимация открытия или закрытия двери
     private Sequence doorSequence;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -82,11 +77,6 @@ public class DoorController : MonoBehaviour
         KillTweens();
     }
 
-
-    // =========================================================
-    // PLAYER ENTER / EXIT
-    // =========================================================
-
     public void PlayerEntered()
     {
         playersInside++;
@@ -109,11 +99,6 @@ public class DoorController : MonoBehaviour
             Close();
         }
     }
-
-
-    // =========================================================
-    // OPEN
-    // =========================================================
 
     private void Open()
     {
@@ -179,11 +164,6 @@ public class DoorController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // CLOSE
-    // =========================================================
-
     private void Close()
     {
         if (!isOpen)
@@ -248,11 +228,7 @@ public class DoorController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillTweens()
     {
         if (

@@ -30,10 +30,6 @@ public class ExplosionVfxPool : MonoBehaviour
     {
         if (instance == null)
         {
-            Debug.LogError(
-                "ExplosionVfxPool is missing in scene."
-            );
-
             return;
         }
 
@@ -66,11 +62,6 @@ public class ExplosionVfxPool : MonoBehaviour
 
         if (vfx == null)
         {
-            Debug.LogError(
-                $"{prefab.name}: " +
-                "ExplosionVfx component is missing."
-            );
-
             pool.Release(effect);
             return;
         }

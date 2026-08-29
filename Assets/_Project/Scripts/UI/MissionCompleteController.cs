@@ -40,16 +40,9 @@ public class MissionCompleteController : MonoBehaviour
 
     [Header("Camera / Additional Control Scripts")]
 
-    [Tooltip(
-        "Сюда перетащи скрипт, который отвечает за вращение камеры."
-    )]
     [SerializeField]
     private MonoBehaviour cameraController;
 
-    [Tooltip(
-        "Сюда можно добавить ADS, стрельбу или другие скрипты, " +
-        "которые продолжают получать игровой ввод после победы."
-    )]
     [SerializeField]
     private MonoBehaviour[] additionalControlScripts;
 
@@ -91,11 +84,6 @@ public class MissionCompleteController : MonoBehaviour
     private Sequence missionCompleteSequence;
 
     private bool isMissionCompleteShown;
-
-
-    // =========================================================
-    // INITIALIZATION
-    // =========================================================
 
     private void Awake()
     {
@@ -144,11 +132,6 @@ public class MissionCompleteController : MonoBehaviour
     {
         if (computerInteractable == null)
         {
-            Debug.LogError(
-                "[MissionComplete] Computer Interactable is not assigned.",
-                this
-            );
-
             return;
         }
 
@@ -192,11 +175,6 @@ public class MissionCompleteController : MonoBehaviour
         KillTweens();
     }
 
-
-    // =========================================================
-    // PREPARE SCREEN
-    // =========================================================
-
     private void PrepareMissionCompleteScreen()
     {
         if (missionCompletePanel == null)
@@ -227,11 +205,6 @@ public class MissionCompleteController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // VICTORY
-    // =========================================================
-
     private void ShowMissionCompleteScreen()
     {
         if (isMissionCompleteShown)
@@ -240,16 +213,6 @@ public class MissionCompleteController : MonoBehaviour
 
         isMissionCompleteShown = true;
 
-
-        Debug.Log(
-            "[MissionComplete] MISSION COMPLETE!"
-        );
-
-
-        // -----------------------------------------------------
-        // СКРЫВАЕМ HUD
-        // -----------------------------------------------------
-
         if (hudToHide != null)
         {
             hudToHide.SetActive(
@@ -257,21 +220,11 @@ public class MissionCompleteController : MonoBehaviour
             );
         }
 
-
-        // -----------------------------------------------------
-        // БЛОКИРУЕМ ПЕРЕКЛЮЧЕНИЕ ОРУЖИЯ
-        // -----------------------------------------------------
-
         if (weaponSwitcher != null)
         {
             weaponSwitcher.enabled =
                 false;
         }
-
-
-        // -----------------------------------------------------
-        // БЛОКИРУЕМ ДВИЖЕНИЕ ИГРОКА
-        // -----------------------------------------------------
 
         if (playerController != null)
         {
@@ -279,22 +232,11 @@ public class MissionCompleteController : MonoBehaviour
                 false;
         }
 
-
-        // -----------------------------------------------------
-        // БЛОКИРУЕМ КАМЕРУ
-        // -----------------------------------------------------
-
         if (cameraController != null)
         {
             cameraController.enabled =
                 false;
         }
-
-
-        // -----------------------------------------------------
-        // БЛОКИРУЕМ ДОПОЛНИТЕЛЬНОЕ УПРАВЛЕНИЕ
-        // ADS / СТРЕЛЬБА / ДРУГИЕ СКРИПТЫ
-        // -----------------------------------------------------
 
         if (additionalControlScripts != null)
         {
@@ -311,31 +253,16 @@ public class MissionCompleteController : MonoBehaviour
             }
         }
 
-
-        // -----------------------------------------------------
-        // ОСВОБОЖДАЕМ КУРСОР
-        // -----------------------------------------------------
-
         Cursor.lockState =
             CursorLockMode.None;
 
         Cursor.visible = true;
-
-
-        // -----------------------------------------------------
-        // ОСТАНАВЛИВАЕМ ИГРУ
-        // -----------------------------------------------------
 
         Time.timeScale = 0f;
 
 
         if (missionCompletePanel == null)
             return;
-
-
-        // -----------------------------------------------------
-        // ПОКАЗЫВАЕМ ЭКРАН ПОБЕДЫ
-        // -----------------------------------------------------
 
         KillTweens();
 
@@ -359,20 +286,10 @@ public class MissionCompleteController : MonoBehaviour
 
         PrepareAnimationState();
 
-
-        // =====================================================
-        // ANIMATION
-        // =====================================================
-
         missionCompleteSequence =
             DOTween.Sequence()
                 .SetUpdate(true)
                 .SetLink(gameObject);
-
-
-        // -----------------------------------------------------
-        // PANEL FADE
-        // -----------------------------------------------------
 
         if (canvasGroup != null)
         {
@@ -388,11 +305,6 @@ public class MissionCompleteController : MonoBehaviour
             );
         }
 
-
-        // -----------------------------------------------------
-        // TITLE
-        // -----------------------------------------------------
-
         if (missionCompleteText != null)
         {
             missionCompleteSequence.Join(
@@ -407,19 +319,9 @@ public class MissionCompleteController : MonoBehaviour
             );
         }
 
-
-        // -----------------------------------------------------
-        // DELAY
-        // -----------------------------------------------------
-
         missionCompleteSequence.AppendInterval(
             buttonsDelay
         );
-
-
-        // -----------------------------------------------------
-        // RESTART BUTTON
-        // -----------------------------------------------------
 
         if (restartButtonTransform != null)
         {
@@ -435,11 +337,6 @@ public class MissionCompleteController : MonoBehaviour
             );
         }
 
-
-        // -----------------------------------------------------
-        // MAIN MENU BUTTON
-        // -----------------------------------------------------
-
         if (mainMenuButtonTransform != null)
         {
             missionCompleteSequence.Append(
@@ -453,11 +350,6 @@ public class MissionCompleteController : MonoBehaviour
                     )
             );
         }
-
-
-        // -----------------------------------------------------
-        // ENABLE UI
-        // -----------------------------------------------------
 
         missionCompleteSequence.OnComplete(
             () =>
@@ -475,11 +367,6 @@ public class MissionCompleteController : MonoBehaviour
             }
         );
     }
-
-
-    // =========================================================
-    // PREPARE ANIMATION
-    // =========================================================
 
     private void PrepareAnimationState()
     {
@@ -504,11 +391,6 @@ public class MissionCompleteController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // RESTART
-    // =========================================================
-
     public void RestartLevel()
     {
         KillTweens();
@@ -525,11 +407,6 @@ public class MissionCompleteController : MonoBehaviour
             currentScene.name
         );
     }
-
-
-    // =========================================================
-    // MAIN MENU
-    // =========================================================
 
     public void ReturnToMainMenu()
     {
@@ -550,11 +427,7 @@ public class MissionCompleteController : MonoBehaviour
         );
     }
 
-
-    // =========================================================
     // CLEANUP
-    // =========================================================
-
     private void KillTweens()
     {
         if (missionCompleteSequence != null)

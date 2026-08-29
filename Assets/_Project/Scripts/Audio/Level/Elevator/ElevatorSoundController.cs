@@ -33,11 +33,6 @@ public class ElevatorSoundController : MonoBehaviour
     [SerializeField]
     private float maxDistance = 20f;
 
-
-    // ==========================================
-    // PUBLIC
-    // ==========================================
-
     public void PlayMoveUp()
     {
         PlaySound(
@@ -52,11 +47,6 @@ public class ElevatorSoundController : MonoBehaviour
             moveDownSound
         );
     }
-
-
-    // ==========================================
-    // PLAY SOUND
-    // ==========================================
 
     private void PlaySound(
         AudioClip clip)

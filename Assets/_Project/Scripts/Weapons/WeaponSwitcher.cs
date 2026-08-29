@@ -10,25 +10,21 @@ public class WeaponSwitcher : MonoBehaviour
     [SerializeField]
     private WeaponBase[] weapons;
 
-
     [Header("Start")]
 
     [SerializeField]
     private int startWeaponIndex = 0;
-
 
     [Header("Unlocked Weapons")]
 
     [SerializeField]
     private bool[] unlockedWeapons;
 
-
     [Header("Animation")]
 
     [SerializeField]
     private PlayerAnimationController
         animationController;
-
 
     private IInputService inputService;
 
@@ -37,7 +33,6 @@ public class WeaponSwitcher : MonoBehaviour
     private int pendingWeaponIndex = -1;
 
     private bool isSwitchingWeapon;
-
 
     public WeaponBase CurrentWeapon =>
         currentWeaponIndex >= 0 &&
@@ -49,7 +44,6 @@ public class WeaponSwitcher : MonoBehaviour
     public event Action<WeaponBase>
         CurrentWeaponChanged;
 
-
     [Inject]
     private void Construct(
         IInputService inputService)
@@ -58,7 +52,6 @@ public class WeaponSwitcher : MonoBehaviour
             inputService;
     }
 
-
     private void Awake()
     {
         if (
@@ -66,11 +59,6 @@ public class WeaponSwitcher : MonoBehaviour
             weapons.Length == 0
         )
         {
-            Debug.LogError(
-                "WeaponSwitcher: Weapons array is empty.",
-                this
-            );
-
             return;
         }
 
@@ -85,10 +73,6 @@ public class WeaponSwitcher : MonoBehaviour
                 >();
         }
 
-
-        // Приводим массив разблокировки
-        // к количеству оружия.
-
         if (
             unlockedWeapons == null ||
             unlockedWeapons.Length !=
@@ -101,10 +85,6 @@ public class WeaponSwitcher : MonoBehaviour
                 ];
         }
 
-
-        // Проверяем оружие
-        // и выключаем всё при старте.
-
         for (
             int i = 0;
             i < weapons.Length;
@@ -113,21 +93,11 @@ public class WeaponSwitcher : MonoBehaviour
         {
             if (weapons[i] == null)
             {
-                Debug.LogError(
-                    $"WeaponSwitcher: " +
-                    $"Weapon at index {i} is missing.",
-                    this
-                );
-
                 continue;
             }
 
             weapons[i].Unequip();
         }
-
-
-        // Первые два оружия
-        // доступны с начала.
 
         if (weapons.Length > 0)
         {
@@ -135,14 +105,12 @@ public class WeaponSwitcher : MonoBehaviour
                 true;
         }
 
+
         if (weapons.Length > 1)
         {
             unlockedWeapons[1] =
                 true;
         }
-
-
-        // Проверяем стартовое оружие.
 
         if (
             !IsWeaponUnlocked(
@@ -155,7 +123,6 @@ public class WeaponSwitcher : MonoBehaviour
         }
     }
 
-
     private void OnEnable()
     {
         if (inputService != null)
@@ -167,9 +134,6 @@ public class WeaponSwitcher : MonoBehaviour
 
     private void Start()
     {
-        // Стартовое оружие экипируем
-        // без анимации.
-
         EquipWeaponImmediate(
             startWeaponIndex
         );
@@ -180,24 +144,21 @@ public class WeaponSwitcher : MonoBehaviour
 
     private void OnDisable()
     {
+        CancelCurrentWeaponReload();
+
         UnsubscribeFromInput();
     }
-
 
     private void Update()
     {
         HandleMouseWheel();
     }
 
-
-    // =========================================================
-    // INPUT
-    // =========================================================
-
     private void SubscribeToInput()
     {
         if (inputService == null)
             return;
+
 
         inputService.SelectWeapon.performed -=
             OnSelectWeapon;
@@ -212,6 +173,7 @@ public class WeaponSwitcher : MonoBehaviour
         if (inputService == null)
             return;
 
+
         inputService.SelectWeapon.performed -=
             OnSelectWeapon;
     }
@@ -223,6 +185,7 @@ public class WeaponSwitcher : MonoBehaviour
         string controlName =
             context.control.name;
 
+
         switch (controlName)
         {
             case "1":
@@ -231,11 +194,13 @@ public class WeaponSwitcher : MonoBehaviour
 
                 break;
 
+
             case "2":
 
                 EquipWeapon(1);
 
                 break;
+
 
             case "3":
 
@@ -243,17 +208,20 @@ public class WeaponSwitcher : MonoBehaviour
 
                 break;
 
+
             case "4":
 
                 EquipWeapon(3);
 
                 break;
 
+
             case "5":
 
                 EquipWeapon(4);
 
                 break;
+
 
             case "6":
 
@@ -263,15 +231,16 @@ public class WeaponSwitcher : MonoBehaviour
         }
     }
 
-
     private void HandleMouseWheel()
     {
         if (inputService == null)
             return;
 
+
         float scroll =
             inputService.SwitchWeapon
                 .ReadValue<float>();
+
 
         if (
             Mathf.Approximately(
@@ -294,11 +263,6 @@ public class WeaponSwitcher : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // SWITCHING
-    // =========================================================
-
     public void SwitchToNextWeapon()
     {
         if (
@@ -309,6 +273,7 @@ public class WeaponSwitcher : MonoBehaviour
             return;
         }
 
+
         if (isSwitchingWeapon)
             return;
 
@@ -317,6 +282,7 @@ public class WeaponSwitcher : MonoBehaviour
             FindNextUnlockedWeapon(
                 currentWeaponIndex
             );
+
 
         if (nextIndex >= 0)
         {
@@ -337,6 +303,7 @@ public class WeaponSwitcher : MonoBehaviour
             return;
         }
 
+
         if (isSwitchingWeapon)
             return;
 
@@ -345,6 +312,7 @@ public class WeaponSwitcher : MonoBehaviour
             FindPreviousUnlockedWeapon(
                 currentWeaponIndex
             );
+
 
         if (previousIndex >= 0)
         {
@@ -370,11 +338,6 @@ public class WeaponSwitcher : MonoBehaviour
 
         if (!IsWeaponUnlocked(index))
         {
-            Debug.Log(
-                $"WeaponSwitcher: " +
-                $"Weapon {index} is locked."
-            );
-
             return;
         }
 
@@ -386,9 +349,7 @@ public class WeaponSwitcher : MonoBehaviour
         if (isSwitchingWeapon)
             return;
 
-
-        // Если это первое оружие
-        // и персонаж ещё ничего не держит.
+        CancelCurrentWeaponReload();
 
         if (currentWeaponIndex < 0)
         {
@@ -398,11 +359,6 @@ public class WeaponSwitcher : MonoBehaviour
 
             return;
         }
-
-
-        // Запоминаем оружие,
-        // которое нужно экипировать
-        // в середине анимации.
 
         pendingWeaponIndex =
             index;
@@ -420,18 +376,16 @@ public class WeaponSwitcher : MonoBehaviour
         }
         else
         {
-            // Если контроллер анимации
-            // не назначен — меняем сразу.
-
             ApplyWeaponSwitch();
+
             FinishWeaponSwitch();
         }
     }
 
-
-    // =========================================================
-    // ANIMATION EVENTS
-    // =========================================================
+    public void CancelCurrentWeaponReload()
+    {
+        CurrentWeapon?.CancelReload();
+    }
 
     public void ApplyWeaponSwitch()
     {
@@ -448,6 +402,7 @@ public class WeaponSwitcher : MonoBehaviour
         WeaponBase previousWeapon =
             CurrentWeapon;
 
+
         previousWeapon?.Unequip();
 
 
@@ -458,15 +413,9 @@ public class WeaponSwitcher : MonoBehaviour
         WeaponBase newWeapon =
             CurrentWeapon;
 
+
         if (newWeapon == null)
         {
-            Debug.LogError(
-                $"WeaponSwitcher: " +
-                $"Weapon at index " +
-                $"{currentWeaponIndex} is missing.",
-                this
-            );
-
             currentWeaponIndex = -1;
 
             return;
@@ -475,9 +424,11 @@ public class WeaponSwitcher : MonoBehaviour
 
         newWeapon.Equip();
 
+
         CurrentWeaponChanged?.Invoke(
             newWeapon
         );
+
 
         pendingWeaponIndex =
             -1;
@@ -492,11 +443,6 @@ public class WeaponSwitcher : MonoBehaviour
         isSwitchingWeapon =
             false;
     }
-
-
-    // =========================================================
-    // IMMEDIATE EQUIP
-    // =========================================================
 
     private void EquipWeaponImmediate(
         int index)
@@ -514,6 +460,7 @@ public class WeaponSwitcher : MonoBehaviour
         WeaponBase previousWeapon =
             CurrentWeapon;
 
+
         previousWeapon?.Unequip();
 
 
@@ -524,14 +471,9 @@ public class WeaponSwitcher : MonoBehaviour
         WeaponBase newWeapon =
             CurrentWeapon;
 
+
         if (newWeapon == null)
         {
-            Debug.LogError(
-                $"WeaponSwitcher: " +
-                $"Weapon at index {index} is missing.",
-                this
-            );
-
             currentWeaponIndex =
                 -1;
 
@@ -541,16 +483,11 @@ public class WeaponSwitcher : MonoBehaviour
 
         newWeapon.Equip();
 
+
         CurrentWeaponChanged?.Invoke(
             newWeapon
         );
     }
-
-
-    // =========================================================
-    // UNLOCK
-    // =========================================================
-
     public bool IsWeaponUnlocked(
         int index)
     {
@@ -593,12 +530,6 @@ public class WeaponSwitcher : MonoBehaviour
 
         if (weapons[index] == null)
         {
-            Debug.LogWarning(
-                $"WeaponSwitcher: " +
-                $"Cannot unlock missing weapon " +
-                $"at index {index}."
-            );
-
             return false;
         }
 
@@ -609,13 +540,6 @@ public class WeaponSwitcher : MonoBehaviour
 
         unlockedWeapons[index] =
             true;
-
-
-        Debug.Log(
-            $"WeaponSwitcher: " +
-            $"Unlocked weapon {index}: " +
-            $"{weapons[index].name}"
-        );
 
         return true;
     }
@@ -633,13 +557,9 @@ public class WeaponSwitcher : MonoBehaviour
             return null;
         }
 
+
         return weapons[index];
     }
-
-
-    // =========================================================
-    // FIND NEXT / PREVIOUS
-    // =========================================================
 
     private int FindNextUnlockedWeapon(
         int currentIndex)
@@ -673,6 +593,7 @@ public class WeaponSwitcher : MonoBehaviour
                 return index;
             }
         }
+
 
         return -1;
     }
@@ -714,6 +635,7 @@ public class WeaponSwitcher : MonoBehaviour
             }
         }
 
+
         return -1;
     }
 
@@ -735,6 +657,7 @@ public class WeaponSwitcher : MonoBehaviour
                 return i;
             }
         }
+
 
         return -1;
     }

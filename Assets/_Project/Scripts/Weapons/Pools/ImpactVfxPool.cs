@@ -3,20 +3,11 @@ using UnityEngine;
 
 public class ImpactVfxPool : MonoBehaviour
 {
-    // =========================================================
-    // SINGLETON
-    // =========================================================
-
     public static ImpactVfxPool Instance
     {
         get;
         private set;
     }
-
-
-    // =========================================================
-    // POOLS
-    // =========================================================
 
     private readonly Dictionary<
         ParticleSystem,
@@ -27,11 +18,6 @@ public class ImpactVfxPool : MonoBehaviour
             Queue<ImpactVfx>
         >();
 
-
-    // =========================================================
-    // VFX OWNERS
-    // =========================================================
-
     private readonly Dictionary<
         ImpactVfx,
         ParticleSystem
@@ -40,11 +26,6 @@ public class ImpactVfxPool : MonoBehaviour
             ImpactVfx,
             ParticleSystem
         >();
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -65,11 +46,6 @@ public class ImpactVfxPool : MonoBehaviour
             this;
     }
 
-
-    // =========================================================
-    // GET
-    // =========================================================
-
     public ImpactVfx Get(
         ParticleSystem prefab,
         Vector3 position,
@@ -77,11 +53,6 @@ public class ImpactVfxPool : MonoBehaviour
     {
         if (prefab == null)
             return null;
-
-
-        // =====================================================
-        // CREATE POOL
-        // =====================================================
 
         if (
             !pools.ContainsKey(
@@ -103,11 +74,6 @@ public class ImpactVfxPool : MonoBehaviour
         ImpactVfx vfx =
             null;
 
-
-        // =====================================================
-        // FIND AVAILABLE VFX
-        // =====================================================
-
         while (
             pool.Count > 0 &&
             vfx == null
@@ -123,11 +89,6 @@ public class ImpactVfxPool : MonoBehaviour
                     candidate;
             }
         }
-
-
-        // =====================================================
-        // CREATE NEW
-        // =====================================================
 
         if (vfx == null)
         {
@@ -159,11 +120,6 @@ public class ImpactVfxPool : MonoBehaviour
                 prefab;
         }
 
-
-        // =====================================================
-        // ACTIVATE
-        // =====================================================
-
         vfx.Play(
             position,
             rotation
@@ -172,11 +128,6 @@ public class ImpactVfxPool : MonoBehaviour
 
         return vfx;
     }
-
-
-    // =========================================================
-    // RETURN
-    // =========================================================
 
     public void Return(
         ImpactVfx vfx)

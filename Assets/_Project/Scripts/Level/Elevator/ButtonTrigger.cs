@@ -31,8 +31,6 @@ public class ButtonTrigger : MonoBehaviour
             return;
 
         playerInside = true;
-
-        Debug.Log("[Elevator] Player entered button zone.");
     }
 
     private void OnTriggerExit(Collider other)
@@ -41,8 +39,6 @@ public class ButtonTrigger : MonoBehaviour
             return;
 
         playerInside = false;
-
-        Debug.Log("[Elevator] Player left button zone.");
     }
 
     private void OnInteract(InputAction.CallbackContext context)
@@ -50,11 +46,8 @@ public class ButtonTrigger : MonoBehaviour
         if (!playerInside)
             return;
 
-        Debug.Log("[Elevator] Interact pressed.");
-
         if (elevator == null)
         {
-            Debug.LogError("[ButtonTrigger] Elevator is not assigned.", this);
             return;
         }
 

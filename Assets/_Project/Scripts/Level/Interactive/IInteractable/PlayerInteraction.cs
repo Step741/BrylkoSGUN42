@@ -30,17 +30,10 @@ public class PlayerInteraction : MonoBehaviour
     private IInteractable currentInteractable;
     private InteractableHighlight currentHighlight;
 
-    // Последний текст, который был передан в prompt.
-    // Нужен, чтобы не вызывать Show() каждый кадр.
     private string currentPromptText;
 
-    // Отслеживаем, подписались ли мы на InputAction.
     private bool isSubscribed;
 
-
-    // =========================================================
-    // ZENJECT
-    // =========================================================
 
     [Inject]
     private void Construct(
@@ -50,11 +43,6 @@ public class PlayerInteraction : MonoBehaviour
         this.inputService =
             inputService;
     }
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void OnEnable()
     {
@@ -80,11 +68,6 @@ public class PlayerInteraction : MonoBehaviour
     {
         UnsubscribeInput();
     }
-
-
-    // =========================================================
-    // INPUT
-    // =========================================================
 
     private void SubscribeInput()
     {
@@ -120,11 +103,6 @@ public class PlayerInteraction : MonoBehaviour
 
         isSubscribed = false;
     }
-
-
-    // =========================================================
-    // INTERACTION CHECK
-    // =========================================================
 
     private void CheckInteraction()
     {
@@ -181,18 +159,12 @@ public class PlayerInteraction : MonoBehaviour
             }
 
 
-            // Подсвечиваем только действительно
-            // интерактивные объекты.
+            //Подсвечиваем только действительно интерактивные объекты
             if (detectedInteractable == null)
             {
                 detectedHighlight = null;
             }
         }
-
-
-        // =====================================================
-        // ПЕРЕШЛИ НА ДРУГОЙ ОБЪЕКТ
-        // =====================================================
 
         if (
             detectedInteractable !=
@@ -216,17 +188,9 @@ public class PlayerInteraction : MonoBehaviour
                 );
             }
 
-
-            // Новый объект — сбрасываем сохранённый текст,
-            // чтобы новый prompt гарантированно показался.
             currentPromptText =
                 null;
         }
-
-
-        // =====================================================
-        // ТОТ ЖЕ ОБЪЕКТ, НО ДРУГОЙ COLLIDER
-        // =====================================================
 
         else if (
             currentInteractable != null &&
@@ -254,19 +218,12 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-
-        // =====================================================
-        // PROMPT
-        // =====================================================
-
         if (currentInteractable != null)
         {
             string newPromptText =
                 currentInteractable
                     .GetInteractionText();
 
-
-            // Вызываем Show только если текст изменился.
             if (
                 currentPromptText !=
                 newPromptText
@@ -282,8 +239,6 @@ public class PlayerInteraction : MonoBehaviour
         }
         else
         {
-            // Если интерактивного объекта нет,
-            // скрываем prompt только один раз.
             if (currentPromptText != null)
             {
                 currentPromptText =
@@ -293,11 +248,6 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
     }
-
-
-    // =========================================================
-    // INPUT CALLBACK
-    // =========================================================
 
     private void OnInteract(
         InputAction.CallbackContext context
@@ -310,11 +260,7 @@ public class PlayerInteraction : MonoBehaviour
         currentInteractable.Interact();
     }
 
-
-    // =========================================================
-    // CLEAR
-    // =========================================================
-
+    //CLEAR
     private void ClearInteraction()
     {
         if (currentHighlight != null)
@@ -340,11 +286,6 @@ public class PlayerInteraction : MonoBehaviour
             HidePrompt();
         }
     }
-
-
-    // =========================================================
-    // PROMPT
-    // =========================================================
 
     private void ShowPrompt(
         string text

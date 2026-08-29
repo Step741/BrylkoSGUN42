@@ -20,21 +20,11 @@ public class DestructibleObject : MonoBehaviour
 
     private bool destroyed;
 
-
-    // =========================================================
-    // ZENJECT
-    // =========================================================
-
     [Inject]
     private void Construct(DropTable dropTable)
     {
         this.dropTable = dropTable;
     }
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -64,11 +54,6 @@ public class DestructibleObject : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // DEATH
-    // =========================================================
-
     private void OnDied()
     {
         if (destroyed)
@@ -76,47 +61,22 @@ public class DestructibleObject : MonoBehaviour
 
         destroyed = true;
 
-
-        // -----------------------------------------------------
-        // DROP
-        // -----------------------------------------------------
-
         SpawnDrop();
-
-
-        // -----------------------------------------------------
-        // DESTRUCTION
-        // -----------------------------------------------------
 
         SpawnDebris();
 
         Destroy(gameObject);
     }
 
-
-    // =========================================================
-    // DROP
-    // =========================================================
-
     private void SpawnDrop()
     {
         if (dropTable == null)
         {
-            Debug.LogWarning(
-                $"[{name}] DropTable is not injected.",
-                this
-            );
-
             return;
         }
 
         if (dropConfig == null)
         {
-            Debug.LogWarning(
-                $"[{name}] DropConfig is not assigned.",
-                this
-            );
-
             return;
         }
 
@@ -125,11 +85,6 @@ public class DestructibleObject : MonoBehaviour
             transform.position
         );
     }
-
-
-    // =========================================================
-    // DEBRIS
-    // =========================================================
 
     private void SpawnDebris()
     {

@@ -2,30 +2,16 @@ using UnityEngine;
 
 public class SurfaceIdentifier : MonoBehaviour
 {
-    // =========================================================
-    // SURFACE
-    // =========================================================
-
     [Header("Surface")]
 
     [SerializeField]
     private SurfaceType surfaceType =
         SurfaceType.Concrete;
 
-
-    // =========================================================
-    // IMPACT VFX
-    // =========================================================
-
     [Header("Impact VFX")]
 
     [SerializeField]
     private ParticleSystem impactVfx;
-
-
-    // =========================================================
-    // IMPACT DECAL
-    // =========================================================
 
     [Header("Impact Decal")]
 
@@ -35,11 +21,6 @@ public class SurfaceIdentifier : MonoBehaviour
     [SerializeField]
     private float decalLifetime =
         8f;
-
-
-    // =========================================================
-    // IMPACT SOUNDS
-    // =========================================================
 
     [Header("Impact Sounds")]
 
@@ -51,11 +32,6 @@ public class SurfaceIdentifier : MonoBehaviour
 
     [SerializeField]
     private AudioClip fleshImpactSound;
-
-
-    // =========================================================
-    // SOUND SETTINGS
-    // =========================================================
 
     [Header("Sound Settings")]
 
@@ -71,11 +47,6 @@ public class SurfaceIdentifier : MonoBehaviour
             1.05f
         );
 
-
-    // =========================================================
-    // 3D SOUND
-    // =========================================================
-
     [Header("3D Sound")]
 
     [SerializeField]
@@ -86,35 +57,58 @@ public class SurfaceIdentifier : MonoBehaviour
     private float maxDistance =
         20f;
 
-
-    // =========================================================
-    // PROPERTIES
-    // =========================================================
-
     public SurfaceType SurfaceType =>
         surfaceType;
-
-
-    // =========================================================
-    // PLAY IMPACT
-    // =========================================================
 
     public void PlayImpact(
         Vector3 point,
         Vector3 normal,
         Transform hitTransform)
     {
-        // =====================================================
-        // VFX
-        // =====================================================
+        PlayImpactInternal(
+            point,
+            normal,
+            hitTransform,
+            impactVfx,
+            decalPrefab,
+            true
+        );
+    }
 
+    public void PlayCustomImpact(
+        Vector3 point,
+        Vector3 normal,
+        Transform hitTransform,
+        ParticleSystem customImpactVfx,
+        GameObject customDecalPrefab
+    )
+    {
+        PlayImpactInternal(
+            point,
+            normal,
+            hitTransform,
+            customImpactVfx,
+            customDecalPrefab,
+            true
+        );
+    }
+
+    private void PlayImpactInternal(
+        Vector3 point,
+        Vector3 normal,
+        Transform hitTransform,
+        ParticleSystem selectedImpactVfx,
+        GameObject selectedDecalPrefab,
+        bool playSound
+    )
+    {
         if (
-            impactVfx != null &&
+            selectedImpactVfx != null &&
             ImpactVfxPool.Instance != null
         )
         {
             ImpactVfxPool.Instance.Get(
-                impactVfx,
+                selectedImpactVfx,
                 point,
                 Quaternion.LookRotation(
                     normal
@@ -122,18 +116,13 @@ public class SurfaceIdentifier : MonoBehaviour
             );
         }
 
-
-        // =====================================================
-        // DECAL
-        // =====================================================
-
         if (
-            decalPrefab != null &&
+            selectedDecalPrefab != null &&
             DecalPool.Instance != null
         )
         {
             DecalPool.Instance.Get(
-                decalPrefab,
+                selectedDecalPrefab,
                 point +
                 normal *
                 0.002f,
@@ -145,20 +134,13 @@ public class SurfaceIdentifier : MonoBehaviour
             );
         }
 
-
-        // =====================================================
-        // IMPACT SOUND
-        // =====================================================
-
-        PlayImpactSound(
-            point
-        );
+        if (playSound)
+        {
+            PlayImpactSound(
+                point
+            );
+        }
     }
-
-
-    // =========================================================
-    // IMPACT SOUND
-    // =========================================================
 
     private void PlayImpactSound(
         Vector3 point)
@@ -198,11 +180,6 @@ public class SurfaceIdentifier : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // GET IMPACT SOUND
-    // =========================================================
-
     private AudioClip GetImpactSound()
     {
         switch (
@@ -210,15 +187,22 @@ public class SurfaceIdentifier : MonoBehaviour
         )
         {
             case SurfaceType.Concrete:
+
                 return concreteImpactSound;
 
+
             case SurfaceType.Metal:
+
                 return metalImpactSound;
 
+
             case SurfaceType.Flesh:
+
                 return fleshImpactSound;
 
+
             default:
+
                 return null;
         }
     }

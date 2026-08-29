@@ -22,7 +22,7 @@ public class GameMusic : MonoBehaviour
 
     private void Awake()
     {
-        // Защита от дубликатов
+        //Защита от дубликатов
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -31,9 +31,6 @@ public class GameMusic : MonoBehaviour
 
         Instance = this;
 
-        // ВАЖНО:
-        // GameMusic должен быть корневым GameObject в Hierarchy,
-        // а не дочерним объектом другого GameObject.
         DontDestroyOnLoad(gameObject);
 
 

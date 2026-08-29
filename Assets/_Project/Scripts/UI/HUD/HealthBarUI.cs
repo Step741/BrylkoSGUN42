@@ -16,11 +16,9 @@ public class HealthBarUI : MonoBehaviour
     [Header("DOTween Animation")]
 
     [SerializeField]
-    [Tooltip("Длительность анимации изменения здоровья.")]
     private float healthAnimationDuration = 0.25f;
 
     [SerializeField]
-    [Tooltip("Длительность плавной смены цвета.")]
     private float colorAnimationDuration = 0.2f;
 
 
@@ -37,11 +35,6 @@ public class HealthBarUI : MonoBehaviour
 
 
     private Image fillImage;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -72,35 +65,27 @@ public class HealthBarUI : MonoBehaviour
     {
         if (health == null)
         {
-            Debug.LogError(
-                "HealthBarUI: Health reference is missing."
-            );
-
             return;
         }
 
 
         if (healthSlider == null)
         {
-            Debug.LogError(
-                "HealthBarUI: Health Slider reference is missing."
-            );
-
             return;
         }
 
 
-        // Устанавливаем максимальное здоровье.
+        //Устанавливает максимальное здоровье
         healthSlider.maxValue =
             health.MaxHealth;
 
 
-        // Начальное значение без анимации.
+        //Начальное значение без анимации
         healthSlider.value =
             health.CurrentHealth;
 
 
-        // Начальный цвет без анимации.
+        // Начальный цвет без анимации
         Color startColor =
             GetHealthColor(
                 health.CurrentHealth,
@@ -131,15 +116,9 @@ public class HealthBarUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Дополнительная страховка при уничтожении
-        // объекта вместе со сценой.
+        //Дополнительная страховка при уничтожении объекта вместе со сценой
         KillTweens();
     }
-
-
-    // =========================================================
-    // HEALTH CHANGED
-    // =========================================================
 
     private void OnHealthChanged(
         float currentHealth,
@@ -148,20 +127,11 @@ public class HealthBarUI : MonoBehaviour
         if (healthSlider == null)
             return;
 
-
-        // Обновляем максимум здоровья.
         healthSlider.maxValue =
             maxHealth;
 
-
-        // Останавливаем предыдущую анимацию,
-        // чтобы при быстром получении урона tween'ы
-        // не накладывались друг на друга.
         healthSlider.DOKill();
 
-
-        // Анимируем здоровье от текущего
-        // отображаемого значения к новому.
         healthSlider
             .DOValue(
                 currentHealth,
@@ -174,11 +144,6 @@ public class HealthBarUI : MonoBehaviour
                 healthSlider.gameObject
             );
 
-
-        // =====================================================
-        // COLOR
-        // =====================================================
-
         if (fillImage != null)
         {
             Color targetColor =
@@ -187,13 +152,8 @@ public class HealthBarUI : MonoBehaviour
                     maxHealth
                 );
 
-
-            // Останавливаем предыдущую
-            // анимацию цвета.
             fillImage.DOKill();
 
-
-            // Плавно меняем цвет полоски.
             fillImage
                 .DOColor(
                     targetColor,
@@ -207,11 +167,6 @@ public class HealthBarUI : MonoBehaviour
                 );
         }
     }
-
-
-    // =========================================================
-    // GET HEALTH COLOR
-    // =========================================================
 
     private Color GetHealthColor(
         float currentHealth,
@@ -241,11 +196,7 @@ public class HealthBarUI : MonoBehaviour
         return lowHealthColor;
     }
 
-
-    // =========================================================
     // CLEANUP
-    // =========================================================
-
     private void KillTweens()
     {
         if (healthSlider != null)

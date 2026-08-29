@@ -72,9 +72,6 @@ public class WeaponController : MonoBehaviour
         if (!shot)
             return;
 
-
-        // Добавляем визуальный разброс прицела
-        // только после успешного выстрела.
         dynamicCrosshair
             ?.AddFireSpread();
 

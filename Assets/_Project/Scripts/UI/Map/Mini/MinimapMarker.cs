@@ -48,11 +48,6 @@ public class MinimapMarker : MonoBehaviour
     public bool Visible =>
         visible;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void OnEnable()
     {
         TryRegister();
@@ -61,8 +56,6 @@ public class MinimapMarker : MonoBehaviour
 
     private void Start()
     {
-        // На случай, если OnEnable произошёл раньше,
-        // чем MinimapController успел инициализироваться.
         TryRegister();
     }
 
@@ -72,20 +65,10 @@ public class MinimapMarker : MonoBehaviour
         MinimapController.Unregister(this);
     }
 
-
-    // =========================================================
-    // VISIBILITY
-    // =========================================================
-
     public void SetVisible(bool value)
     {
         visible = value;
     }
-
-
-    // =========================================================
-    // REGISTER
-    // =========================================================
 
     private void TryRegister()
     {

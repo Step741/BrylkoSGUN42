@@ -25,17 +25,7 @@ public class KeyCardPickup : MonoBehaviour, IPickable
 
     private bool isPickedUp;
 
-
-    // =========================================================
-    // EVENT
-    // =========================================================
-
     public event Action PickedUp;
-
-
-    // =========================================================
-    // TRIGGER PICKUP
-    // =========================================================
 
     private void OnTriggerEnter(Collider other)
     {
@@ -47,11 +37,6 @@ public class KeyCardPickup : MonoBehaviour, IPickable
 
         PickUp();
     }
-
-
-    // =========================================================
-    // PICKUP
-    // =========================================================
 
     public void PickUp()
     {
@@ -65,17 +50,8 @@ public class KeyCardPickup : MonoBehaviour, IPickable
 
         if (inventory == null)
         {
-            Debug.LogWarning(
-                $"[{name}] PlayerInventory not found."
-            );
-
             return;
         }
-
-
-        // -----------------------------------------------------
-        // Уже есть карта?
-        // -----------------------------------------------------
 
         if (!inventory.TryAddKeyCard())
         {
@@ -85,20 +61,10 @@ public class KeyCardPickup : MonoBehaviour, IPickable
 
         isPickedUp = true;
 
-
-        // -----------------------------------------------------
-        // FEEDBACK
-        // -----------------------------------------------------
-
         if (pickupFeedback != null)
         {
             pickupFeedback.Play();
         }
-
-
-        // -----------------------------------------------------
-        // Отключаем лазерные барьеры
-        // -----------------------------------------------------
 
         if (laserBarriers != null)
         {
@@ -111,11 +77,6 @@ public class KeyCardPickup : MonoBehaviour, IPickable
             }
         }
 
-
-        // -----------------------------------------------------
-        // Активируем газ
-        // -----------------------------------------------------
-
         if (gasZones != null)
         {
             foreach (GasDamageZone gasZone in gasZones)
@@ -127,26 +88,11 @@ public class KeyCardPickup : MonoBehaviour, IPickable
             }
         }
 
-
-        Debug.Log(
-            $"[{name}] Key card picked up."
-        );
-
-
-        // -----------------------------------------------------
-        // NOTIFY OBJECTIVE SYSTEM
-        // -----------------------------------------------------
-
         PickedUp?.Invoke();
 
 
         Destroy(gameObject);
     }
-
-
-    // =========================================================
-    // PLAYER
-    // =========================================================
 
     private PlayerInventory FindPlayerInventory()
     {
@@ -176,11 +122,6 @@ public class KeyCardPickup : MonoBehaviour, IPickable
 
         return null;
     }
-
-
-    // =========================================================
-    // LAYER
-    // =========================================================
 
     private bool IsPlayer(int layer)
     {

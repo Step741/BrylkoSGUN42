@@ -63,11 +63,6 @@ public class MenuButtonEffect : MonoBehaviour,
         }
     }
 
-
-    // =========================================================
-    // HOVER
-    // =========================================================
-
     public void OnPointerEnter(
         PointerEventData eventData)
     {
@@ -121,11 +116,6 @@ public class MenuButtonEffect : MonoBehaviour,
         }
     }
 
-
-    // =========================================================
-    // PRESS
-    // =========================================================
-
     public void OnPointerDown(
         PointerEventData eventData)
     {
@@ -153,11 +143,6 @@ public class MenuButtonEffect : MonoBehaviour,
         );
     }
 
-
-    // =========================================================
-    // SCALE
-    // =========================================================
-
     private void AnimateScale(
         Vector3 targetScale)
     {
@@ -176,11 +161,7 @@ public class MenuButtonEffect : MonoBehaviour,
                 .SetUpdate(true);
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void OnDestroy()
     {
         scaleTween?.Kill();

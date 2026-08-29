@@ -26,21 +26,11 @@ public class MeleeIdleState : EnemyState
     {
         if (melee == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] MeleeIdleState: " +
-                "EnemyMelee is missing."
-            );
-
             return;
         }
 
 
         melee.StopMoving();
-
-
-        Debug.Log(
-            $"[{enemy.name}] State: Melee Idle"
-        );
     }
 
 
@@ -56,11 +46,6 @@ public class MeleeIdleState : EnemyState
 
         if (!enemy.Vision.CanSeePlayer())
             return;
-
-
-        // ==========================================
-        // ALERT SOUND
-        // ==========================================
 
         if (enemySoundController != null)
         {

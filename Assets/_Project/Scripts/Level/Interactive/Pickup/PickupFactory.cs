@@ -9,11 +9,6 @@ public class PickupFactory : IPickupFactory
         this.config = config;
     }
 
-
-    // =========================================================
-    // HEALTH
-    // =========================================================
-
     public GameObject CreateHealth(Vector3 position)
     {
         return Create(
@@ -22,11 +17,6 @@ public class PickupFactory : IPickupFactory
             "Health"
         );
     }
-
-
-    // =========================================================
-    // AMMO
-    // =========================================================
 
     public GameObject CreateRifleAmmo(Vector3 position)
     {
@@ -57,11 +47,6 @@ public class PickupFactory : IPickupFactory
             "Grenade Launcher Ammo"
         );
     }
-
-
-    // =========================================================
-    // WEAPONS
-    // =========================================================
 
     public GameObject CreateRifle(Vector3 position)
     {
@@ -103,11 +88,6 @@ public class PickupFactory : IPickupFactory
         );
     }
 
-
-    // =========================================================
-    // CREATE
-    // =========================================================
-
     private GameObject Create(
         GameObject prefab,
         Vector3 position,
@@ -115,11 +95,6 @@ public class PickupFactory : IPickupFactory
     {
         if (prefab == null)
         {
-            Debug.LogWarning(
-                $"[PickupFactory] " +
-                $"{pickupName} prefab is not assigned."
-            );
-
             return null;
         }
 

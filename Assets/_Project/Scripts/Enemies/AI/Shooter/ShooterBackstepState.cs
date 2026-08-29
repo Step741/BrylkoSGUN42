@@ -23,19 +23,11 @@ public class ShooterBackstepState : EnemyState
     {
         if (shooter == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterBackstepState: EnemyShooter is missing."
-            );
-
             return;
         }
 
         if (enemy.Vision == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterBackstepState: EnemyVision is missing."
-            );
-
             return;
         }
 
@@ -79,10 +71,6 @@ public class ShooterBackstepState : EnemyState
                 targetPosition
             );
         }
-
-        Debug.Log(
-            $"[{enemy.name}] State: Backstep"
-        );
     }
 
     public override void Tick()

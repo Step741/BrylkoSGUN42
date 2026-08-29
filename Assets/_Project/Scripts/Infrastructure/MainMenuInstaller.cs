@@ -14,20 +14,11 @@ public class MainMenuInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        // ==========================================
-        // SOUND SERVICE
-        // ==========================================
-
         Container
             .Bind<ISoundService>()
             .To<SoundService>()
             .FromInstance(soundService)
             .AsSingle();
-
-
-        // ==========================================
-        // UI SOUND LIBRARY
-        // ==========================================
 
         Container
             .BindInstance(uiSoundLibrary)

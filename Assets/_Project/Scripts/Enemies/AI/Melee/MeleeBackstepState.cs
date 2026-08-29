@@ -23,11 +23,6 @@ public class MeleeBackstepState : EnemyState
     {
         if (melee == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] MeleeBackstepState: " +
-                "EnemyMelee is missing."
-            );
-
             return;
         }
 
@@ -76,10 +71,6 @@ public class MeleeBackstepState : EnemyState
                 targetPosition
             );
         }
-
-        Debug.Log(
-            $"[{enemy.name}] State: Melee Backstep"
-        );
     }
 
     public override void Tick()

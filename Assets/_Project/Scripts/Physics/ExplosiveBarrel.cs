@@ -120,11 +120,6 @@ public class ExplosiveBarrel : MonoBehaviour
         Vector3 explosionPosition =
             transform.position;
 
-
-        // ==================================================
-        // 1. ОСНОВНОЙ ВЗРЫВ
-        // ==================================================
-
         if (explosion != null)
         {
             explosion.Explode(
@@ -132,46 +127,22 @@ public class ExplosiveBarrel : MonoBehaviour
             );
         }
 
-
-        // ==================================================
-        // 2. EXPLOSION AUDIO EFFECT
-        // ==================================================
-
         PlayExplosionAudioEffect(
             explosionPosition
         );
-
-
-        // ==================================================
-        // 3. VFX
-        // ==================================================
 
         SpawnVfx(
             explosionPosition
         );
 
-
-        // ==================================================
-        // 4. ЗВУК
-        // ==================================================
-
         PlaySound(
             explosionPosition
         );
 
-
-        // ==================================================
-        // 5. ЦЕПНАЯ РЕАКЦИЯ
-        // ==================================================
-
+        //ЦЕПНАЯ РЕАКЦИЯ
         TriggerChainReaction(
             explosionPosition
         );
-
-
-        // ==================================================
-        // 6. ОТКЛЮЧАЕМ КОЛЛАЙДЕРЫ БОЧКИ
-        // ==================================================
 
         Collider[] colliders =
             GetComponentsInChildren<
@@ -188,29 +159,14 @@ public class ExplosiveBarrel : MonoBehaviour
                 false;
         }
 
-
-        // ==================================================
-        // 7. ОСКОЛКИ
-        // ==================================================
-
         SpawnDebris(
             explosionPosition
         );
-
-
-        // ==================================================
-        // 8. УНИЧТОЖАЕМ БОЧКУ
-        // ==================================================
 
         Destroy(
             gameObject
         );
     }
-
-
-    // =========================================================
-    // EXPLOSION AUDIO EFFECT
-    // =========================================================
 
     private void PlayExplosionAudioEffect(
         Vector3 explosionPosition)
@@ -279,17 +235,9 @@ public class ExplosiveBarrel : MonoBehaviour
                     intensity
                 );
 
-
-            // Игрок найден,
-            // повторно искать не нужно.
             break;
         }
     }
-
-
-    // =========================================================
-    // CHAIN REACTION
-    // =========================================================
 
     private void TriggerChainReaction(
         Vector3 explosionPosition)
@@ -321,14 +269,9 @@ public class ExplosiveBarrel : MonoBehaviour
             if (barrel == null)
                 continue;
 
-
-            // Не запускаем самого себя.
             if (barrel == this)
                 continue;
 
-
-            // Уже взорвавшаяся бочка
-            // ничего не делает.
             if (barrel.exploded)
                 continue;
 
@@ -348,11 +291,6 @@ public class ExplosiveBarrel : MonoBehaviour
 
         Explode();
     }
-
-
-    // =========================================================
-    // VFX
-    // =========================================================
 
     private void SpawnVfx(
         Vector3 position)
@@ -374,11 +312,6 @@ public class ExplosiveBarrel : MonoBehaviour
             vfxLifetime
         );
     }
-
-
-    // =========================================================
-    // SOUND
-    // =========================================================
 
     private void PlaySound(
         Vector3 position)
@@ -402,11 +335,6 @@ public class ExplosiveBarrel : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // DEBRIS
-    // =========================================================
-
     private void SpawnDebris(
         Vector3 position)
     {
@@ -427,11 +355,6 @@ public class ExplosiveBarrel : MonoBehaviour
             debrisLifetime
         );
     }
-
-
-    // =========================================================
-    // GIZMOS
-    // =========================================================
 
     private void OnDrawGizmosSelected()
     {

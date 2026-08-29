@@ -19,11 +19,6 @@ public class MeleeAttackState : EnemyState
     {
         if (melee == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] MeleeAttackState: " +
-                "EnemyMelee is missing."
-            );
-
             return;
         }
 
@@ -33,11 +28,6 @@ public class MeleeAttackState : EnemyState
 
         attackTimer =
             0f;
-
-
-        Debug.Log(
-            $"[{enemy.name}] State: Melee Attack"
-        );
     }
 
 
@@ -60,7 +50,7 @@ public class MeleeAttackState : EnemyState
             return;
 
 
-        // Если игрок потерян — прекращаем атаку.
+        //Если игрок потерян, прекращает атаку
         if (!enemy.Vision.CanSeePlayer())
         {
             melee.CancelAttack();
@@ -81,8 +71,7 @@ public class MeleeAttackState : EnemyState
             );
 
 
-        // Если игрок успел уйти далеко,
-        // прекращаем атаку и начинаем преследование.
+        //Если игрок успел уйти далеко, прекращает атаку и начинает преследование
         if (
             distance >
             melee.AttackDistance + 0.25f
@@ -106,9 +95,6 @@ public class MeleeAttackState : EnemyState
             player
         );
 
-
-        // Пока идёт анимация атаки —
-        // ждём Animation Event.
         if (
             melee.IsAttackAnimationPlaying()
         )
@@ -121,7 +107,7 @@ public class MeleeAttackState : EnemyState
             Time.deltaTime;
 
 
-        // Запускаем следующую атаку.
+        //Запускает следующую атаку
         if (attackTimer <= 0f)
         {
             melee.StartAttackAnimation();

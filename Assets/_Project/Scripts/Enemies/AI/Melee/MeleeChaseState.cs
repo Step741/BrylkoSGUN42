@@ -14,16 +14,8 @@ public class MeleeChaseState : EnemyState
     {
         if (melee == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] MeleeChaseState: EnemyMelee is missing."
-            );
-
             return;
         }
-
-        Debug.Log(
-            $"[{enemy.name}] State: Melee Chase"
-        );
     }
 
     public override void Tick()
@@ -40,7 +32,6 @@ public class MeleeChaseState : EnemyState
         if (player == null)
             return;
 
-        // Игрок потерян.
         if (!enemy.Vision.CanSeePlayer())
         {
             melee.StopMoving();
@@ -52,7 +43,6 @@ public class MeleeChaseState : EnemyState
             return;
         }
 
-        // Игрок в радиусе атаки.
         if (melee.IsPlayerInAttackRange(player))
         {
             melee.StopMoving();
@@ -64,7 +54,6 @@ public class MeleeChaseState : EnemyState
             return;
         }
 
-        // Продолжаем преследование.
         melee.MoveToPlayer(player);
     }
 

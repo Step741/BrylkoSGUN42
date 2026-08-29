@@ -4,19 +4,20 @@ using UnityEngine;
 public class Katana : WeaponBase
 {
     [Header("References")]
+
     [SerializeField]
     private Transform attackPoint;
 
-
     [Header("Weapon Sounds")]
+
     [SerializeField]
     private AudioClip swingSound;
 
     [SerializeField]
     private AudioClip hitSound;
 
-
     [Header("Sound Settings")]
+
     [SerializeField]
     [Range(0f, 1f)]
     private float soundVolume = 1f;
@@ -24,6 +25,13 @@ public class Katana : WeaponBase
     [SerializeField]
     private float soundPitch = 1f;
 
+    [Header("Katana Impact")]
+
+    [SerializeField]
+    private ParticleSystem katanaImpactVfx;
+
+    [SerializeField]
+    private GameObject katanaDecalPrefab;
 
     private float nextAttackTime;
 
@@ -34,18 +42,13 @@ public class Katana : WeaponBase
     private readonly HashSet<IDamageable> damagedTargets =
         new HashSet<IDamageable>();
 
-
     protected override void Awake()
     {
         base.Awake();
 
-        hitBuffer = new Collider[32];
+        hitBuffer =
+            new Collider[32];
     }
-
-
-    // =========================================================
-    // SHOOT
-    // =========================================================
 
     public override bool Shoot()
     {
@@ -53,26 +56,28 @@ public class Katana : WeaponBase
             return false;
 
 
-        // Катана не использует патроны.
+        //Катана не использует патроны
         if (attackPending)
             return false;
 
 
-        if (Time.time < nextAttackTime)
-            return false;
-
-
-        if (attackPoint == null)
+        if (
+            Time.time <
+            nextAttackTime
+        )
         {
-            Debug.LogError(
-                $"{name}: Attack Point is missing."
-            );
-
             return false;
         }
 
 
-        attackPending = true;
+        if (attackPoint == null)
+        {
+            return false;
+        }
+
+
+        attackPending =
+            true;
 
 
         nextAttackTime =
@@ -83,22 +88,14 @@ public class Katana : WeaponBase
         return true;
     }
 
-
-    // =========================================================
-    // ATTACK
-    // =========================================================
-
-    /// <summary>
-    /// Вызывается Animation Event
-    /// в момент прохождения лезвия через цель.
-    /// </summary>
-    public void Attack()
+public void Attack()
     {
         if (!attackPending)
             return;
 
 
-        attackPending = false;
+        attackPending =
+            false;
 
 
         if (config == null)
@@ -108,12 +105,6 @@ public class Katana : WeaponBase
         if (attackPoint == null)
             return;
 
-
-        // =====================================================
-        // SWING SOUND
-        // =====================================================
-
-        // Звук реального взмаха.
         PlaySound(
             swingSound
         );
@@ -137,47 +128,22 @@ public class Katana : WeaponBase
                 QueryTriggerInteraction.Ignore
             );
 
-
-        // =====================================================
-        // HIT SOUND
-        // =====================================================
-
-        // Если катана задела хотя бы один объект,
-        // проигрываем звук удара только один раз
-        // за текущий взмах.
-        bool hasHit = false;
-
-
-        for (int i = 0; i < hitCount; i++)
-        {
-            if (hitBuffer[i] != null)
-            {
-                hasHit = true;
-                break;
-            }
-        }
-
-
-        if (hasHit)
-        {
-            PlaySound(
-                hitSound
-            );
-        }
-
-
-        // =====================================================
-        // DAMAGE
-        // =====================================================
-
         Vector3 attackDirection =
             transform.forward;
 
 
-        int damagedCount = 0;
+        int damagedCount =
+            0;
+
+        bool hasValidHit =
+            false;
 
 
-        for (int i = 0; i < hitCount; i++)
+        for (
+            int i = 0;
+            i < hitCount;
+            i++
+        )
         {
             Collider hit =
                 hitBuffer[i];
@@ -196,11 +162,11 @@ public class Katana : WeaponBase
             if (damageable == null)
                 continue;
 
-
-            // Не наносим урон одному объекту
-            // несколько раз из-за нескольких Collider.
-            if (!damagedTargets.Add(
-                    damageable))
+            if (
+                !damagedTargets.Add(
+                    damageable
+                )
+            )
             {
                 continue;
             }
@@ -219,25 +185,22 @@ public class Katana : WeaponBase
                     targetDirection
                 );
 
-
-            // Цель должна находиться
-            // перед персонажем.
             if (dot <= 0f)
                 continue;
-
 
             damageable.TakeDamage(
                 config.Damage
             );
 
-
-            damagedCount++;
-
-
-            Debug.Log(
-                $"Katana hit: {hit.name}"
+            ProcessSurfaceImpact(
+                hit
             );
 
+
+            hasValidHit =
+                true;
+
+            damagedCount++;
 
             if (
                 damagedCount >=
@@ -247,22 +210,168 @@ public class Katana : WeaponBase
                 break;
             }
         }
+
+        if (hasValidHit)
+        {
+            PlaySound(
+                hitSound
+            );
+        }
     }
 
+    private void ProcessSurfaceImpact(
+        Collider targetCollider)
+    {
+        if (targetCollider == null)
+            return;
 
-    // =========================================================
-    // RELOAD
-    // =========================================================
+
+        Vector3 attackOrigin =
+            attackPoint.position;
+
+
+        Vector3 closestPoint =
+            targetCollider.ClosestPoint(
+                attackOrigin
+            );
+
+
+        Vector3 direction =
+            closestPoint -
+            attackOrigin;
+
+
+        float distance =
+            direction.magnitude;
+
+        if (distance <= 0.001f)
+        {
+            direction =
+                transform.forward;
+
+            distance =
+                config.KatanaAttackRange;
+        }
+        else
+        {
+            direction /=
+                distance;
+        }
+
+
+        float rayDistance =
+            distance +
+            0.1f;
+
+
+        if (
+            Physics.Raycast(
+                attackOrigin,
+                direction,
+                out RaycastHit hit,
+                rayDistance,
+                config.KatanaAttackMask,
+                QueryTriggerInteraction.Ignore
+            )
+        )
+        {
+            if (
+                hit.collider ==
+                targetCollider
+            )
+            {
+                ProcessKatanaImpact(
+                    hit.point,
+                    hit.normal,
+                    hit.collider.transform
+                );
+
+                return;
+            }
+        }
+
+        SurfaceIdentifier surface =
+            targetCollider.GetComponent<
+                SurfaceIdentifier
+            >();
+
+
+        if (surface == null)
+        {
+            surface =
+                targetCollider.GetComponentInParent<
+                    SurfaceIdentifier
+                >();
+        }
+
+
+        if (surface == null)
+            return;
+
+
+        Vector3 normal =
+            (
+                closestPoint -
+                targetCollider.bounds.center
+            ).normalized;
+
+
+        if (
+            normal.sqrMagnitude <=
+            0.001f
+        )
+        {
+            normal =
+                -transform.forward;
+        }
+
+
+        surface.PlayCustomImpact(
+            closestPoint,
+            normal,
+            targetCollider.transform,
+            katanaImpactVfx,
+            katanaDecalPrefab
+        );
+    }
+
+    private void ProcessKatanaImpact(
+        Vector3 point,
+        Vector3 normal,
+        Transform hitTransform)
+    {
+        SurfaceIdentifier surface =
+            hitTransform.GetComponent<
+                SurfaceIdentifier
+            >();
+
+
+        if (surface == null)
+        {
+            surface =
+                hitTransform.GetComponentInParent<
+                    SurfaceIdentifier
+                >();
+        }
+
+
+        if (surface == null)
+            return;
+
+
+        surface.PlayCustomImpact(
+            point,
+            normal,
+            hitTransform,
+            katanaImpactVfx,
+            katanaDecalPrefab
+        );
+    }
 
     public override void Reload()
     {
-        // Катана не перезаряжается.
+        //Не перезаряжается.
     }
-
-
-    // =========================================================
-    // SOUND
-    // =========================================================
 
     private void PlaySound(
         AudioClip clip)
@@ -270,8 +379,14 @@ public class Katana : WeaponBase
         if (clip == null)
             return;
 
-        if (SoundService.Instance == null)
+
+        if (
+            SoundService.Instance ==
+            null
+        )
+        {
             return;
+        }
 
 
         SoundService.Instance.Play2D(
@@ -282,23 +397,17 @@ public class Katana : WeaponBase
         );
     }
 
-
-    // =========================================================
-    // DISABLE
-    // =========================================================
-
-    private void OnDisable()
+    protected override void OnDisable()
     {
-        attackPending = false;
+        base.OnDisable();
+
+        attackPending =
+            false;
 
         damagedTargets.Clear();
     }
 
-
-    // =========================================================
-    // GIZMOS
-    // =========================================================
-
+    //GIZMOS
     private void OnDrawGizmosSelected()
     {
         if (config == null)

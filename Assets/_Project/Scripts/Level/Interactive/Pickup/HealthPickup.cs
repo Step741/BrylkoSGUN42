@@ -3,16 +3,21 @@ using UnityEngine;
 public class HealthPickup : PickupBase
 {
     [Header("Health")]
+
     [SerializeField]
     private float healAmount = 25f;
 
-    protected override bool CanPickup(Transform player)
+    protected override bool CanPickup(
+        Transform player
+    )
     {
         if (player == null)
             return false;
 
+
         Health health =
             player.GetComponent<Health>();
+
 
         if (health == null)
         {
@@ -22,25 +27,23 @@ public class HealthPickup : PickupBase
                 );
         }
 
+
         if (health == null)
         {
-            Debug.LogWarning(
-                $"[{name}] Health component not found."
-            );
-
             return false;
         }
 
-        // Мёртвый игрок аптечку подобрать не может.
         if (health.IsDead)
             return false;
 
-        // Если здоровье полное —
-        // аптечка остаётся на месте.
-        if (health.CurrentHealth >= health.MaxHealth)
+        if (
+            health.CurrentHealth >=
+            health.MaxHealth
+        )
         {
             return false;
         }
+
 
         return true;
     }
@@ -50,8 +53,10 @@ public class HealthPickup : PickupBase
         if (PickupPlayer == null)
             return;
 
+
         Health health =
             PickupPlayer.GetComponent<Health>();
+
 
         if (health == null)
         {
@@ -61,31 +66,27 @@ public class HealthPickup : PickupBase
                 );
         }
 
+
         if (health == null)
         {
-            Debug.LogWarning(
-                $"[{name}] Health component not found."
-            );
-
             return;
         }
+
 
         if (health.IsDead)
             return;
 
-        if (health.CurrentHealth >= health.MaxHealth)
-        {
-            Debug.Log(
-                $"[{name}] Player health is already full."
-            );
 
+        if (
+            health.CurrentHealth >=
+            health.MaxHealth
+        )
+        {
             return;
         }
 
-        health.Heal(healAmount);
-
-        Debug.Log(
-            $"[{name}] Health pickup: +{healAmount} HP."
+        health.HealOverTime(
+            healAmount
         );
     }
 }

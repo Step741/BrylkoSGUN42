@@ -17,21 +17,11 @@ public class EnemyDeathController : MonoBehaviour
 
     private bool isDead;
 
-
-    // =========================================================
-    // ZENJECT
-    // =========================================================
-
     [Inject]
     private void Construct(DropTable dropTable)
     {
         this.dropTable = dropTable;
     }
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -61,11 +51,6 @@ public class EnemyDeathController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // DEATH
-    // =========================================================
-
     private void HandleDeath()
     {
         if (isDead)
@@ -73,17 +58,7 @@ public class EnemyDeathController : MonoBehaviour
 
         isDead = true;
 
-
-        // -----------------------------------------------------
-        // DROP
-        // -----------------------------------------------------
-
         SpawnDrop();
-
-
-        // -----------------------------------------------------
-        // EXISTING DEATH LOGIC
-        // -----------------------------------------------------
 
         if (enemy == null)
             return;
@@ -95,33 +70,17 @@ public class EnemyDeathController : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // DROP
-    // =========================================================
-
     private void SpawnDrop()
     {
         if (dropTable == null)
         {
-            Debug.LogWarning(
-                $"[{name}] DropTable is not injected.",
-                this
-            );
-
             return;
         }
 
         if (dropConfig == null)
         {
-            Debug.LogWarning(
-                $"[{name}] DropConfig is not assigned.",
-                this
-            );
-
             return;
         }
-
 
         dropTable.Roll(
             dropConfig,

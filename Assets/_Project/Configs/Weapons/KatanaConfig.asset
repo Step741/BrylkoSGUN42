@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: KatanaConfig
   m_EditorClassIdentifier: 
   weaponName: GrenadeLauncher
-  damage: 50
+  damage: 60
   fireRate: 1
   magazineSize: 0
   maxReserveAmmo: 120
   reserveAmmo: 0
   infiniteAmmo: 1
+  reloadDuration: 1.5
   range: 35
   spread: 7
   maxSpread: 7

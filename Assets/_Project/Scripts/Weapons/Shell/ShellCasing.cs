@@ -44,11 +44,6 @@ public class ShellCasing : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-
-    // =========================================================
-    // POOL
-    // =========================================================
-
     public void SetPool(ShellPool pool)
     {
         this.pool = pool;
@@ -60,19 +55,15 @@ public class ShellCasing : MonoBehaviour
         Quaternion rotation,
         float lifetime)
     {
-        // Полный сброс физики от прошлого использования
         ResetPhysics();
 
-        // Новая позиция
         transform.SetPositionAndRotation(
             position,
             rotation
         );
 
-        // Сброс звукового состояния
         nextImpactSoundTime = 0f;
 
-        // Новый таймер жизни
         releaseTime =
             Time.time + lifetime;
     }
@@ -130,11 +121,6 @@ public class ShellCasing : MonoBehaviour
         nextImpactSoundTime = 0f;
         releaseTime = 0f;
     }
-
-
-    // =========================================================
-    // COLLISION SOUND
-    // =========================================================
 
     private void OnCollisionEnter(
         Collision collision)

@@ -43,10 +43,6 @@ public class Enemy : MonoBehaviour
 
             return;
         }
-
-        Debug.LogWarning(
-            $"[{name}] No enemy behaviour assigned."
-        );
     }
 
     private void Update()

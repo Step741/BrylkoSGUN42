@@ -33,11 +33,6 @@ public class InteractionPromptAnimator : MonoBehaviour
     private Tween fadeTween;
     private Tween scaleTween;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         originalScale =
@@ -73,11 +68,6 @@ public class InteractionPromptAnimator : MonoBehaviour
         KillTweens();
     }
 
-
-    // =========================================================
-    // SHOW
-    // =========================================================
-
     public void Show(string text)
     {
         if (promptText != null)
@@ -86,12 +76,9 @@ public class InteractionPromptAnimator : MonoBehaviour
         }
 
 
-        // Останавливаем предыдущие анимации.
+        //Останавливает предыдущие анимации
         KillTweens();
 
-
-        // Если объект был скрыт после Hide(),
-        // снова включаем его перед запуском анимации.
         if (!gameObject.activeSelf)
         {
             gameObject.SetActive(true);
@@ -107,10 +94,6 @@ public class InteractionPromptAnimator : MonoBehaviour
         transform.localScale =
             originalScale * startScale;
 
-
-        // =====================================================
-        // FADE IN
-        // =====================================================
 
         if (canvasGroup != null)
         {
@@ -139,12 +122,6 @@ public class InteractionPromptAnimator : MonoBehaviour
                         }
                     );
         }
-
-
-        // =====================================================
-        // SCALE IN
-        // =====================================================
-
         scaleTween =
             transform
                 .DOScale(
@@ -171,11 +148,6 @@ public class InteractionPromptAnimator : MonoBehaviour
                 );
     }
 
-
-    // =========================================================
-    // HIDE
-    // =========================================================
-
     public void Hide()
     {
         KillTweens();
@@ -186,12 +158,6 @@ public class InteractionPromptAnimator : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
-
-
-        // =====================================================
-        // FADE OUT
-        // =====================================================
-
         fadeTween =
             canvasGroup
                 .DOFade(
@@ -215,20 +181,12 @@ public class InteractionPromptAnimator : MonoBehaviour
                     {
                         fadeTween = null;
 
-
-                        // Если объект всё ещё существует,
-                        // отключаем его после анимации.
                         if (this != null)
                         {
                             gameObject.SetActive(false);
                         }
                     }
                 );
-
-
-        // =====================================================
-        // SCALE OUT
-        // =====================================================
 
         scaleTween =
             transform
@@ -256,11 +214,7 @@ public class InteractionPromptAnimator : MonoBehaviour
                 );
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillTweens()
     {
         if (

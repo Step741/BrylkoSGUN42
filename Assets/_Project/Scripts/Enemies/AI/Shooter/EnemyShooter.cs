@@ -3,10 +3,6 @@ using UnityEngine.AI;
 
 public class EnemyShooter : MonoBehaviour
 {
-    // ==========================================
-    // PATROL
-    // ==========================================
-
     [Header("Patrol")]
 
     [SerializeField]
@@ -18,11 +14,6 @@ public class EnemyShooter : MonoBehaviour
     [SerializeField]
     private float waitAtPoint = 1f;
 
-
-    // ==========================================
-    // COMBAT
-    // ==========================================
-
     [Header("Combat")]
 
     [SerializeField]
@@ -33,11 +24,6 @@ public class EnemyShooter : MonoBehaviour
 
     [SerializeField]
     private float attackCooldown = 1f;
-
-
-    // ==========================================
-    // TAKE COVER
-    // ==========================================
 
     [Header("Take Cover")]
 
@@ -53,11 +39,6 @@ public class EnemyShooter : MonoBehaviour
     [SerializeField]
     private float coverPointTolerance = 0.8f;
 
-
-    // ==========================================
-    // PREDICTIVE SHOOTING
-    // ==========================================
-
     [Header("Predictive Shooting")]
 
     [SerializeField]
@@ -65,11 +46,6 @@ public class EnemyShooter : MonoBehaviour
 
     [SerializeField]
     private float aimSpread = 0f;
-
-
-    // ==========================================
-    // PROJECTILE
-    // ==========================================
 
     [Header("Projectile")]
 
@@ -79,11 +55,6 @@ public class EnemyShooter : MonoBehaviour
     [SerializeField]
     private Transform spitOrigin;
 
-
-    // ==========================================
-    // MOVEMENT
-    // ==========================================
-
     [Header("Movement")]
 
     [SerializeField]
@@ -91,11 +62,6 @@ public class EnemyShooter : MonoBehaviour
 
     [SerializeField]
     private float rotationSpeed = 8f;
-
-
-    // ==========================================
-    // ANIMATION
-    // ==========================================
 
     [Header("Animation")]
 
@@ -108,11 +74,6 @@ public class EnemyShooter : MonoBehaviour
     [SerializeField]
     private float movementAnimationThreshold = 0.05f;
 
-
-    // ==========================================
-    // ANIMATOR HASHES
-    // ==========================================
-
     private static readonly int SpeedHash =
         Animator.StringToHash("Speed");
 
@@ -122,35 +83,14 @@ public class EnemyShooter : MonoBehaviour
     private static readonly int DieHash =
         Animator.StringToHash("Die");
 
-
-    // ==========================================
-    // COMPONENTS
-    // ==========================================
-
     private Enemy enemy;
 
     private NavMeshAgent agent;
 
     private Health health;
 
-
-    // ==========================================
-    // PATROL STATE
-    // ==========================================
-
     private int currentPatrolIndex;
-
-
-    // ==========================================
-    // PLAYER MEMORY
-    // ==========================================
-
     private Vector3 lastKnownPlayerPosition;
-
-
-    // ==========================================
-    // DISABLE DEATH COLLIDERS
-    // ==========================================
 
     private void DisableDeathColliders()
     {
@@ -172,26 +112,11 @@ public class EnemyShooter : MonoBehaviour
         }
     }
 
-
-    // ==========================================
-    // DEATH
-    // ==========================================
-
     private bool deathAnimationPlayed;
-
-
-    // ==========================================
-    // PENDING PROJECTILE
-    // ==========================================
 
     private bool projectileQueued;
 
     private Vector3 queuedProjectileDirection;
-
-
-    // ==========================================
-    // PUBLIC PROPERTIES
-    // ==========================================
 
     public Enemy Enemy =>
         enemy;
@@ -249,11 +174,6 @@ public class EnemyShooter : MonoBehaviour
     public Vector3 LastKnownPlayerPosition =>
         lastKnownPlayerPosition;
 
-
-    // ==========================================
-    // PROJECTILE POOL
-    // ==========================================
-
     public void SetProjectilePool(
         SpitProjectilePool newPool
     )
@@ -261,11 +181,6 @@ public class EnemyShooter : MonoBehaviour
         projectilePool =
             newPool;
     }
-
-
-    // ==========================================
-    // UNITY
-    // ==========================================
 
     private void Awake()
     {
@@ -279,7 +194,7 @@ public class EnemyShooter : MonoBehaviour
             GetComponent<Health>();
 
 
-        // Применяем скорость из Inspector.
+        //Применяет скорость из Inspector
         if (agent != null)
         {
             agent.speed =
@@ -299,39 +214,6 @@ public class EnemyShooter : MonoBehaviour
             spitOrigin =
                 transform;
         }
-
-
-        if (enemy == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyShooter requires Enemy component."
-            );
-        }
-
-
-        if (agent == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyShooter requires NavMeshAgent."
-            );
-        }
-
-
-        if (health == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyShooter requires Health component."
-            );
-        }
-
-
-        if (animator == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyShooter requires Animator."
-            );
-        }
-
 
         if (health != null)
         {
@@ -355,11 +237,6 @@ public class EnemyShooter : MonoBehaviour
                 Die;
         }
     }
-
-
-    // ==========================================
-    // MOVEMENT ANIMATION
-    // ==========================================
 
     private void UpdateMovementAnimation()
     {
@@ -453,11 +330,6 @@ public class EnemyShooter : MonoBehaviour
         );
     }
 
-
-    // ==========================================
-    // ATTACK ANIMATION
-    // ==========================================
-
     public void StartAttackAnimation()
     {
         if (animator == null)
@@ -485,11 +357,6 @@ public class EnemyShooter : MonoBehaviour
         );
     }
 
-
-    // ==========================================
-    // QUEUE PROJECTILE
-    // ==========================================
-
     public void QueueProjectile(
         Vector3 direction
     )
@@ -510,11 +377,6 @@ public class EnemyShooter : MonoBehaviour
             true;
     }
 
-
-    // ==========================================
-    // FIRE PROJECTILE
-    // ==========================================
-
     public void FireQueuedProjectile()
     {
         if (!projectileQueued)
@@ -532,10 +394,6 @@ public class EnemyShooter : MonoBehaviour
 
         if (projectilePool == null)
         {
-            Debug.LogWarning(
-                $"[{name}] Projectile pool is missing."
-            );
-
             projectileQueued =
                 false;
 
@@ -560,10 +418,6 @@ public class EnemyShooter : MonoBehaviour
 
         if (projectile == null)
         {
-            Debug.LogWarning(
-                $"[{name}] Could not get projectile from pool."
-            );
-
             projectileQueued =
                 false;
 
@@ -588,11 +442,6 @@ public class EnemyShooter : MonoBehaviour
             false;
     }
 
-
-    // ==========================================
-    // DEATH
-    // ==========================================
-
     private void Die()
     {
         if (deathAnimationPlayed)
@@ -607,9 +456,7 @@ public class EnemyShooter : MonoBehaviour
         );
 
 
-        // Отключаем все коллайдеры врага,
-        // чтобы после смерти пули больше не попадали
-        // в вертикальный коллайдер и не создавали декали в воздухе.
+        //Отключает все коллайдеры врага
         DisableDeathColliders();
 
 
@@ -642,11 +489,6 @@ public class EnemyShooter : MonoBehaviour
             DieHash
         );
     }
-
-
-    // ==========================================
-    // PATROL
-    // ==========================================
 
     public void SetPatrolIndex(
         int index
@@ -765,11 +607,6 @@ public class EnemyShooter : MonoBehaviour
         MoveToCurrentPatrolPoint();
     }
 
-
-    // ==========================================
-    // MOVEMENT
-    // ==========================================
-
     public void StopMoving()
     {
         if (agent == null)
@@ -826,11 +663,6 @@ public class EnemyShooter : MonoBehaviour
             );
     }
 
-
-    // ==========================================
-    // PLAYER MEMORY
-    // ==========================================
-
     public void SetLastKnownPlayerPosition(
         Vector3 position
     )
@@ -864,11 +696,6 @@ public class EnemyShooter : MonoBehaviour
                 patrolPointTolerance
             );
     }
-
-
-    // ==========================================
-    // TAKE COVER
-    // ==========================================
 
     public bool NeedsToTakeCover()
     {
@@ -1095,10 +922,14 @@ public class EnemyShooter : MonoBehaviour
             );
     }
 
+    private void OnDisable()
+    {
+        projectileQueued = false;
 
-    // ==========================================
-    // GIZMOS
-    // ==========================================
+        CancelAttackAnimation();
+    }
+
+    //GIZMOS
 
     private void OnDrawGizmos()
     {
@@ -1106,11 +937,6 @@ public class EnemyShooter : MonoBehaviour
 
         DrawCurrentStateTarget();
     }
-
-
-    // ==========================================
-    // PATROL ROUTE
-    // ==========================================
 
     private void DrawPatrolRoute()
     {
@@ -1171,11 +997,6 @@ public class EnemyShooter : MonoBehaviour
             );
         }
     }
-
-
-    // ==========================================
-    // CURRENT STATE TARGET
-    // ==========================================
 
     private void DrawCurrentStateTarget()
     {
@@ -1320,11 +1141,6 @@ public class EnemyShooter : MonoBehaviour
         }
     }
 
-
-    // ==========================================
-    // DRAW CURRENT TARGET
-    // ==========================================
-
     private void DrawCurrentTarget(
         Vector3 targetPosition,
         float radius
@@ -1353,11 +1169,6 @@ public class EnemyShooter : MonoBehaviour
             radius * 0.12f
         );
     }
-
-
-    // ==========================================
-    // DRAW NAVMESH DESTINATION
-    // ==========================================
 
     private void DrawAgentDestination(
         float radius

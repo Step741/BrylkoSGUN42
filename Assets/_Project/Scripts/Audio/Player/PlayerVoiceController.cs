@@ -93,11 +93,6 @@ public class PlayerVoiceController : MonoBehaviour
             HandleDeath;
     }
 
-
-    // ==========================================
-    // EVENTS
-    // ==========================================
-
     private void HandleDamageReceived(
         Vector3 damageSourcePosition)
     {
@@ -109,11 +104,6 @@ public class PlayerVoiceController : MonoBehaviour
     {
         PlayDeath();
     }
-
-
-    // ==========================================
-    // PUBLIC VOICE METHODS
-    // ==========================================
 
     public void PlayJump()
     {
@@ -145,11 +135,6 @@ public class PlayerVoiceController : MonoBehaviour
             deathSounds
         );
     }
-
-
-    // ==========================================
-    // PLAY SOUND
-    // ==========================================
 
     private void PlayRandomSound(
         AudioClip[] sounds)

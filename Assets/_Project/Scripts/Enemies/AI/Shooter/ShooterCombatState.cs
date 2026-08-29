@@ -13,11 +13,6 @@ public class ShooterCombatState : EnemyState
 
     private int attackCount;
 
-
-    // ==========================================
-    // ATTACK SETTINGS
-    // ==========================================
-
     private const float MinAttackDistance =
         10f;
 
@@ -39,31 +34,16 @@ public class ShooterCombatState : EnemyState
             >();
     }
 
-
-    // ==========================================
-    // ENTER
-    // ==========================================
-
     public override void Enter()
     {
         if (shooter == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterCombatState: " +
-                "EnemyShooter is missing."
-            );
-
             return;
         }
 
 
         if (enemy.Vision == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterCombatState: " +
-                "EnemyVision is missing."
-            );
-
             return;
         }
 
@@ -76,17 +56,7 @@ public class ShooterCombatState : EnemyState
 
         attackCount =
             0;
-
-
-        Debug.Log(
-            $"[{enemy.name}] State: Combat"
-        );
     }
-
-
-    // ==========================================
-    // TICK
-    // ==========================================
 
     public override void Tick()
     {
@@ -106,11 +76,6 @@ public class ShooterCombatState : EnemyState
         if (player == null)
             return;
 
-
-        // ==========================================
-        // LOW HEALTH -> TAKE COVER
-        // ==========================================
-
         if (shooter.NeedsToTakeCover())
         {
             enemy.StateMachine.ChangeState(
@@ -121,11 +86,6 @@ public class ShooterCombatState : EnemyState
 
             return;
         }
-
-
-        // ==========================================
-        // PLAYER MEMORY / SEARCH
-        // ==========================================
 
         if (enemy.Vision.CanSeePlayer())
         {
@@ -144,11 +104,6 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
-
-        // ==========================================
-        // WHILE ATTACK ANIMATION IS PLAYING
-        // ==========================================
-
         if (shooter.IsAttackAnimationPlaying())
         {
             shooter.StopMoving();
@@ -160,11 +115,6 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
-
-        // ==========================================
-        // DISTANCE TO PLAYER
-        // ==========================================
-
         Vector3 direction =
             player.position -
             shooter.transform.position;
@@ -175,11 +125,6 @@ public class ShooterCombatState : EnemyState
 
         float distance =
             direction.magnitude;
-
-
-        // ==========================================
-        // TOO CLOSE
-        // ==========================================
 
         if (
             distance <
@@ -193,21 +138,11 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
-
-        // ==========================================
-        // ATTACK POSITION
-        // ==========================================
-
         shooter.StopMoving();
 
         LookAtPlayer(
             player
         );
-
-
-        // ==========================================
-        // ATTACK TIMER
-        // ==========================================
 
         attackTimer -=
             Time.deltaTime;
@@ -228,11 +163,6 @@ public class ShooterCombatState : EnemyState
             attackTimer =
                 shooter.AttackCooldown;
 
-
-            // ======================================
-            // AFTER 3 ATTACKS -> BACKSTEP
-            // ======================================
-
             if (
                 attackCount >=
                 AttacksBeforeBackstep
@@ -249,11 +179,6 @@ public class ShooterCombatState : EnemyState
         }
     }
 
-
-    // ==========================================
-    // START ATTACK
-    // ==========================================
-
     private void StartAttack(
         Transform player
     )
@@ -264,11 +189,6 @@ public class ShooterCombatState : EnemyState
         {
             return;
         }
-
-
-        // ==========================================
-        // CALCULATE PROJECTILE DIRECTION
-        // ==========================================
 
         Vector3 aimDirection =
             CalculateAimDirection(
@@ -284,26 +204,11 @@ public class ShooterCombatState : EnemyState
             return;
         }
 
-
-        // ==========================================
-        // QUEUE PROJECTILE
-        // ==========================================
-
         shooter.QueueProjectile(
             aimDirection
         );
 
-
-        // ==========================================
-        // START ATTACK ANIMATION
-        // ==========================================
-
         shooter.StartAttackAnimation();
-
-
-        // ==========================================
-        // ATTACK SOUND
-        // ==========================================
 
         if (
             enemySoundController != null
@@ -313,11 +218,6 @@ public class ShooterCombatState : EnemyState
         }
     }
 
-
-    // ==========================================
-    // CALCULATE AIM DIRECTION
-    // ==========================================
-
     private Vector3 CalculateAimDirection(
         Transform player
     )
@@ -325,20 +225,8 @@ public class ShooterCombatState : EnemyState
         if (player == null)
             return Vector3.zero;
 
-
-        // ==========================================
-        // PROJECTILE ORIGIN
-        //
-        // Используем фактическую точку запуска.
-        // ==========================================
-
         Vector3 shooterPosition =
             shooter.SpitOrigin.position;
-
-
-        // ==========================================
-        // PLAYER AIM POINT
-        // ==========================================
 
         PlayerAimTarget aimTarget =
             player.GetComponent<
@@ -352,31 +240,16 @@ public class ShooterCombatState : EnemyState
                 ? aimTarget.AimPoint.position
                 : player.position;
 
-
-        // ==========================================
-        // PLAYER VELOCITY
-        // ==========================================
-
         Vector3 playerVelocity =
             GetPlayerVelocity(
                 player
             );
-
-
-        // ==========================================
-        // PROJECTILE SPEED
-        // ==========================================
 
         float projectileSpeed =
             Mathf.Max(
                 shooter.ProjectileSpeed,
                 0.01f
             );
-
-
-        // ==========================================
-        // INTERCEPT TIME
-        // ==========================================
 
         float interceptTime =
             CalculateInterceptTime(
@@ -386,20 +259,10 @@ public class ShooterCombatState : EnemyState
                 projectileSpeed
             );
 
-
-        // ==========================================
-        // PREDICTED POSITION
-        // ==========================================
-
         Vector3 predictedPosition =
             playerPosition +
             playerVelocity *
             interceptTime;
-
-
-        // ==========================================
-        // AIM DIRECTION
-        // ==========================================
 
         Vector3 aimDirection =
             predictedPosition -
@@ -417,11 +280,6 @@ public class ShooterCombatState : EnemyState
 
         aimDirection.Normalize();
 
-
-        // ==========================================
-        // AIM SPREAD
-        // ==========================================
-
         aimDirection =
             ApplySpread(
                 aimDirection,
@@ -431,11 +289,6 @@ public class ShooterCombatState : EnemyState
 
         return aimDirection;
     }
-
-
-    // ==========================================
-    // INTERCEPT TIME
-    // ==========================================
 
     private float CalculateInterceptTime(
         Vector3 shooterPosition,
@@ -549,11 +402,6 @@ public class ShooterCombatState : EnemyState
         return time;
     }
 
-
-    // ==========================================
-    // PLAYER VELOCITY
-    // ==========================================
-
     private Vector3 GetPlayerVelocity(
         Transform player
     )
@@ -587,11 +435,6 @@ public class ShooterCombatState : EnemyState
         return
             Vector3.zero;
     }
-
-
-    // ==========================================
-    // SPREAD
-    // ==========================================
 
     private Vector3 ApplySpread(
         Vector3 direction,
@@ -627,11 +470,6 @@ public class ShooterCombatState : EnemyState
             spreadRotation *
             direction;
     }
-
-
-    // ==========================================
-    // MOVE AWAY FROM PLAYER
-    // ==========================================
 
     private void MoveAwayFromPlayer(
         Transform player
@@ -684,11 +522,6 @@ public class ShooterCombatState : EnemyState
         );
     }
 
-
-    // ==========================================
-    // LOOK AT PLAYER
-    // ==========================================
-
     private void LookAtPlayer(
         Transform player
     )
@@ -727,11 +560,6 @@ public class ShooterCombatState : EnemyState
                 Time.deltaTime * 8f
             );
     }
-
-
-    // ==========================================
-    // EXIT
-    // ==========================================
 
     public override void Exit()
     {

@@ -52,11 +52,6 @@ public class EnemyMelee :
     [SerializeField]
     private float stunDuration = 1.5f;
 
-
-    // ==========================================
-    // ANIMATOR HASHES
-    // ==========================================
-
     private static readonly int SpeedHash =
         Animator.StringToHash("Speed");
 
@@ -66,11 +61,6 @@ public class EnemyMelee :
     private static readonly int DieHash =
         Animator.StringToHash("Die");
 
-
-    // ==========================================
-    // COMPONENTS
-    // ==========================================
-
     private Enemy enemy;
     private NavMeshAgent agent;
     private Health health;
@@ -78,26 +68,11 @@ public class EnemyMelee :
     private EnemySoundController
         enemySoundController;
 
-
-    // ==========================================
-    // STATE
-    // ==========================================
-
     private bool attackAnimationPlaying;
     private bool deathAnimationPlayed;
 
-
-    // ==========================================
-    // ATTACK
-    // ==========================================
-
     private readonly Collider[] attackResults =
         new Collider[16];
-
-
-    // ==========================================
-    // PUBLIC PROPERTIES
-    // ==========================================
 
     public Enemy Enemy => enemy;
 
@@ -120,11 +95,6 @@ public class EnemyMelee :
     public float StunDuration =>
         stunDuration;
 
-
-    // ==========================================
-    // UNITY
-    // ==========================================
-
     private void Awake()
     {
         enemy =
@@ -140,51 +110,16 @@ public class EnemyMelee :
         enemySoundController =
             GetComponent<EnemySoundController>();
 
-
         if (agent != null)
         {
             agent.speed = moveSpeed;
         }
-
 
         if (animator == null)
         {
             animator =
                 GetComponentInChildren<Animator>();
         }
-
-
-        if (enemy == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyMelee requires Enemy component."
-            );
-        }
-
-
-        if (agent == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyMelee requires NavMeshAgent."
-            );
-        }
-
-
-        if (health == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyMelee requires Health component."
-            );
-        }
-
-
-        if (animator == null)
-        {
-            Debug.LogError(
-                $"[{name}] EnemyMelee requires Animator."
-            );
-        }
-
 
         if (health != null)
         {
@@ -208,19 +143,13 @@ public class EnemyMelee :
                 Die;
         }
     }
-
-
-    // ==========================================
-    // MOVEMENT ANIMATION
-    // ==========================================
-
     private void UpdateMovementAnimation()
     {
         if (animator == null)
             return;
 
 
-        // После смерти всегда остаёмся на Death.
+        //После смерти всегда остаётся на Death
         if (
             deathAnimationPlayed ||
             (health != null && health.IsDead)
@@ -235,7 +164,7 @@ public class EnemyMelee :
         }
 
 
-        // Если NavMeshAgent остановлен — Idle.
+        //Если NavMeshAgent остановлен — Idle
         if (
             agent == null ||
             !agent.isOnNavMesh ||
@@ -251,7 +180,7 @@ public class EnemyMelee :
         }
 
 
-        // Берём фактическое направление движения.
+        //Берёт фактическое направление движения
         Vector3 velocity =
             agent.velocity;
 
@@ -259,8 +188,7 @@ public class EnemyMelee :
             0f;
 
 
-        // Если агент ещё не успел набрать скорость,
-        // используем направление, куда он хочет двигаться.
+        //Если агент ещё не успел набрать скорость, использует направление, куда он хочет двигаться
         if (
             velocity.sqrMagnitude <
             movementAnimationThreshold *
@@ -291,20 +219,12 @@ public class EnemyMelee :
         }
 
 
-        // Определяем направление движения
-        // относительно направления врага.
+        //Определяет направление движения относительно направления врага
         float direction =
             Vector3.Dot(
                 transform.forward,
                 velocity.normalized
             );
-
-
-        // Даём Animator только 3 стабильных значения:
-        //
-        //  1  = WalkForward
-        //  0  = Idle
-        // -1  = WalkBackward
 
         if (direction > 0.1f)
         {
@@ -322,19 +242,12 @@ public class EnemyMelee :
         }
         else
         {
-            // Если враг движется вбок,
-            // считаем это движением вперёд.
             animator.SetFloat(
                 SpeedHash,
                 1f
             );
         }
     }
-
-
-    // ==========================================
-    // MOVEMENT
-    // ==========================================
 
     public void MoveToPlayer(
         Transform player)
@@ -438,11 +351,6 @@ public class EnemyMelee :
             );
     }
 
-
-    // ==========================================
-    // ATTACK RANGE
-    // ==========================================
-
     public bool IsPlayerInAttackRange(
         Transform player)
     {
@@ -462,11 +370,6 @@ public class EnemyMelee :
         return direction.magnitude <=
                attackDistance;
     }
-
-
-    // ==========================================
-    // ATTACK ANIMATION
-    // ==========================================
 
     public void StartAttackAnimation()
     {
@@ -508,15 +411,6 @@ public class EnemyMelee :
         return attackAnimationPlaying;
     }
 
-
-    // ==========================================
-    // MELEE ATTACK
-    // ==========================================
-
-    /// <summary>
-    /// Animation Event.
-    /// Вызывается в момент фактического удара.
-    /// </summary>
     public void PerformAttack()
     {
         if (!attackAnimationPlaying)
@@ -626,24 +520,10 @@ public class EnemyMelee :
             damageable.TakeDamage(
                 attackDamage
             );
-
-
-            Debug.Log(
-                $"[{name}] Melee attack hit " +
-                $"{targetCollider.name} for " +
-                $"{attackDamage} damage."
-            );
-
-
             break;
         }
     }
 
-
-    /// <summary>
-    /// Animation Event.
-    /// Вызывается в последнем кадре ClawAttack.
-    /// </summary>
     public void FinishAttackAnimation()
     {
         if (!attackAnimationPlaying)
@@ -687,11 +567,6 @@ public class EnemyMelee :
         );
     }
 
-
-    // ==========================================
-    // STUN
-    // ==========================================
-
     public void Stun()
     {
         if (
@@ -732,11 +607,6 @@ public class EnemyMelee :
         );
     }
 
-
-    // ==========================================
-    // DISABLE DEATH COLLIDERS
-    // ==========================================
-
     private void DisableDeathColliders()
     {
         Collider[] colliders =
@@ -759,11 +629,6 @@ public class EnemyMelee :
         }
     }
 
-
-    // ==========================================
-    // DEATH
-    // ==========================================
-
     public void Die()
     {
         if (deathAnimationPlayed)
@@ -778,9 +643,7 @@ public class EnemyMelee :
         );
 
 
-        // Отключаем все коллайдеры врага,
-        // чтобы после смерти новые попадания
-        // и декали больше не регистрировались.
+        //Отключает все коллайдеры врага
         DisableDeathColliders();
 
 
@@ -825,11 +688,7 @@ public class EnemyMelee :
         );
     }
 
-
-    // ==========================================
-    // GIZMOS
-    // ==========================================
-
+    //GIZMOS
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(
@@ -880,19 +739,11 @@ public class EnemyMelee :
             attackDistance
         );
     }
-    // ==========================================
-    // GIZMOS
-    // ==========================================
 
     private void OnDrawGizmos()
     {
         DrawCurrentStateTarget();
     }
-
-
-    // ==========================================
-    // CURRENT STATE TARGET
-    // ==========================================
 
     private void DrawCurrentStateTarget()
     {
@@ -919,11 +770,6 @@ public class EnemyMelee :
         if (currentState == null)
             return;
 
-
-        // ==========================================
-        // IDLE
-        // ==========================================
-
         if (
             currentState is MeleeIdleState
         )
@@ -933,11 +779,6 @@ public class EnemyMelee :
 
             return;
         }
-
-
-        // ==========================================
-        // CHASE
-        // ==========================================
 
         if (
             currentState is MeleeChaseState
@@ -965,11 +806,6 @@ public class EnemyMelee :
             return;
         }
 
-
-        // ==========================================
-        // ATTACK
-        // ==========================================
-
         if (
             currentState is MeleeAttackState
         )
@@ -996,11 +832,6 @@ public class EnemyMelee :
             return;
         }
 
-
-        // ==========================================
-        // BACKSTEP
-        // ==========================================
-
         if (
             currentState is MeleeBackstepState
         )
@@ -1016,11 +847,6 @@ public class EnemyMelee :
             return;
         }
 
-
-        // ==========================================
-        // STUNNED
-        // ==========================================
-
         if (
             currentState is MeleeStunnedState
         )
@@ -1033,11 +859,6 @@ public class EnemyMelee :
 
             return;
         }
-
-
-        // ==========================================
-        // DEFAULT
-        // ==========================================
 
         Gizmos.color =
             Color.white;
@@ -1056,11 +877,6 @@ public class EnemyMelee :
         }
     }
 
-
-    // ==========================================
-    // DRAW CURRENT TARGET
-    // ==========================================
-
     private void DrawCurrentTarget(
         Vector3 targetPosition,
         float radius
@@ -1071,20 +887,11 @@ public class EnemyMelee :
             Vector3.up *
             0.5f;
 
-
-        // ------------------------------------------
-        // LINE TO TARGET
-        // ------------------------------------------
-
         Gizmos.DrawLine(
             startPosition,
             targetPosition
         );
 
-
-        // ------------------------------------------
-        // TARGET MARKER
-        // ------------------------------------------
 
         Gizmos.DrawWireSphere(
             targetPosition,
@@ -1097,11 +904,6 @@ public class EnemyMelee :
             radius * 0.12f
         );
     }
-
-
-    // ==========================================
-    // DRAW AGENT DESTINATION
-    // ==========================================
 
     private void DrawAgentDestination(
         float radius
@@ -1122,11 +924,6 @@ public class EnemyMelee :
             radius
         );
     }
-
-
-    // ==========================================
-    // STUNNED MARKER
-    // ==========================================
 
     private void DrawStunnedMarker()
     {

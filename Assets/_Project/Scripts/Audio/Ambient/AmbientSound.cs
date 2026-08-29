@@ -71,11 +71,6 @@ public class AmbientSound : MonoBehaviour
     private Tween ambientTween;
     private int zoneVersion;
 
-
-    // =========================
-    // UNITY
-    // =========================
-
     private void Awake()
     {
         CreateBaseAmbientSource();
@@ -102,11 +97,6 @@ public class AmbientSound : MonoBehaviour
             StopCoroutine(randomAmbientCoroutine);
         }
     }
-
-
-    // =========================
-    // BASE AMBIENT
-    // =========================
 
     private void CreateBaseAmbientSource()
     {
@@ -149,10 +139,6 @@ public class AmbientSound : MonoBehaviour
         baseAmbientSource.Stop();
     }
 
-
-    // =========================
-    // ZONE CHANGE
-    // =========================
 
     public void ChangeAmbient(
         AudioClip newBaseClip,
@@ -325,10 +311,6 @@ public class AmbientSound : MonoBehaviour
                 .SetUpdate(true);
     }
 
-
-    // =========================
-    // RANDOM AMBIENT
-    // =========================
 
     private void StartRandomAmbientRoutine()
     {

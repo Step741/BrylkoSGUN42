@@ -17,6 +17,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform visual;
 
+    [Header("Free Fire Rotation")]
+
+    [SerializeField]
+    private float freeFireRotationSpeed = 720f;
+
+    [SerializeField]
+    private float animationAimOffset = 18f;
+
+
+    [Header("ADS Rotation")]
+
+    [SerializeField]
+    private float adsAnimationAimOffset = 15f;
 
     [Header("Jump & Gravity")]
 
@@ -32,7 +45,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private LayerMask groundLayer;
 
-
     [Header("Crouch")]
 
     [SerializeField]
@@ -47,118 +59,96 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private LayerMask obstacleLayer;
 
-
     private CharacterController characterController;
+
     private IInputService inputService;
+
     private Transform cameraTransform;
+
     private PlayerVoiceController playerVoiceController;
 
     private float verticalVelocity;
 
     private float standingHeight;
+
     private Vector3 standingCenter;
 
     private bool isCrouching;
+
     private bool isSprinting;
+
     private bool isMoving;
+
     private bool isGrounded;
 
+    public bool IsMoving =>
+        isMoving;
 
-    // =========================
-    // PUBLIC STATES
-    // =========================
+    public bool IsSprinting =>
+        isSprinting;
 
-    public bool IsMoving => isMoving;
+    public bool IsCrouching =>
+        isCrouching;
 
-    public bool IsSprinting => isSprinting;
-
-    public bool IsCrouching => isCrouching;
-
-    public bool IsGrounded => isGrounded;
-
+    public bool IsGrounded =>
+        isGrounded;
 
     [Inject]
     private void Construct(
         IInputService inputService,
         Camera mainCamera)
     {
-        this.inputService = inputService;
-        cameraTransform = mainCamera.transform;
-    }
+        this.inputService =
+            inputService;
 
+        cameraTransform =
+            mainCamera.transform;
+    }
 
     private void Awake()
     {
         characterController =
             GetComponent<CharacterController>();
 
+
         playerVoiceController =
             GetComponent<PlayerVoiceController>();
 
+
         standingHeight =
             characterController.height;
+
 
         standingCenter =
             characterController.center;
     }
 
-
     private void Update()
     {
-        // =========================
-        // CROUCH
-        // =========================
-
         UpdateCrouch();
 
         UpdateCharacterHeight();
-
-
-        // =========================
-        // MOVEMENT INPUT
-        // =========================
 
         Vector3 movement =
             GetMovement();
 
 
-        // Определяем движение сразу
-        // по фактическому направлению,
-        // а не через velocity после Move().
         isMoving =
-            movement.sqrMagnitude > 0.0001f;
-
-
-        // =========================
-        // GROUND
-        // =========================
+            movement.sqrMagnitude >
+            0.0001f;
 
         isGrounded =
             CheckGrounded();
 
-
-        // =========================
-        // GRAVITY & JUMP
-        // =========================
-
         ApplyGravity();
-
-
-        // =========================
-        // SPRINT
-        // =========================
 
         isSprinting =
             isMoving &&
             !isCrouching &&
             inputService.Sprint.IsPressed();
 
-
-        // =========================
-        // SPEED
-        // =========================
-
         float currentSpeed;
+
 
         if (isCrouching)
         {
@@ -176,15 +166,13 @@ public class PlayerController : MonoBehaviour
                 moveSpeed;
         }
 
-
-        // =========================
-        // MOVE
-        // =========================
-
         Vector3 horizontalMovement =
             movement;
 
-        movement *= currentSpeed;
+
+        movement *=
+            currentSpeed;
+
 
         movement.y =
             verticalVelocity;
@@ -195,23 +183,23 @@ public class PlayerController : MonoBehaviour
             Time.deltaTime
         );
 
-
-        // =========================
-        // VISUAL ROTATION
-        // =========================
-
-        if (!inputService.Aim.IsPressed())
+        if (inputService.Aim.IsPressed())
+        {
+            AlignVisualWithPlayer();
+        }
+        else if (
+            inputService.Fire.IsPressed()
+        )
+        {
+            RotateVisualTowardsAim();
+        }
+        else
         {
             RotateVisual(
                 horizontalMovement
             );
         }
-        else
-        {
-            AlignVisualWithPlayer();
-        }
     }
-
 
     private Vector3 GetMovement()
     {
@@ -226,11 +214,15 @@ public class PlayerController : MonoBehaviour
             cameraTransform.right;
 
 
-        cameraForward.y = 0f;
-        cameraRight.y = 0f;
+        cameraForward.y =
+            0f;
+
+        cameraRight.y =
+            0f;
 
 
         cameraForward.Normalize();
+
         cameraRight.Normalize();
 
 
@@ -245,12 +237,12 @@ public class PlayerController : MonoBehaviour
         );
     }
 
-
     private void ApplyGravity()
     {
         if (
             isGrounded &&
-            verticalVelocity < 0f)
+            verticalVelocity < 0f
+        )
         {
             verticalVelocity =
                 -2f;
@@ -259,7 +251,8 @@ public class PlayerController : MonoBehaviour
 
         if (
             inputService.Jump.WasPressedThisFrame() &&
-            isGrounded)
+            isGrounded
+        )
         {
             verticalVelocity =
                 Mathf.Sqrt(
@@ -268,7 +261,11 @@ public class PlayerController : MonoBehaviour
                     gravity
                 );
 
-            if (playerVoiceController != null)
+
+            if (
+                playerVoiceController !=
+                null
+            )
             {
                 playerVoiceController.PlayJump();
             }
@@ -280,11 +277,11 @@ public class PlayerController : MonoBehaviour
             Time.deltaTime;
     }
 
-
     private void UpdateCrouch()
     {
         if (
-            inputService.Crouch.IsPressed())
+            inputService.Crouch.IsPressed()
+        )
         {
             isCrouching =
                 true;
@@ -324,19 +321,23 @@ public class PlayerController : MonoBehaviour
 
         float bottomY =
             standingCenter.y -
-            standingHeight * 0.5f;
+            standingHeight *
+            0.5f;
 
 
         float targetCenterY =
             bottomY +
-            newHeight * 0.5f;
+            newHeight *
+            0.5f;
 
 
         Vector3 center =
             characterController.center;
 
+
         center.y =
             targetCenterY;
+
 
         characterController.center =
             center;
@@ -370,13 +371,17 @@ public class PlayerController : MonoBehaviour
         );
     }
 
-
     private void RotateVisual(
         Vector3 moveDirection)
     {
+        if (visual == null)
+            return;
+
+
         if (
             moveDirection.sqrMagnitude <
-            0.01f)
+            0.01f
+        )
         {
             return;
         }
@@ -397,22 +402,83 @@ public class PlayerController : MonoBehaviour
             );
     }
 
+    private void RotateVisualTowardsAim()
+    {
+        if (visual == null)
+            return;
+
+
+        if (cameraTransform == null)
+            return;
+
+
+        //Направление взгляда камеры
+        Vector3 aimDirection =
+            cameraTransform.forward;
+
+
+        //Убирает вертикальную составляющую
+        aimDirection.y =
+            0f;
+
+
+        if (
+            aimDirection.sqrMagnitude <
+            0.001f
+        )
+        {
+            return;
+        }
+
+
+        aimDirection.Normalize();
+
+
+        //Компенсация смещения обычной анимации стрельбы
+        Quaternion aimRotation =
+            Quaternion.LookRotation(
+                aimDirection
+            );
+
+
+        aimRotation *=
+            Quaternion.Euler(
+                0f,
+                animationAimOffset,
+                0f
+            );
+
+        visual.rotation =
+            Quaternion.RotateTowards(
+                visual.rotation,
+                aimRotation,
+                freeFireRotationSpeed *
+                Time.deltaTime
+            );
+    }
 
     private void AlignVisualWithPlayer()
     {
         if (visual == null)
             return;
 
+        Quaternion targetRotation =
+            transform.rotation *
+            Quaternion.Euler(
+                0f,
+                adsAnimationAimOffset,
+                0f
+            );
 
-        visual.localRotation =
+
+        visual.rotation =
             Quaternion.Slerp(
-                visual.localRotation,
-                Quaternion.identity,
+                visual.rotation,
+                targetRotation,
                 rotationSpeed *
                 Time.deltaTime
             );
     }
-
 
     private bool CheckGrounded()
     {
@@ -443,6 +509,7 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    //GIZMOS
     private void OnDrawGizmosSelected()
     {
         Gizmos.color =

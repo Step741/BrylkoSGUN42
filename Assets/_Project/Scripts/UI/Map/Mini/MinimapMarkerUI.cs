@@ -69,8 +69,6 @@ public class MinimapMarkerUI : MonoBehaviour
                 direction.x
             ) * Mathf.Rad2Deg;
 
-
-        // Стандартная UI-стрелка должна смотреть вверх.
         edgeArrowImage.rectTransform.localRotation =
             Quaternion.Euler(
                 0f,

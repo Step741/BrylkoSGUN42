@@ -16,20 +16,12 @@ public class ShooterPatrolState : EnemyState
     {
         if (shooter == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterPatrolState: EnemyShooter is missing."
-            );
-
             return;
         }
 
         if (shooter.PatrolPoints == null ||
             shooter.PatrolPoints.Length == 0)
         {
-            Debug.LogWarning(
-                $"[{enemy.name}] No patrol points assigned."
-            );
-
             return;
         }
 
@@ -37,10 +29,6 @@ public class ShooterPatrolState : EnemyState
         shooter.MoveToCurrentPatrolPoint();
 
         waitTimer = 0f;
-
-        Debug.Log(
-            $"[{enemy.name}] State: Shooter Patrol"
-        );
     }
 
     public override void Tick()
@@ -48,10 +36,7 @@ public class ShooterPatrolState : EnemyState
         if (shooter == null)
             return;
 
-        // ==========================================
-        // 1. Проверяем, увидел ли враг игрока.
-        // ==========================================
-
+        //Проверяет, увидел ли враг игрока
         if (enemy.Vision != null &&
             enemy.Vision.CanSeePlayer())
         {
@@ -64,10 +49,7 @@ public class ShooterPatrolState : EnemyState
             return;
         }
 
-        // ==========================================
-        // 2. Обычный патруль.
-        // ==========================================
-
+        //Патруль
         if (shooter.PatrolPoints == null ||
             shooter.PatrolPoints.Length == 0)
         {

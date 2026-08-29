@@ -27,11 +27,6 @@ public class AmmoPickup : PickupBase
 
         if (weapon == null)
         {
-            Debug.LogWarning(
-                $"[{name}] Weapon for ammo type " +
-                $"{ammoType} not found."
-            );
-
             return false;
         }
 
@@ -54,20 +49,10 @@ public class AmmoPickup : PickupBase
 
         if (weapon == null)
         {
-            Debug.LogWarning(
-                $"[{name}] Weapon for ammo type " +
-                $"{ammoType} not found."
-            );
-
             return;
         }
 
         weapon.AddReserveAmmo(amount);
-
-        Debug.Log(
-            $"[{name}] Ammo pickup: " +
-            $"{ammoType} +{amount}."
-        );
     }
 
     private WeaponBase FindWeapon(
@@ -92,10 +77,6 @@ public class AmmoPickup : PickupBase
 
         if (switcher == null)
         {
-            Debug.LogWarning(
-                $"[{name}] WeaponSwitcher not found."
-            );
-
             return null;
         }
 

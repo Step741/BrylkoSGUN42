@@ -19,10 +19,6 @@ public class EnemyFactory : IEnemyFactory
     {
         if (prefab == null)
         {
-            Debug.LogError(
-                "EnemyFactory: prefab is missing."
-            );
-
             return null;
         }
 
@@ -36,17 +32,8 @@ public class EnemyFactory : IEnemyFactory
 
         if (enemy == null)
         {
-            Debug.LogError(
-                "EnemyFactory: failed to create enemy."
-            );
-
             return null;
         }
-
-        Debug.Log(
-            $"EnemyFactory: spawned {enemy.name}"
-        );
-
         return enemy;
     }
 }

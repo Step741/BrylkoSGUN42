@@ -10,7 +10,6 @@ public class EnemyStateMachine
     {
         if (newState == null)
         {
-            Debug.LogError("EnemyStateMachine: new state is null.");
             return;
         }
 

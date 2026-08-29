@@ -58,11 +58,6 @@ public class GasTrapSoundController : MonoBehaviour
         ConfigureAudioSource();
     }
 
-
-    // ==========================================
-    // CONFIGURATION
-    // ==========================================
-
     private void ConfigureAudioSource()
     {
         if (audioSource == null)
@@ -99,11 +94,6 @@ public class GasTrapSoundController : MonoBehaviour
                 sfxMixerGroup;
         }
     }
-
-
-    // ==========================================
-    // PUBLIC
-    // ==========================================
 
     public void StartGasSound()
     {

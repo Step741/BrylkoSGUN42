@@ -4,25 +4,11 @@ using UnityEngine;
 
 public class ImpactDecal : MonoBehaviour
 {
-    // =========================================================
-    // ACTIVE DECALS
-    // =========================================================
-
     private static readonly HashSet<ImpactDecal>
         activeDecals =
             new HashSet<ImpactDecal>();
 
-
-    // =========================================================
-    // STATE
-    // =========================================================
-
     private Coroutine lifetimeCoroutine;
-
-
-    // =========================================================
-    // FOLLOW TARGET
-    // =========================================================
 
     private Transform followTarget;
 
@@ -32,21 +18,12 @@ public class ImpactDecal : MonoBehaviour
 
     private bool wasFollowingTarget;
 
-
-    // =========================================================
-    // SETUP
-    // =========================================================
-
     public void Activate(
         Vector3 position,
         Quaternion rotation,
         float lifetime,
         Transform parent)
     {
-        // =====================================================
-        // STOP PREVIOUS TIMER
-        // =====================================================
-
         if (lifetimeCoroutine != null)
         {
             StopCoroutine(
@@ -56,11 +33,6 @@ public class ImpactDecal : MonoBehaviour
             lifetimeCoroutine =
                 null;
         }
-
-
-        // =====================================================
-        // FOLLOW TARGET
-        // =====================================================
 
         followTarget =
             parent;
@@ -83,38 +55,18 @@ public class ImpactDecal : MonoBehaviour
                 rotation;
         }
 
-
-        // =====================================================
-        // REGISTER ACTIVE DECAL
-        // =====================================================
-
         activeDecals.Add(
             this
         );
-
-
-        // =====================================================
-        // POSITION
-        // =====================================================
 
         transform.SetPositionAndRotation(
             position,
             rotation
         );
 
-
-        // =====================================================
-        // ACTIVATE
-        // =====================================================
-
         gameObject.SetActive(
             true
         );
-
-
-        // =====================================================
-        // LIFETIME
-        // =====================================================
 
         if (lifetime > 0f)
         {
@@ -126,11 +78,6 @@ public class ImpactDecal : MonoBehaviour
                 );
         }
     }
-
-
-    // =========================================================
-    // REMOVE DECALS FOR TARGET
-    // =========================================================
 
     public static void RemoveDecalsForTarget(
         Transform target)
@@ -159,11 +106,6 @@ public class ImpactDecal : MonoBehaviour
                 continue;
             }
 
-
-            // =================================================
-            // SAME OBJECT
-            // =================================================
-
             if (
                 decal.followTarget ==
                 target
@@ -176,11 +118,6 @@ public class ImpactDecal : MonoBehaviour
                 continue;
             }
 
-
-            // =================================================
-            // TARGET IS CHILD OF ENEMY
-            // =================================================
-
             if (
                 decal.followTarget.IsChildOf(
                     target
@@ -192,11 +129,6 @@ public class ImpactDecal : MonoBehaviour
                 );
             }
         }
-
-
-        // =====================================================
-        // RETURN TO POOL
-        // =====================================================
 
         foreach (
             ImpactDecal decal
@@ -213,17 +145,8 @@ public class ImpactDecal : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // FOLLOW TARGET
-    // =========================================================
-
     private void LateUpdate()
     {
-        // =====================================================
-        // TARGET DESTROYED
-        // =====================================================
-
         if (
             wasFollowingTarget &&
             followTarget == null
@@ -239,38 +162,18 @@ public class ImpactDecal : MonoBehaviour
             return;
         }
 
-
-        // =====================================================
-        // NO TARGET
-        // =====================================================
-
         if (followTarget == null)
             return;
-
-
-        // =====================================================
-        // FOLLOW POSITION
-        // =====================================================
 
         transform.position =
             followTarget.TransformPoint(
                 localPosition
             );
 
-
-        // =====================================================
-        // FOLLOW ROTATION
-        // =====================================================
-
         transform.rotation =
             followTarget.rotation *
             localRotation;
     }
-
-
-    // =========================================================
-    // RETURN AFTER LIFETIME
-    // =========================================================
 
     private IEnumerator ReturnAfterLifetime(
         float lifetime)
@@ -289,25 +192,11 @@ public class ImpactDecal : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // RETURN TO POOL
-    // =========================================================
-
     public void ReturnToPool()
     {
-        // =====================================================
-        // REMOVE FROM ACTIVE LIST
-        // =====================================================
-
         activeDecals.Remove(
             this
         );
-
-
-        // =====================================================
-        // STOP TIMER
-        // =====================================================
 
         if (lifetimeCoroutine != null)
         {
@@ -319,21 +208,11 @@ public class ImpactDecal : MonoBehaviour
                 null;
         }
 
-
-        // =====================================================
-        // STOP FOLLOWING
-        // =====================================================
-
         followTarget =
             null;
 
         wasFollowingTarget =
             false;
-
-
-        // =====================================================
-        // RETURN UNDER POOL
-        // =====================================================
 
         if (DecalPool.Instance != null)
         {
@@ -349,11 +228,7 @@ public class ImpactDecal : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // DISABLE
-    // =========================================================
-
+    //DISABLE
     private void OnDisable()
     {
         activeDecals.Remove(
@@ -371,11 +246,7 @@ public class ImpactDecal : MonoBehaviour
             false;
     }
 
-
-    // =========================================================
     // DESTROY
-    // =========================================================
-
     private void OnDestroy()
     {
         activeDecals.Remove(

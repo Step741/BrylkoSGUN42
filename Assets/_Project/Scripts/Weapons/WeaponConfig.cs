@@ -7,18 +7,25 @@ using UnityEngine;
 public class WeaponConfig : ScriptableObject
 {
     [Header("Identity")]
+
     [SerializeField]
     private string weaponName;
 
+
     [Header("Damage")]
+
     [SerializeField]
     private float damage = 25f;
 
+
     [Header("Fire")]
+
     [SerializeField]
     private float fireRate = 4f;
 
+
     [Header("Ammo")]
+
     [SerializeField]
     private int magazineSize = 12;
 
@@ -31,7 +38,16 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private bool infiniteAmmo = false;
 
+
+    [Header("Reload")]
+
+    [SerializeField]
+    [Min(0f)]
+    private float reloadDuration = 1.5f;
+
+
     [Header("Ballistics")]
+
     [SerializeField]
     private float range = 100f;
 
@@ -47,7 +63,9 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private float spreadRecoverySpeed = 2f;
 
+
     [Header("Shotgun")]
+
     [SerializeField]
     private int pellets = 10;
 
@@ -60,7 +78,9 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private float knockbackForce = 4f;
 
+
     [Header("Grenade Launcher")]
+
     [SerializeField]
     private GameObject projectilePrefab;
 
@@ -91,7 +111,9 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private LayerMask explosionObstacleMask;
 
+
     [Header("Explosion Effects")]
+
     [SerializeField]
     private GameObject explosionVfxPrefab;
 
@@ -101,7 +123,9 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private float explosionVfxLifetime = 2f;
 
+
     [Header("Railgun")]
+
     [SerializeField]
     private int railgunMaxTargets = 3;
 
@@ -120,7 +144,9 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private LayerMask railgunHitMask;
 
+
     [Header("Katana")]
+
     [SerializeField]
     private float katanaAttackRange = 2f;
 
@@ -136,14 +162,11 @@ public class WeaponConfig : ScriptableObject
     [SerializeField]
     private LayerMask katanaAttackMask;
 
+
     [Header("Recoil")]
+
     [SerializeField]
     private float recoil = 1f;
-
-
-    // =========================
-    // PUBLIC PROPERTIES
-    // =========================
 
     public string WeaponName =>
         weaponName;
@@ -153,11 +176,6 @@ public class WeaponConfig : ScriptableObject
 
     public float FireRate =>
         fireRate;
-
-
-    // =========================
-    // AMMO
-    // =========================
 
     public int MagazineSize =>
         magazineSize;
@@ -171,10 +189,8 @@ public class WeaponConfig : ScriptableObject
     public bool InfiniteAmmo =>
         infiniteAmmo;
 
-
-    // =========================
-    // BALLISTICS
-    // =========================
+    public float ReloadDuration =>
+        reloadDuration;
 
     public float Range =>
         range;
@@ -191,11 +207,6 @@ public class WeaponConfig : ScriptableObject
     public float SpreadRecoverySpeed =>
         spreadRecoverySpeed;
 
-
-    // =========================
-    // SHOTGUN
-    // =========================
-
     public int Pellets =>
         pellets;
 
@@ -207,11 +218,6 @@ public class WeaponConfig : ScriptableObject
 
     public float KnockbackForce =>
         knockbackForce;
-
-
-    // =========================
-    // GRENADE LAUNCHER
-    // =========================
 
     public GameObject ProjectilePrefab =>
         projectilePrefab;
@@ -243,11 +249,6 @@ public class WeaponConfig : ScriptableObject
     public LayerMask ExplosionObstacleMask =>
         explosionObstacleMask;
 
-
-    // =========================
-    // EXPLOSION EFFECTS
-    // =========================
-
     public GameObject ExplosionVfxPrefab =>
         explosionVfxPrefab;
 
@@ -256,11 +257,6 @@ public class WeaponConfig : ScriptableObject
 
     public float ExplosionVfxLifetime =>
         explosionVfxLifetime;
-
-
-    // =========================
-    // RAILGUN
-    // =========================
 
     public int RailgunMaxTargets =>
         railgunMaxTargets;
@@ -280,11 +276,6 @@ public class WeaponConfig : ScriptableObject
     public LayerMask RailgunHitMask =>
         railgunHitMask;
 
-
-    // =========================
-    // KATANA
-    // =========================
-
     public float KatanaAttackRange =>
         katanaAttackRange;
 
@@ -299,11 +290,6 @@ public class WeaponConfig : ScriptableObject
 
     public LayerMask KatanaAttackMask =>
         katanaAttackMask;
-
-
-    // =========================
-    // RECOIL
-    // =========================
 
     public float Recoil =>
         recoil;

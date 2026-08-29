@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Zenject;
 
@@ -8,11 +9,6 @@ public class EnemySpawner : MonoBehaviour
         Timer,
         Trigger
     }
-
-
-    // ==========================================
-    // SPAWN
-    // ==========================================
 
     [Header("Spawn")]
 
@@ -30,20 +26,10 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField]
     private Transform[] spawnPoints;
 
-
-    // ==========================================
-    // PROJECTILE POOL
-    // ==========================================
-
     [Header("Projectile Pool")]
 
     [SerializeField]
     private SpitProjectilePool spitProjectilePool;
-
-
-    // ==========================================
-    // WAVE
-    // ==========================================
 
     [Header("Wave")]
 
@@ -54,29 +40,20 @@ public class EnemySpawner : MonoBehaviour
     private float waveInterval = 10f;
 
     [SerializeField]
+    [Min(0f)]
+    private float spawnInterval = 1f;
+
+    [SerializeField]
     private bool spawnFirstWaveImmediately =
         true;
 
-
-    // ==========================================
-    // DEPENDENCIES
-    // ==========================================
-
     private IEnemyFactory enemyFactory;
-
-
-    // ==========================================
-    // STATE
-    // ==========================================
 
     private float timer;
 
     private bool waveActive;
 
-
-    // ==========================================
-    // INJECTION
-    // ==========================================
+    private Coroutine waveCoroutine;
 
     [Inject]
     private void Construct(
@@ -86,18 +63,15 @@ public class EnemySpawner : MonoBehaviour
             enemyFactory;
     }
 
-
-    // ==========================================
-    // UNITY
-    // ==========================================
-
     private void Start()
     {
         if (!ValidateSetup())
             return;
 
-        if (spawnMode ==
-            SpawnMode.Timer)
+        if (
+            spawnMode ==
+            SpawnMode.Timer
+        )
         {
             if (spawnFirstWaveImmediately)
             {
@@ -111,11 +85,17 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
-        if (spawnMode !=
-            SpawnMode.Timer)
+        if (
+            spawnMode !=
+            SpawnMode.Timer
+        )
         {
             return;
         }
+
+        //Пока текущая волна создаётся, не запускат следующую
+        if (waveActive)
+            return;
 
         timer -= Time.deltaTime;
 
@@ -131,8 +111,10 @@ public class EnemySpawner : MonoBehaviour
     private void OnTriggerEnter(
         Collider other)
     {
-        if (spawnMode !=
-            SpawnMode.Trigger)
+        if (
+            spawnMode !=
+            SpawnMode.Trigger
+        )
         {
             return;
         }
@@ -140,16 +122,17 @@ public class EnemySpawner : MonoBehaviour
         if (waveActive)
             return;
 
-        if (!other.CompareTag("Player"))
+        if (other.gameObject.layer != LayerMask.NameToLayer("Player"))
             return;
 
         SpawnWave();
     }
 
 
-    // ==========================================
-    // SPAWN WAVE
-    // ==========================================
+    private void OnDisable()
+    {
+        CancelWave();
+    }
 
     public void SpawnWave()
     {
@@ -159,28 +142,61 @@ public class EnemySpawner : MonoBehaviour
         if (!ValidateSetup())
             return;
 
+        waveCoroutine =
+            StartCoroutine(
+                SpawnWaveRoutine()
+            );
+    }
+
+
+    private IEnumerator SpawnWaveRoutine()
+    {
         waveActive = true;
 
         for (
             int i = 0;
             i < enemiesPerWave;
-            i++)
+            i++
+        )
         {
             SpawnEnemy(i);
+
+            if (
+                i <
+                enemiesPerWave - 1
+            )
+            {
+                if (spawnInterval > 0f)
+                {
+                    yield return new WaitForSeconds(
+                        spawnInterval
+                    );
+                }
+                else
+                {
+                    yield return null;
+                }
+            }
         }
 
         waveActive = false;
 
-        Debug.Log(
-            $"[{name}] Wave spawned: " +
-            $"{enemiesPerWave} enemies."
-        );
+        waveCoroutine = null;
     }
 
+    private void CancelWave()
+    {
+        if (waveCoroutine != null)
+        {
+            StopCoroutine(
+                waveCoroutine
+            );
 
-    // ==========================================
-    // SPAWN ENEMY
-    // ==========================================
+            waveCoroutine = null;
+        }
+
+        waveActive = false;
+    }
 
     private void SpawnEnemy(
         int index)
@@ -191,8 +207,6 @@ public class EnemySpawner : MonoBehaviour
         if (spawnPoint == null)
             return;
 
-
-        // Создаём врага через текущую фабрику.
         Enemy enemy =
             enemyFactory.Create(
                 enemyPrefab,
@@ -207,13 +221,6 @@ public class EnemySpawner : MonoBehaviour
         enemy.name =
             $"{enemyType}_Enemy_{index + 1}";
 
-
-        // ==========================================
-        // SHOOTER PROJECTILE POOL
-        // ==========================================
-
-        // Если заспавненный враг является стрелком,
-        // передаём ему общий пул снарядов со сцены.
         if (spitProjectilePool != null)
         {
             EnemyShooter shooter =
@@ -229,12 +236,6 @@ public class EnemySpawner : MonoBehaviour
             }
         }
     }
-
-
-    // ==========================================
-    // SPAWN POINT
-    // ==========================================
-
     private Transform GetSpawnPoint(
         int index)
     {
@@ -246,16 +247,6 @@ public class EnemySpawner : MonoBehaviour
             return null;
         }
 
-
-        // Распределяем врагов по точкам
-        // по кругу:
-        //
-        // 0 → Point 0
-        // 1 → Point 1
-        // 2 → Point 0
-        // 3 → Point 1
-        //
-
         int pointIndex =
             index % spawnPoints.Length;
 
@@ -263,30 +254,16 @@ public class EnemySpawner : MonoBehaviour
             pointIndex
         ];
     }
-
-
-    // ==========================================
-    // VALIDATION
-    // ==========================================
-
     private bool ValidateSetup()
     {
         if (enemyFactory == null)
         {
-            Debug.LogError(
-                $"[{name}] IEnemyFactory is not injected."
-            );
-
             return false;
         }
 
 
         if (enemyPrefab == null)
         {
-            Debug.LogError(
-                $"[{name}] Enemy Prefab is missing."
-            );
-
             return false;
         }
 
@@ -296,46 +273,27 @@ public class EnemySpawner : MonoBehaviour
             spawnPoints.Length < 2
         )
         {
-            Debug.LogError(
-                $"[{name}] EnemySpawner requires " +
-                "at least 2 spawn points."
-            );
-
             return false;
         }
 
 
         if (enemiesPerWave <= 0)
         {
-            Debug.LogError(
-                $"[{name}] Enemies Per Wave must be > 0."
-            );
-
             return false;
         }
 
-
-        // Пул нужен только для врага-стрелка.
         if (
             enemyType ==
             EnemySpawnType.Shooter &&
             spitProjectilePool == null
         )
         {
-            Debug.LogWarning(
-                $"[{name}] SpitProjectilePool is not assigned. " +
-                "Spawned EnemyShooter will not be able to fire."
-            );
         }
 
         return true;
     }
 
-
-    // ==========================================
     // GIZMOS
-    // ==========================================
-
     private void OnDrawGizmosSelected()
     {
         if (spawnPoints == null)
@@ -344,7 +302,8 @@ public class EnemySpawner : MonoBehaviour
         for (
             int i = 0;
             i < spawnPoints.Length;
-            i++)
+            i++
+        )
         {
             Transform point =
                 spawnPoints[i];

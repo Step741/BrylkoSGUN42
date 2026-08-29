@@ -23,21 +23,11 @@ public class MinimapMarkerPool : MonoBehaviour
     {
         if (markerPrefab == null)
         {
-            Debug.LogError(
-                "[MinimapMarkerPool] Marker Prefab is not assigned.",
-                this
-            );
-
             return;
         }
 
         if (markerContainer == null)
         {
-            Debug.LogError(
-                "[MinimapMarkerPool] Marker Container is not assigned.",
-                this
-            );
-
             return;
         }
 

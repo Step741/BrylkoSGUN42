@@ -16,16 +16,10 @@ public class MeleeStunnedState : EnemyState
     {
         if (melee == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] MeleeStunnedState: " +
-                "EnemyMelee is missing."
-            );
-
             return;
         }
 
-        // Полностью останавливаем движение
-        // и отменяем текущую атаку.
+        //Полностью останавливает движение и отменяет текущую атаку
         melee.CancelAttack();
         melee.StopMoving();
 
@@ -33,10 +27,6 @@ public class MeleeStunnedState : EnemyState
             melee.StunDuration;
 
         melee.PlayStunnedAnimation();
-
-        Debug.Log(
-            $"[{enemy.name}] State: Melee Stunned"
-        );
     }
 
     public override void Tick()
@@ -44,11 +34,8 @@ public class MeleeStunnedState : EnemyState
         if (melee == null)
             return;
 
-        // Во время оглушения не двигаемся.
         melee.StopMoving();
 
-        // Если враг уже умер,
-        // существующая система Death сама разберётся.
         if (melee.Health != null &&
             melee.Health.IsDead)
         {

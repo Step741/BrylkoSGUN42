@@ -45,26 +45,16 @@ public class WeaponIconHUD : MonoBehaviour
     [Header("DOTween Animation")]
 
     [SerializeField]
-    [Tooltip("Максимальное увеличение активной иконки.")]
     private float activeScale = 1.15f;
 
     [SerializeField]
-    [Tooltip("Длительность увеличения иконки.")]
     private float punchDuration = 0.12f;
 
     [SerializeField]
-    [Tooltip("Длительность возврата к обычному размеру.")]
     private float returnDuration = 0.15f;
 
     [SerializeField]
-    [Tooltip("Длительность плавного изменения цвета.")]
     private float colorDuration = 0.15f;
-
-
-    // =========================================================
-    // SEQUENCES
-    // Отдельная Sequence для каждой иконки.
-    // =========================================================
 
     private Sequence pistolSequence;
     private Sequence rifleSequence;
@@ -72,11 +62,6 @@ public class WeaponIconHUD : MonoBehaviour
     private Sequence grenadeLauncherSequence;
     private Sequence railgunSequence;
     private Sequence katanaSequence;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void OnEnable()
     {
@@ -113,11 +98,6 @@ public class WeaponIconHUD : MonoBehaviour
         KillAllTweens();
     }
 
-
-    // =========================================================
-    // WEAPON CHANGED
-    // =========================================================
-
     private void OnWeaponChanged(
         WeaponBase weapon)
     {
@@ -126,11 +106,6 @@ public class WeaponIconHUD : MonoBehaviour
             true
         );
     }
-
-
-    // =========================================================
-    // REFRESH
-    // =========================================================
 
     private void RefreshWeaponIcons(
         bool animate)
@@ -144,17 +119,10 @@ public class WeaponIconHUD : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // UPDATE ICONS
-    // =========================================================
-
     private void UpdateIcons(
         WeaponBase currentWeapon,
         bool animate)
     {
-        // Сначала выключаем выделение у всех.
-
         SetIconState(
             pistolIcon,
             false,
@@ -194,12 +162,6 @@ public class WeaponIconHUD : MonoBehaviour
 
         if (currentWeapon == null)
             return;
-
-
-        // =====================================================
-        // Определяем оружие по его реальному типу.
-        // Порядок массива WeaponSwitcher больше не важен.
-        // =====================================================
 
         if (currentWeapon is Pistol)
         {
@@ -251,11 +213,6 @@ public class WeaponIconHUD : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // ICON STATE
-    // =========================================================
-
     private void SetIconState(
         Image icon,
         bool isActive,
@@ -264,16 +221,7 @@ public class WeaponIconHUD : MonoBehaviour
         if (icon == null)
             return;
 
-
-        // Останавливаем предыдущие анимации
-        // именно этой иконки.
         KillIconTween(icon);
-
-
-        // =====================================================
-        // БЕЗ АНИМАЦИИ
-        // Используется при загрузке HUD.
-        // =====================================================
 
         if (!animate)
         {
@@ -287,11 +235,6 @@ public class WeaponIconHUD : MonoBehaviour
 
             return;
         }
-
-
-        // =====================================================
-        // НЕАКТИВНАЯ ИКОНКА
-        // =====================================================
 
         if (!isActive)
         {
@@ -323,19 +266,11 @@ public class WeaponIconHUD : MonoBehaviour
             return;
         }
 
-
-        // =====================================================
-        // АКТИВНАЯ ИКОНКА
-        // =====================================================
-
         Sequence sequence =
             DOTween.Sequence()
                 .SetLink(
                     icon.gameObject
                 );
-
-
-        // Сначала плавно меняем цвет.
 
         sequence.Join(
             icon
@@ -348,9 +283,6 @@ public class WeaponIconHUD : MonoBehaviour
                 )
         );
 
-
-        // Увеличиваем.
-
         sequence.Append(
             icon.transform
                 .DOScale(
@@ -361,9 +293,6 @@ public class WeaponIconHUD : MonoBehaviour
                     Ease.OutQuad
                 )
         );
-
-
-        // И мягко возвращаем обратно.
 
         sequence.Append(
             icon.transform
@@ -382,11 +311,6 @@ public class WeaponIconHUD : MonoBehaviour
             sequence
         );
     }
-
-
-    // =========================================================
-    // SEQUENCE STORAGE
-    // =========================================================
 
     private void StoreSequence(
         Image icon,
@@ -460,11 +384,7 @@ public class WeaponIconHUD : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillAllTweens()
     {
         KillSequence(
@@ -553,10 +473,6 @@ public class WeaponIconHUD : MonoBehaviour
     {
         if (icon == null)
             return;
-
-
-        // Убиваем сохранённую Sequence,
-        // соответствующую конкретной иконке.
 
         if (icon == pistolIcon)
         {

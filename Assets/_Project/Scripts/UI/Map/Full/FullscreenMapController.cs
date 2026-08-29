@@ -26,19 +26,15 @@ public class FullscreenMapController : MonoBehaviour
     [Header("DOTween Animation")]
 
     [SerializeField]
-    [Tooltip("Длительность открытия карты.")]
     private float openDuration = 0.25f;
 
     [SerializeField]
-    [Tooltip("Длительность закрытия карты.")]
     private float closeDuration = 0.2f;
 
     [SerializeField]
-    [Tooltip("Начальный масштаб карты при открытии.")]
     private float closedScale = 0.96f;
 
     [SerializeField]
-    [Tooltip("Длительность появления нового маркера.")]
     private float markerAppearDuration = 0.2f;
 
 
@@ -50,21 +46,11 @@ public class FullscreenMapController : MonoBehaviour
         FullscreenMapMarkerUI
     > markerUIs = new();
 
-
-    // =========================================================
-    // DOTWEEN
-    // =========================================================
-
     private CanvasGroup mapCanvasGroup;
 
     private Transform mapTransform;
 
     private Tween mapTween;
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -112,7 +98,7 @@ public class FullscreenMapController : MonoBehaviour
         inputActions.UI.Disable();
 
 
-        // Останавливаем все активные DOTween-анимации.
+        //Останавливает все активные анимации
         KillAllTweens();
     }
 
@@ -144,21 +130,11 @@ public class FullscreenMapController : MonoBehaviour
         UpdateMarkers();
     }
 
-
-    // =========================================================
-    // INPUT
-    // =========================================================
-
     private void OnMapPressed(
         InputAction.CallbackContext context)
     {
         ToggleMap();
     }
-
-
-    // =========================================================
-    // MAP
-    // =========================================================
 
     public void ToggleMap()
     {
@@ -182,16 +158,10 @@ public class FullscreenMapController : MonoBehaviour
         if (fullscreenMap == null)
             return;
 
-
-        // Останавливаем предыдущую анимацию.
         KillMapTween();
 
-
-        // Включаем карту.
         fullscreenMap.SetActive(true);
 
-
-        // Включаем камеру карты.
         if (fullscreenMapCamera != null)
         {
             fullscreenMapCamera.gameObject.SetActive(
@@ -199,15 +169,10 @@ public class FullscreenMapController : MonoBehaviour
             );
         }
 
-
-        // Обновляем маркеры сразу.
         RefreshMarkers();
 
         UpdateMarkers();
 
-
-        // Если CanvasGroup отсутствует,
-        // карта просто откроется как раньше.
         if (
             mapCanvasGroup == null ||
             mapTransform == null
@@ -216,8 +181,6 @@ public class FullscreenMapController : MonoBehaviour
             return;
         }
 
-
-        // Начальное состояние анимации.
         mapCanvasGroup.alpha =
             0f;
 
@@ -226,8 +189,6 @@ public class FullscreenMapController : MonoBehaviour
             Vector3.one *
             closedScale;
 
-
-        // Fade + Scale одновременно.
         Sequence sequence =
             DOTween.Sequence();
 
@@ -255,9 +216,6 @@ public class FullscreenMapController : MonoBehaviour
                 )
         );
 
-
-        // Если объект карты уничтожается,
-        // DOTween автоматически убивает tween.
         sequence.SetLink(
             fullscreenMap
         );
@@ -277,13 +235,8 @@ public class FullscreenMapController : MonoBehaviour
         if (!fullscreenMap.activeSelf)
             return;
 
-
-        // Останавливаем предыдущую анимацию.
         KillMapTween();
 
-
-        // Если CanvasGroup отсутствует,
-        // закрываем карту старым способом.
         if (
             mapCanvasGroup == null ||
             mapTransform == null
@@ -298,8 +251,6 @@ public class FullscreenMapController : MonoBehaviour
         Sequence sequence =
             DOTween.Sequence();
 
-
-        // Плавно скрываем карту.
         sequence.Join(
             mapCanvasGroup
                 .DOFade(
@@ -311,8 +262,6 @@ public class FullscreenMapController : MonoBehaviour
                 )
         );
 
-
-        // Слегка уменьшаем.
         sequence.Join(
             mapTransform
                 .DOScale(
@@ -325,8 +274,6 @@ public class FullscreenMapController : MonoBehaviour
                 )
         );
 
-
-        // После завершения полностью выключаем карту.
         sequence.OnComplete(
             () =>
             {
@@ -339,9 +286,6 @@ public class FullscreenMapController : MonoBehaviour
             }
         );
 
-
-        // Если карта уничтожается при рестарте,
-        // tween автоматически уничтожается вместе с ней.
         sequence.SetLink(
             fullscreenMap
         );
@@ -369,11 +313,6 @@ public class FullscreenMapController : MonoBehaviour
             );
         }
     }
-
-
-    // =========================================================
-    // MARKERS
-    // =========================================================
 
     private void RefreshMarkers()
     {
@@ -440,11 +379,6 @@ public class FullscreenMapController : MonoBehaviour
             markerUI
         );
 
-
-        // =====================================================
-        // DOTWEEN MARKER APPEAR
-        // =====================================================
-
         if (
             markerUI.RectTransform != null
         )
@@ -452,8 +386,6 @@ public class FullscreenMapController : MonoBehaviour
             RectTransform markerTransform =
                 markerUI.RectTransform;
 
-
-            // Убиваем старые tween'ы именно этого объекта.
             markerTransform.DOKill();
 
 
@@ -471,10 +403,6 @@ public class FullscreenMapController : MonoBehaviour
                         Ease.OutBack
                     );
 
-
-            // КРИТИЧНО:
-            // если объект маркера уничтожается,
-            // DOTween автоматически завершает tween.
             markerTween.SetLink(
                 markerUI.gameObject
             );
@@ -507,8 +435,6 @@ public class FullscreenMapController : MonoBehaviour
             FullscreenMapMarkerUI markerUI =
                 pair.Value;
 
-
-            // Если игровой маркер уничтожен.
             if (marker == null)
             {
                 if (markerUI != null)
@@ -535,8 +461,6 @@ public class FullscreenMapController : MonoBehaviour
                 continue;
             }
 
-
-            // Если UI-маркер уничтожен.
             if (markerUI == null)
             {
                 markersToRemove.Add(
@@ -553,9 +477,6 @@ public class FullscreenMapController : MonoBehaviour
             );
         }
 
-
-        // Удаляем невалидные записи
-        // уже после завершения foreach.
         foreach (
             FullscreenMapMarker marker
             in markersToRemove
@@ -649,9 +570,6 @@ public class FullscreenMapController : MonoBehaviour
             *
             markersContainer.rect.height;
 
-
-        // Позицию оставляем без DOTween.
-        // Она обновляется каждый кадр.
         markerUI.RectTransform.anchoredPosition =
             new Vector2(
                 x,
@@ -664,11 +582,7 @@ public class FullscreenMapController : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillAllTweens()
     {
         KillMapTween();

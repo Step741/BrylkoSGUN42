@@ -20,20 +20,11 @@ public class MinimapCameraFollow : MonoBehaviour
     private Vector3 fixedRotation =
         new Vector3(90f, 0f, 0f);
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void LateUpdate()
     {
         if (target == null)
             return;
 
-
-        // =====================================================
-        // POSITION
-        // =====================================================
 
         Vector3 position =
             target.position;
@@ -44,13 +35,6 @@ public class MinimapCameraFollow : MonoBehaviour
         transform.position =
             position;
 
-
-        // =====================================================
-        // ROTATION
-        // =====================================================
-
-        // Миникарта всегда смотрит строго вниз
-        // и не зависит от поворота игрока или основной камеры.
         transform.rotation =
             Quaternion.Euler(
                 fixedRotation

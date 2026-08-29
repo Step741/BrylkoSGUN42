@@ -5,37 +5,13 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class GrenadeProjectile : MonoBehaviour
 {
-    // =========================================================
-    // COMPONENTS
-    // =========================================================
-
     private Rigidbody rb;
-
-
-    // =========================================================
-    // CONFIG
-    // =========================================================
 
     private WeaponConfig config;
 
-
-    // =========================================================
-    // POOL
-    // =========================================================
-
     private ProjectilePool projectilePool;
 
-
-    // =========================================================
-    // LIFETIME
-    // =========================================================
-
     private float lifeTimer;
-
-
-    // =========================================================
-    // EXPLOSION DELAY
-    // =========================================================
 
     [Header("Explosion Delay")]
 
@@ -47,27 +23,12 @@ public class GrenadeProjectile : MonoBehaviour
 
     private bool firstCollisionOccurred;
 
-
-    // =========================================================
-    // STATE
-    // =========================================================
-
     private bool exploded;
-
-
-    // =========================================================
-    // EXPLOSION
-    // =========================================================
 
     private Collider[] explosionResults;
 
     private readonly HashSet<IDamageable> damagedTargets =
         new HashSet<IDamageable>();
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -75,22 +36,12 @@ public class GrenadeProjectile : MonoBehaviour
             GetComponent<Rigidbody>();
     }
 
-
-    // =========================================================
-    // POOL
-    // =========================================================
-
     public void SetPool(
         ProjectilePool pool)
     {
         projectilePool =
             pool;
     }
-
-
-    // =========================================================
-    // INITIALIZE
-    // =========================================================
 
     public void Initialize(
         WeaponConfig weaponConfig,
@@ -113,12 +64,6 @@ public class GrenadeProjectile : MonoBehaviour
 
         if (config == null)
         {
-            Debug.LogError(
-                $"{name}: WeaponConfig is missing."
-            );
-
-            ReturnToPool();
-
             return;
         }
 
@@ -139,18 +84,8 @@ public class GrenadeProjectile : MonoBehaviour
                 new Collider[maxTargets];
         }
 
-
-        // =====================================================
-        // MAXIMUM LIFETIME
-        // =====================================================
-
         lifeTimer =
             config.ProjectileLifetime;
-
-
-        // =====================================================
-        // RESET PHYSICS
-        // =====================================================
 
         if (rb != null)
         {
@@ -161,27 +96,17 @@ public class GrenadeProjectile : MonoBehaviour
                 Vector3.zero;
 
 
-            // Запускаем гранату.
+            //Запускает гранату
             rb.velocity =
                 direction.normalized *
                 config.ProjectileSpeed;
         }
     }
 
-
-    // =========================================================
-    // UPDATE
-    // =========================================================
-
     private void Update()
     {
         if (exploded)
             return;
-
-
-        // =====================================================
-        // MAXIMUM LIFETIME
-        // =====================================================
 
         lifeTimer -=
             Time.deltaTime;
@@ -193,11 +118,6 @@ public class GrenadeProjectile : MonoBehaviour
 
             return;
         }
-
-
-        // =====================================================
-        // EXPLOSION AFTER FIRST COLLISION
-        // =====================================================
 
         if (!firstCollisionOccurred)
             return;
@@ -213,20 +133,11 @@ public class GrenadeProjectile : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // COLLISION
-    // =========================================================
-
     private void OnCollisionEnter(
         Collision collision)
     {
         if (exploded)
             return;
-
-
-        // При первом касании поверхности
-        // запускаем таймер взрыва.
 
         if (!firstCollisionOccurred)
         {
@@ -236,16 +147,7 @@ public class GrenadeProjectile : MonoBehaviour
             explosionDelayTimer =
                 explosionDelayAfterFirstHit;
         }
-
-
-        // Никакого Explode() здесь нет.
-        // Rigidbody + Physic Material сами отвечают за отскок.
     }
-
-
-    // =========================================================
-    // EXPLOSION
-    // =========================================================
 
     private void Explode()
     {
@@ -268,21 +170,12 @@ public class GrenadeProjectile : MonoBehaviour
         Vector3 explosionPosition =
             transform.position;
 
-
-        // ==================================================
-        // VFX
-        // ==================================================
-
         ExplosionVfxPool.Play(
             config.ExplosionVfxPrefab,
             explosionPosition,
             config.ExplosionVfxLifetime
         );
 
-
-        // ==================================================
-        // EXPLOSION SOUND
-        // ==================================================
 
         if (
             SoundService.Instance != null &&
@@ -295,11 +188,6 @@ public class GrenadeProjectile : MonoBehaviour
                 SoundType.SFX
             );
         }
-
-
-        // ==================================================
-        // FIND TARGETS
-        // ==================================================
 
         int hitCount =
             Physics.OverlapSphereNonAlloc(
@@ -320,11 +208,6 @@ public class GrenadeProjectile : MonoBehaviour
             if (targetCollider == null)
                 continue;
 
-
-            // --------------------------------------------------
-            // Ближайшая точка объекта к взрыву
-            // --------------------------------------------------
-
             Vector3 targetPoint =
                 targetCollider.ClosestPoint(
                     explosionPosition
@@ -336,11 +219,6 @@ public class GrenadeProjectile : MonoBehaviour
                     explosionPosition,
                     targetPoint
                 );
-
-
-            // --------------------------------------------------
-            // Проверка препятствия
-            // --------------------------------------------------
 
             if (
                 Physics.Linecast(
@@ -354,11 +232,6 @@ public class GrenadeProjectile : MonoBehaviour
                 continue;
             }
 
-
-            // --------------------------------------------------
-            // Получаем объект, способный получать урон
-            // --------------------------------------------------
-
             IDamageable damageable =
                 targetCollider.GetComponentInParent<
                     IDamageable
@@ -368,11 +241,6 @@ public class GrenadeProjectile : MonoBehaviour
             if (damageable == null)
                 continue;
 
-
-            // --------------------------------------------------
-            // Один объект получает урон только один раз
-            // --------------------------------------------------
-
             if (
                 !damagedTargets.Add(
                     damageable
@@ -381,11 +249,6 @@ public class GrenadeProjectile : MonoBehaviour
             {
                 continue;
             }
-
-
-            // --------------------------------------------------
-            // Урон зависит от расстояния
-            // --------------------------------------------------
 
             float damageMultiplier =
                 1f -
@@ -398,11 +261,6 @@ public class GrenadeProjectile : MonoBehaviour
             float finalDamage =
                 config.ExplosionDamage *
                 damageMultiplier;
-
-
-            // ==================================================
-            // EXPLOSION AUDIO EFFECT
-            // ==================================================
 
             PlayerAudioEffects playerAudioEffects =
                 targetCollider.GetComponentInParent<
@@ -417,19 +275,9 @@ public class GrenadeProjectile : MonoBehaviour
                 );
             }
 
-
-            // ==================================================
-            // DAMAGE
-            // ==================================================
-
             damageable.TakeDamage(
                 finalDamage
             );
-
-
-            // ==================================================
-            // STUN
-            // ==================================================
 
             IStunnable stunnable =
                 targetCollider.GetComponentInParent<
@@ -441,11 +289,6 @@ public class GrenadeProjectile : MonoBehaviour
             {
                 stunnable.Stun();
             }
-
-
-            // ==================================================
-            // EXPLOSION FORCE
-            // ==================================================
 
             Rigidbody targetRigidbody =
                 targetCollider.GetComponentInParent<
@@ -465,18 +308,8 @@ public class GrenadeProjectile : MonoBehaviour
             }
         }
 
-
-        // ==================================================
-        // RETURN TO POOL
-        // ==================================================
-
         ReturnToPool();
     }
-
-
-    // =========================================================
-    // RETURN TO POOL
-    // =========================================================
 
     private void ReturnToPool()
     {
@@ -514,11 +347,7 @@ public class GrenadeProjectile : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // GIZMOS
-    // =========================================================
-
+    //GIZMOS
     private void OnDrawGizmosSelected()
     {
         if (config == null)

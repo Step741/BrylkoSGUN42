@@ -121,7 +121,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3979707657246093399}
   serializedVersion: 4
-  m_Mass: 25
+  m_Mass: 20
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -168,6 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 30
+  healTickInterval: 0.5
+  healPerTick: 5
 --- !u!114 &6316062741293889807
 MonoBehaviour:
   m_ObjectHideFlags: 0

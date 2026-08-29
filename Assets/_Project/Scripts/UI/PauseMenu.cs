@@ -10,10 +10,6 @@ using Zenject;
 
 public class PauseMenu : MonoBehaviour
 {
-    // =========================================================
-    // MENU
-    // =========================================================
-
     [Header("Menu")]
 
     [SerializeField]
@@ -25,20 +21,10 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private RectTransform menuPanel;
 
-
-    // =========================================================
-    // TITLE
-    // =========================================================
-
     [Header("Title")]
 
     [SerializeField]
     private RectTransform pausedTitle;
-
-
-    // =========================================================
-    // MENU BUTTONS
-    // =========================================================
 
     [Header("Menu Buttons")]
 
@@ -55,11 +41,6 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private Button mainMenuButton;
 
-
-    // =========================================================
-    // SETTINGS
-    // =========================================================
-
     [Header("Settings")]
 
     [SerializeField]
@@ -74,20 +55,10 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private Button backButton;
 
-
-    // =========================================================
-    // SCENE
-    // =========================================================
-
     [Header("Scene")]
 
     [SerializeField]
     private string mainMenuSceneName = "MainMenu";
-
-
-    // =========================================================
-    // ANIMATION
-    // =========================================================
 
     [Header("Animation - Menu")]
 
@@ -124,11 +95,6 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private float settingsScaleDuration = 0.3f;
 
-
-    // =========================================================
-    // STATE
-    // =========================================================
-
     private IInputService inputService;
 
     private bool isOpen;
@@ -141,11 +107,6 @@ public class PauseMenu : MonoBehaviour
 
     private Tween fadeTween;
     private Tween scaleTween;
-
-
-    // =========================================================
-    // ZENJECT
-    // =========================================================
 
     [Inject]
     private void Construct(
@@ -160,20 +121,10 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // INITIALIZATION
-    // =========================================================
-
     private void Awake()
     {
         if (menuRoot == null)
         {
-            Debug.LogError(
-                "PauseMenu: Menu Root reference is missing.",
-                this
-            );
-
             return;
         }
 
@@ -187,18 +138,8 @@ public class PauseMenu : MonoBehaviour
 
         if (menuCanvasGroup == null)
         {
-            Debug.LogError(
-                "PauseMenu: CanvasGroup is missing on MenuRoot.",
-                this
-            );
-
             return;
         }
-
-
-        // -----------------------------------------------------
-        // SETTINGS CANVAS GROUP
-        // -----------------------------------------------------
 
         if (settingsRoot != null &&
             settingsCanvasGroup == null)
@@ -206,11 +147,6 @@ public class PauseMenu : MonoBehaviour
             settingsCanvasGroup =
                 settingsRoot.GetComponent<CanvasGroup>();
         }
-
-
-        // -----------------------------------------------------
-        // BUTTON EVENTS
-        // -----------------------------------------------------
 
         if (continueButton != null)
         {
@@ -257,11 +193,6 @@ public class PauseMenu : MonoBehaviour
         SetCursorForGameplay();
     }
 
-
-    // =========================================================
-    // PAUSE INPUT
-    // =========================================================
-
     private void OnPausePerformed(
         InputAction.CallbackContext context)
     {
@@ -280,8 +211,6 @@ public class PauseMenu : MonoBehaviour
         if (isSceneChanging)
             return;
 
-
-        // Esc внутри Settings возвращает назад.
         if (isSettingsOpen)
         {
             CloseSettings();
@@ -300,11 +229,6 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // TOGGLE
-    // =========================================================
-
     public void ToggleMenu()
     {
         if (isSceneChanging)
@@ -321,11 +245,6 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // OPEN MENU
-    // =========================================================
-
     public void OpenMenu()
     {
         if (isSceneChanging)
@@ -338,44 +257,20 @@ public class PauseMenu : MonoBehaviour
         isOpen = true;
         isSettingsOpen = false;
 
-
-        // -----------------------------------------------------
-        // INPUT
-        // -----------------------------------------------------
-
         if (inputService != null)
         {
             inputService.EnableUIInput();
         }
 
-
-        // -----------------------------------------------------
-        // PAUSE GAME
-        // -----------------------------------------------------
-
         Time.timeScale = 0f;
-
-
-        // -----------------------------------------------------
-        // CURSOR
-        // -----------------------------------------------------
 
         SetCursorForMenu();
 
-
-        // -----------------------------------------------------
-        // RESET SETTINGS
-        // -----------------------------------------------------
 
         if (settingsRoot != null)
         {
             settingsRoot.SetActive(false);
         }
-
-
-        // -----------------------------------------------------
-        // SHOW MENU
-        // -----------------------------------------------------
 
         menuRoot.SetActive(true);
 
@@ -389,18 +284,11 @@ public class PauseMenu : MonoBehaviour
 
         PrepareMenuAnimation();
 
-
-        // -----------------------------------------------------
-        // PLAY ANIMATION
-        // -----------------------------------------------------
-
         menuSequence =
             DOTween.Sequence()
                 .SetUpdate(true)
                 .SetLink(gameObject);
 
-
-        // Затемнение / появление.
         menuSequence.Append(
             menuCanvasGroup
                 .DOFade(
@@ -410,8 +298,6 @@ public class PauseMenu : MonoBehaviour
                 .SetEase(Ease.OutQuad)
         );
 
-
-        // Общая лёгкая анимация панели.
         if (menuPanel != null)
         {
             menuSequence.Join(
@@ -424,8 +310,6 @@ public class PauseMenu : MonoBehaviour
             );
         }
 
-
-        // PAUSED.
         if (pausedTitle != null)
         {
             menuSequence.Join(
@@ -438,38 +322,25 @@ public class PauseMenu : MonoBehaviour
             );
         }
 
-
-        // CONTINUE.
         AppendButtonAnimation(
             menuSequence,
             continueButton
         );
 
-
-        // RESTART.
         AppendButtonAnimation(
             menuSequence,
             restartButton
         );
 
-
-        // SETTINGS.
         AppendButtonAnimation(
             menuSequence,
             settingsButton
         );
 
-
-        // MAIN MENU.
         AppendButtonAnimation(
             menuSequence,
             mainMenuButton
         );
-
-
-        // -----------------------------------------------------
-        // ENABLE UI
-        // -----------------------------------------------------
 
         menuSequence.OnComplete(
             () =>
@@ -487,11 +358,6 @@ public class PauseMenu : MonoBehaviour
             }
         );
     }
-
-
-    // =========================================================
-    // CLOSE MENU
-    // =========================================================
 
     public void CloseMenu()
     {
@@ -518,11 +384,6 @@ public class PauseMenu : MonoBehaviour
         menuCanvasGroup.interactable = false;
         menuCanvasGroup.blocksRaycasts = false;
 
-
-        // -----------------------------------------------------
-        // FADE OUT
-        // -----------------------------------------------------
-
         fadeTween =
             menuCanvasGroup
                 .DOFade(
@@ -532,11 +393,6 @@ public class PauseMenu : MonoBehaviour
                 .SetEase(Ease.InQuad)
                 .SetUpdate(true)
                 .SetLink(gameObject);
-
-
-        // -----------------------------------------------------
-        // SCALE DOWN
-        // -----------------------------------------------------
 
         if (menuPanel != null)
         {
@@ -561,11 +417,11 @@ public class PauseMenu : MonoBehaviour
                 menuRoot.SetActive(false);
 
 
-                // Возвращаем время.
+                //Возвращает время
                 Time.timeScale = 1f;
 
 
-                // Возвращаем игровой input.
+                //Возвращает input
                 if (inputService != null)
                 {
                     inputService.EnablePlayerInput();
@@ -578,11 +434,6 @@ public class PauseMenu : MonoBehaviour
             }
         );
     }
-
-
-    // =========================================================
-    // PREPARE MENU ANIMATION
-    // =========================================================
 
     private void PrepareMenuAnimation()
     {
@@ -698,11 +549,6 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // SETTINGS
-    // =========================================================
-
     public void OpenSettings()
     {
         if (isSceneChanging)
@@ -726,7 +572,7 @@ public class PauseMenu : MonoBehaviour
         KillSettingsTween();
 
 
-        // Основное меню временно блокируем.
+        //Основное меню временно блокирует
         menuCanvasGroup.interactable = false;
 
         menuCanvasGroup.blocksRaycasts = false;
@@ -751,18 +597,11 @@ public class PauseMenu : MonoBehaviour
                 Vector3.one * hiddenScale;
         }
 
-
-        // -----------------------------------------------------
-        // TRANSITION
-        // -----------------------------------------------------
-
         settingsSequence =
             DOTween.Sequence()
                 .SetUpdate(true)
                 .SetLink(gameObject);
 
-
-        // Скрываем PAUSED меню.
         settingsSequence.Append(
             menuCanvasGroup
                 .DOFade(
@@ -788,8 +627,6 @@ public class PauseMenu : MonoBehaviour
             }
         );
 
-
-        // Показываем SETTINGS.
         if (settingsCanvasGroup != null)
         {
             settingsSequence.Append(
@@ -839,11 +676,6 @@ public class PauseMenu : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // CLOSE SETTINGS
-    // =========================================================
-
     public void CloseSettings()
     {
         if (isSceneChanging)
@@ -872,8 +704,6 @@ public class PauseMenu : MonoBehaviour
                 .SetUpdate(true)
                 .SetLink(gameObject);
 
-
-        // Скрываем SETTINGS.
         if (settingsCanvasGroup != null)
         {
             settingsSequence.Append(
@@ -917,8 +747,6 @@ public class PauseMenu : MonoBehaviour
             }
         );
 
-
-        // Показываем основное меню.
         settingsSequence.Append(
             menuCanvasGroup
                 .DOFade(
@@ -960,11 +788,6 @@ public class PauseMenu : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // RESTART
-    // =========================================================
-
     public void RestartGame()
     {
         if (isSceneChanging)
@@ -997,11 +820,6 @@ public class PauseMenu : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // MAIN MENU
-    // =========================================================
-
     public void ReturnToMainMenu()
     {
         if (isSceneChanging)
@@ -1024,11 +842,6 @@ public class PauseMenu : MonoBehaviour
             mainMenuSceneName
         );
     }
-
-
-    // =========================================================
-    // PREPARE SCENE CHANGE
-    // =========================================================
 
     private void PrepareForSceneChange()
     {
@@ -1056,11 +869,6 @@ public class PauseMenu : MonoBehaviour
         Cursor.visible =
             true;
     }
-
-
-    // =========================================================
-    // UI FOCUS
-    // =========================================================
 
     private void SelectButton(
         Button button)
@@ -1103,11 +911,6 @@ public class PauseMenu : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // CURSOR
-    // =========================================================
-
     private void SetCursorForMenu()
     {
         Cursor.lockState =
@@ -1126,11 +929,6 @@ public class PauseMenu : MonoBehaviour
         Cursor.visible =
             false;
     }
-
-
-    // =========================================================
-    // CANVAS GROUP HELPER
-    // =========================================================
 
     private CanvasGroup GetOrAddCanvasGroup(
         GameObject target)
@@ -1152,11 +950,6 @@ public class PauseMenu : MonoBehaviour
 
         return canvasGroup;
     }
-
-
-    // =========================================================
-    // TWEENS
-    // =========================================================
 
     private void KillMenuTweens()
     {
@@ -1189,11 +982,6 @@ public class PauseMenu : MonoBehaviour
         KillSettingsTween();
     }
 
-
-    // =========================================================
-    // HIDE IMMEDIATELY
-    // =========================================================
-
     private void HideImmediately()
     {
         KillAllTweens();
@@ -1202,11 +990,6 @@ public class PauseMenu : MonoBehaviour
         isOpen = false;
 
         isSettingsOpen = false;
-
-
-        // -----------------------------------------------------
-        // MENU
-        // -----------------------------------------------------
 
         if (menuCanvasGroup != null)
         {
@@ -1232,11 +1015,6 @@ public class PauseMenu : MonoBehaviour
             menuRoot.SetActive(false);
         }
 
-
-        // -----------------------------------------------------
-        // SETTINGS
-        // -----------------------------------------------------
-
         if (settingsCanvasGroup != null)
         {
             settingsCanvasGroup.alpha = 0f;
@@ -1254,11 +1032,6 @@ public class PauseMenu : MonoBehaviour
             settingsRoot.SetActive(false);
         }
     }
-
-
-    // =========================================================
-    // FOCUS
-    // =========================================================
 
     private void OnApplicationFocus(
         bool hasFocus)
@@ -1293,11 +1066,6 @@ public class PauseMenu : MonoBehaviour
             SetCursorForGameplay();
         }
     }
-
-
-    // =========================================================
-    // DESTROY
-    // =========================================================
 
     private void OnDestroy()
     {

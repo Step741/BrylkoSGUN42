@@ -30,11 +30,6 @@ public class PickupFeedback : MonoBehaviour
         PlayEffect();
     }
 
-
-    // =========================================================
-    // AUDIO
-    // =========================================================
-
     private void PlaySound()
     {
         if (pickupSound == null)
@@ -51,11 +46,6 @@ public class PickupFeedback : MonoBehaviour
             soundPitch
         );
     }
-
-
-    // =========================================================
-    // VISUAL EFFECT
-    // =========================================================
 
     private void PlayEffect()
     {

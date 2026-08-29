@@ -70,11 +70,6 @@ public class PlayerAudioEffects : MonoBehaviour
 
     private Coroutine explosionRoutine;
 
-
-    // ==========================================
-    // INITIALIZATION
-    // ==========================================
-
     private void Awake()
     {
         if (health == null)
@@ -160,9 +155,6 @@ public class PlayerAudioEffects : MonoBehaviour
         if (audioMixer == null)
             return;
 
-
-        // Берём наиболее сильный
-        // из двух эффектов.
         float finalTargetCutoff =
             Mathf.Min(
                 healthTargetCutoff,
@@ -183,11 +175,6 @@ public class PlayerAudioEffects : MonoBehaviour
             currentCutoff
         );
     }
-
-
-    // ==========================================
-    // HEALTH LOW PASS
-    // ==========================================
 
     private void HandleHealthChanged(
         float currentHealth,
@@ -246,11 +233,6 @@ public class PlayerAudioEffects : MonoBehaviour
             );
     }
 
-
-    // ==========================================
-    // EXPLOSION EFFECT
-    // ==========================================
-
     public void PlayExplosionEffect(
         float intensity)
     {
@@ -296,18 +278,9 @@ public class PlayerAudioEffects : MonoBehaviour
                 intensity
             );
 
-
-        // ==========================================
-        // МГНОВЕННЫЙ УДАР ОТ ВЗРЫВА
-        // ==========================================
-
         explosionCutoff =
             targetExplosionCutoff;
 
-
-        // Сразу применяем сильнейший
-        // из активных эффектов,
-        // не ожидая общего сглаживания.
         currentCutoff =
             Mathf.Min(
                 healthTargetCutoff,
@@ -319,22 +292,12 @@ public class PlayerAudioEffects : MonoBehaviour
             currentCutoff
         );
 
-
-        // ==========================================
-        // HOLD
-        // ==========================================
-
         if (explosionHoldDuration > 0f)
         {
             yield return new WaitForSeconds(
                 explosionHoldDuration
             );
         }
-
-
-        // ==========================================
-        // RECOVERY
-        // ==========================================
 
         float startCutoff =
             explosionCutoff;
@@ -378,11 +341,6 @@ public class PlayerAudioEffects : MonoBehaviour
             null;
     }
 
-
-    // ==========================================
-    // MIXER
-    // ==========================================
-
     private void ApplyLowPass(
         float cutoff)
     {
@@ -401,11 +359,6 @@ public class PlayerAudioEffects : MonoBehaviour
             cutoff
         );
     }
-
-
-    // ==========================================
-    // CLEANUP
-    // ==========================================
 
     private void OnDestroy()
     {

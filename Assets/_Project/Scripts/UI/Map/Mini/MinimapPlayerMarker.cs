@@ -25,11 +25,6 @@ public class MinimapPlayerMarker : MonoBehaviour
     [SerializeField]
     private float rotationOffset = 0f;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         if (markerRect == null)
@@ -59,12 +54,7 @@ public class MinimapPlayerMarker : MonoBehaviour
         if (markerRect == null)
             return;
 
-
-        // =====================================================
-        // POSITION
-        // =====================================================
-
-        // Игрок всегда находится точно в центре миникарты.
+        //Игрок всегда находится точно в центре миникарты
         markerRect.anchorMin =
             new Vector2(0.5f, 0.5f);
 
@@ -76,11 +66,6 @@ public class MinimapPlayerMarker : MonoBehaviour
 
         markerRect.anchoredPosition =
             Vector2.zero;
-
-
-        // =====================================================
-        // ROTATION
-        // =====================================================
 
         if (!rotateWithView)
             return;
@@ -95,7 +80,7 @@ public class MinimapPlayerMarker : MonoBehaviour
         Vector3 forward =
             playerCamera.transform.forward;
 
-        // Убираем наклон камеры.
+        //Убирает наклон камеры
         forward.y = 0f;
 
 
@@ -105,21 +90,11 @@ public class MinimapPlayerMarker : MonoBehaviour
 
         forward.Normalize();
 
-
-        // =====================================================
-        // CALCULATE ANGLE
-        // =====================================================
-
         float angle =
             Mathf.Atan2(
                 forward.x,
                 forward.z
             ) * Mathf.Rad2Deg;
-
-
-        // =====================================================
-        // ROTATE ONLY VISUAL
-        // =====================================================
 
         rotationTarget.localRotation =
             Quaternion.Euler(
@@ -128,11 +103,6 @@ public class MinimapPlayerMarker : MonoBehaviour
                 -angle + rotationOffset
             );
     }
-
-
-    // =========================================================
-    // SETUP
-    // =========================================================
 
     private void SetupMarkerPosition()
     {

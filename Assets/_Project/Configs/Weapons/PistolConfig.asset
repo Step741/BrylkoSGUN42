@@ -19,6 +19,7 @@ MonoBehaviour:
   maxReserveAmmo: 36
   reserveAmmo: 36
   infiniteAmmo: 1
+  reloadDuration: 2
   range: 100
   spread: 0
   maxSpread: 0

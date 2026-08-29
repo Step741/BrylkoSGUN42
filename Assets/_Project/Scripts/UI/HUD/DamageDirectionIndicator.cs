@@ -24,33 +24,27 @@ public class DamageDirectionIndicator : MonoBehaviour
     [Header("Settings")]
 
     [SerializeField]
-    [Tooltip("Как долго индикатор остаётся видимым.")]
     private float displayTime = 0.8f;
 
     [SerializeField]
-    [Tooltip("Длительность плавного появления.")]
     private float fadeInDuration = 0.08f;
 
     [SerializeField]
-    [Tooltip("Длительность плавного исчезновения.")]
     private float fadeOutDuration = 0.25f;
 
     [SerializeField]
     private float distanceFromCenter = 400f;
 
     [SerializeField]
-    [Tooltip("Максимальное расстояние индикатора вверх и вниз от центра.")]
     private float verticalLimit = 250f;
 
 
     [Header("DOTween Punch")]
 
     [SerializeField]
-    [Tooltip("Сила увеличения индикатора при попадании.")]
     private float punchScale = 0.12f;
 
     [SerializeField]
-    [Tooltip("Длительность эффекта.")]
     private float punchDuration = 0.18f;
 
 
@@ -103,11 +97,6 @@ public class DamageDirectionIndicator : MonoBehaviour
         KillAnimation();
     }
 
-
-    // =========================================================
-    // DAMAGE DIRECTION
-    // =========================================================
-
     private void ShowDamageDirection(
         Vector3 damageSourcePosition
     )
@@ -122,11 +111,6 @@ public class DamageDirectionIndicator : MonoBehaviour
             return;
         }
 
-
-        // -----------------------------------------------------
-        // WORLD DIRECTION
-        // -----------------------------------------------------
-
         Vector3 worldDirection =
             damageSourcePosition -
             playerTransform.position;
@@ -139,11 +123,6 @@ public class DamageDirectionIndicator : MonoBehaviour
         }
 
         worldDirection.Normalize();
-
-
-        // -----------------------------------------------------
-        // CAMERA DIRECTION
-        // -----------------------------------------------------
 
         Vector3 cameraForward =
             playerCamera.transform.forward;
@@ -177,11 +156,6 @@ public class DamageDirectionIndicator : MonoBehaviour
                 forwardDot
             ).normalized;
 
-
-        // -----------------------------------------------------
-        // POSITION
-        // -----------------------------------------------------
-
         float positionX =
             screenDirection.x *
             distanceFromCenter;
@@ -191,7 +165,7 @@ public class DamageDirectionIndicator : MonoBehaviour
             distanceFromCenter;
 
 
-        // Ограничиваем только верх и низ.
+        //Ограничивает только верх и низ
         positionY =
             Mathf.Clamp(
                 positionY,
@@ -205,11 +179,6 @@ public class DamageDirectionIndicator : MonoBehaviour
                 positionX,
                 positionY
             );
-
-
-        // -----------------------------------------------------
-        // ROTATION
-        // -----------------------------------------------------
 
         float angle =
             Mathf.Atan2(
@@ -226,18 +195,8 @@ public class DamageDirectionIndicator : MonoBehaviour
                 angle - 90f
             );
 
-
-        // -----------------------------------------------------
-        // ANIMATION
-        // -----------------------------------------------------
-
         PlayDamageAnimation();
     }
-
-
-    // =========================================================
-    // ANIMATION
-    // =========================================================
 
     private void PlayDamageAnimation()
     {
@@ -263,8 +222,6 @@ public class DamageDirectionIndicator : MonoBehaviour
             DOTween.Sequence()
                 .SetLink(gameObject);
 
-
-        // Появление.
         damageSequence.Append(
             canvasGroup
                 .DOFade(
@@ -276,8 +233,6 @@ public class DamageDirectionIndicator : MonoBehaviour
                 )
         );
 
-
-        // Punch.
         damageSequence.Join(
             indicator
                 .DOPunchScale(
@@ -288,14 +243,10 @@ public class DamageDirectionIndicator : MonoBehaviour
                 )
         );
 
-
-        // Время отображения.
         damageSequence.AppendInterval(
             displayTime
         );
 
-
-        // Исчезновение.
         damageSequence.Append(
             canvasGroup
                 .DOFade(
@@ -324,11 +275,7 @@ public class DamageDirectionIndicator : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillAnimation()
     {
         if (

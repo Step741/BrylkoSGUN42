@@ -46,10 +46,6 @@ public class InteractableHighlight : MonoBehaviour
         Shader.PropertyToID("_EmissionColor");
 
 
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         renderers =
@@ -80,11 +76,6 @@ public class InteractableHighlight : MonoBehaviour
         KillTweens();
     }
 
-
-    // =========================================================
-    // HIGHLIGHT
-    // =========================================================
-
     public void SetHighlighted(bool highlighted)
     {
         if (isHighlighted == highlighted)
@@ -94,7 +85,7 @@ public class InteractableHighlight : MonoBehaviour
         isHighlighted = highlighted;
 
 
-        // Останавливаем предыдущие анимации.
+        //Останавливает предыдущие анимации
         KillTweens();
 
 
@@ -142,16 +133,8 @@ public class InteractableHighlight : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // PULSE
-    // =========================================================
-
     private void StartPulse()
     {
-        // На всякий случай убеждаемся,
-        // что старый pulse уже остановлен.
-
         KillPulseTween();
 
 
@@ -184,11 +167,6 @@ public class InteractableHighlight : MonoBehaviour
                     }
                 );
     }
-
-
-    // =========================================================
-    // APPLY HIGHLIGHT
-    // =========================================================
 
     private void ApplyHighlight(
         float strength
@@ -245,11 +223,7 @@ public class InteractableHighlight : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillTweens()
     {
         KillHighlightTween();

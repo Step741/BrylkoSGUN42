@@ -6,10 +6,6 @@ using Zenject;
 
 public class Railgun : WeaponBase
 {
-    // =========================================================
-    // REFERENCES
-    // =========================================================
-
     [Header("References")]
 
     [SerializeField]
@@ -18,11 +14,6 @@ public class Railgun : WeaponBase
     [SerializeField]
     private LineRenderer beam;
 
-
-    // =========================================================
-    // WEAPON SOUNDS
-    // =========================================================
-
     [Header("Weapon Sounds")]
 
     [SerializeField]
@@ -30,11 +21,6 @@ public class Railgun : WeaponBase
 
     [SerializeField]
     private AudioClip overheatClickSound;
-
-
-    // =========================================================
-    // SOUND SETTINGS
-    // =========================================================
 
     [Header("Sound Settings")]
 
@@ -45,49 +31,24 @@ public class Railgun : WeaponBase
     [SerializeField]
     private float soundPitch = 1f;
 
-
-    // =========================================================
-    // OVERHEAT CLICK
-    // =========================================================
-
     [Header("Overheat Click")]
 
     [SerializeField]
     private float overheatClickCooldown = 0.3f;
-
-
-    // =========================================================
-    // EFFECTS
-    // =========================================================
 
     [Header("Effects")]
 
     [SerializeField]
     private ParticleSystem muzzleFlash;
 
-
-    // =========================================================
-    // RECOIL
-    // =========================================================
-
     [Header("Recoil")]
 
     [SerializeField]
     private WeaponRecoil weaponRecoil;
 
-
-    // =========================================================
-    // COMPONENTS
-    // =========================================================
-
     private Camera playerCamera;
 
     private RaycastHit[] hitBuffer;
-
-
-    // =========================================================
-    // STATE
-    // =========================================================
 
     private float nextFireTime;
 
@@ -105,19 +66,9 @@ public class Railgun : WeaponBase
 
     private float nextOverheatClickTime;
 
-
-    // =========================================================
-    // DAMAGE TRACKING
-    // =========================================================
-
     private readonly HashSet<IDamageable>
         damagedTargets =
             new HashSet<IDamageable>();
-
-
-    // =========================================================
-    // PROPERTIES
-    // =========================================================
 
     public float CurrentHeat =>
         currentHeat;
@@ -139,11 +90,6 @@ public class Railgun : WeaponBase
     public bool IsOverheated =>
         isOverheated;
 
-
-    // =========================================================
-    // INJECTION
-    // =========================================================
-
     [Inject]
     private void Construct(
         Camera playerCamera)
@@ -151,11 +97,6 @@ public class Railgun : WeaponBase
         this.playerCamera =
             playerCamera;
     }
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     protected override void Awake()
     {
@@ -177,20 +118,7 @@ public class Railgun : WeaponBase
             beam.enabled =
                 false;
         }
-
-
-        if (playerCamera == null)
-        {
-            Debug.LogError(
-                $"{name}: Player Camera is missing."
-            );
-        }
     }
-
-
-    // =========================================================
-    // SHOOT
-    // =========================================================
 
     public override bool Shoot()
     {
@@ -204,17 +132,8 @@ public class Railgun : WeaponBase
 
         if (muzzlePoint == null)
         {
-            Debug.LogError(
-                $"{name}: Muzzle Point is missing."
-            );
-
             return false;
         }
-
-
-        // =====================================================
-        // OVERHEAT
-        // =====================================================
 
         if (isOverheated)
         {
@@ -223,33 +142,11 @@ public class Railgun : WeaponBase
             return false;
         }
 
-
-        // =====================================================
-        // SHOT PENDING
-        // =====================================================
-
-        // Не запускаем новую стрельбу,
-        // пока текущая анимация
-        // не дошла до Animation Event.
-
         if (shotPending)
             return false;
 
-
-        // =====================================================
-        // FIRE RATE
-        // =====================================================
-
         if (Time.time < nextFireTime)
             return false;
-
-
-        // =====================================================
-        // SAVE AIM
-        // =====================================================
-
-        // Запоминаем направление прицела
-        // в момент нажатия кнопки.
 
         pendingFireOrigin =
             playerCamera.transform.position;
@@ -270,15 +167,6 @@ public class Railgun : WeaponBase
         return true;
     }
 
-
-    // =========================================================
-    // FIRE RAILGUN
-    // =========================================================
-
-    /// <summary>
-    /// Вызывается Animation Event
-    /// в момент фактического выстрела.
-    /// </summary>
     public void FireRailgun()
     {
         if (!shotPending)
@@ -296,17 +184,7 @@ public class Railgun : WeaponBase
         if (muzzlePoint == null)
             return;
 
-
-        // =====================================================
-        // CLEAR DAMAGED TARGETS
-        // =====================================================
-
         damagedTargets.Clear();
-
-
-        // =====================================================
-        // RAYCAST
-        // =====================================================
 
         int hitCount =
             Physics.RaycastNonAlloc(
@@ -350,19 +228,9 @@ public class Railgun : WeaponBase
             if (hit.collider == null)
                 continue;
 
-
-            // =================================================
-            // SURFACE IMPACT
-            // =================================================
-
             SurfaceImpactUtility.ProcessHit(
                 hit
             );
-
-
-            // =================================================
-            // DAMAGEABLE
-            // =================================================
 
             IDamageable damageable =
                 hit.collider.GetComponentInParent<
@@ -373,11 +241,6 @@ public class Railgun : WeaponBase
             if (damageable == null)
                 continue;
 
-
-            // =================================================
-            // ONE DAMAGE PER TARGET
-            // =================================================
-
             if (
                 !damagedTargets.Add(
                     damageable
@@ -386,11 +249,6 @@ public class Railgun : WeaponBase
             {
                 continue;
             }
-
-
-            // =================================================
-            // DAMAGE HITBOX
-            // =================================================
 
             DamageHitbox hitbox =
                 hit.collider.GetComponent<
@@ -415,20 +273,8 @@ public class Railgun : WeaponBase
 
             damagedCount++;
 
-
-            // Последняя поражённая цель —
-            // визуальный конец луча.
-
             beamEnd =
                 hit.point;
-
-
-            Debug.Log(
-                $"Railgun hit: " +
-                $"{hit.collider.name} " +
-                $"distance: {hit.distance:F1}"
-            );
-
 
             if (
                 damagedCount >=
@@ -439,19 +285,9 @@ public class Railgun : WeaponBase
             }
         }
 
-
-        // =====================================================
-        // VISUAL BEAM
-        // =====================================================
-
         FireVisual(
             beamEnd
         );
-
-
-        // =====================================================
-        // OVERHEAT
-        // =====================================================
 
         shotsSinceCooldown++;
 
@@ -467,23 +303,10 @@ public class Railgun : WeaponBase
                 config.RailgunMaxHeat
             );
 
-
-        Debug.Log(
-            $"Railgun shot " +
-            $"{shotsSinceCooldown}/4 | " +
-            $"Heat: {currentHeat}"
-        );
-
-
         if (shotsSinceCooldown >= 4)
         {
             StartOverheat();
         }
-
-
-        // =====================================================
-        // EFFECTS
-        // =====================================================
 
         MuzzleFlashPool.Instance?.Play(
             muzzleFlash,
@@ -499,22 +322,10 @@ public class Railgun : WeaponBase
         weaponRecoil?.AddRecoil();
     }
 
-
-    // =========================================================
-    // OVERHEAT
-    // =========================================================
-
     private void StartOverheat()
     {
         isOverheated =
             true;
-
-
-        Debug.Log(
-            "RAILGUN OVERHEATED! " +
-            "Cooling for 5 seconds."
-        );
-
 
         StartCoroutine(
             CooldownAfterOverheat()
@@ -537,17 +348,7 @@ public class Railgun : WeaponBase
 
         isOverheated =
             false;
-
-
-        Debug.Log(
-            "Railgun cooled down. Ready."
-        );
     }
-
-
-    // =========================================================
-    // VISUAL BEAM
-    // =========================================================
 
     private void FireVisual(
         Vector3 endPoint)
@@ -571,24 +372,12 @@ public class Railgun : WeaponBase
             endPoint
         );
 
-
-        // Показываем луч.
-
         beam.enabled =
             true;
-
-
-        // Если предыдущий луч ещё отображается,
-        // отменяем старый таймер скрытия.
 
         CancelInvoke(
             nameof(HideBeam)
         );
-
-
-        // Новый таймер начинается заново.
-        // Длительность настраивается
-        // в WeaponConfig.
 
         Invoke(
             nameof(HideBeam),
@@ -606,22 +395,10 @@ public class Railgun : WeaponBase
         }
     }
 
-
-    // =========================================================
-    // RELOAD
-    // =========================================================
-
     public override void Reload()
     {
-        // Обычной перезарядки нет.
-        // После четырёх выстрелов —
-        // автоматическое охлаждение.
+        //Обычной перезарядки нет
     }
-
-
-    // =========================================================
-    // SOUND
-    // =========================================================
 
     private void PlaySound(
         AudioClip clip)
@@ -641,11 +418,6 @@ public class Railgun : WeaponBase
             soundPitch
         );
     }
-
-
-    // =========================================================
-    // OVERHEAT CLICK
-    // =========================================================
 
     private void PlayOverheatClick()
     {
@@ -668,13 +440,11 @@ public class Railgun : WeaponBase
         );
     }
 
-
-    // =========================================================
-    // DISABLE
-    // =========================================================
-
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
+
+
         shotPending =
             false;
 
@@ -691,11 +461,6 @@ public class Railgun : WeaponBase
             0f;
 
 
-        CancelInvoke(
-            nameof(HideBeam)
-        );
-
-
         if (beam != null)
         {
             beam.enabled =
@@ -705,11 +470,6 @@ public class Railgun : WeaponBase
 
         StopAllCoroutines();
     }
-
-
-    // =========================================================
-    // RAYCAST COMPARER
-    // =========================================================
 
     private sealed class RaycastHitDistanceComparer
         : IComparer<RaycastHit>

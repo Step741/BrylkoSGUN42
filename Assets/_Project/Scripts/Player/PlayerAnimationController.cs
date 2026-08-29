@@ -46,11 +46,6 @@ public class PlayerAnimationController : MonoBehaviour
     private static readonly int CombatReadyHash =
         Animator.StringToHash("CombatReady");
 
-
-    // =========================================================
-    // REFERENCES
-    // =========================================================
-
     [Header("References")]
 
     [SerializeField]
@@ -62,20 +57,10 @@ public class PlayerAnimationController : MonoBehaviour
     [SerializeField]
     private Health health;
 
-
-    // =========================================================
-    // ANIMATION
-    // =========================================================
-
     [Header("Animation")]
 
     [SerializeField]
     private float smoothTime = 0.1f;
-
-
-    // =========================================================
-    // SPRINT ANIMATION
-    // =========================================================
 
     [Header("Sprint Animation")]
 
@@ -85,31 +70,15 @@ public class PlayerAnimationController : MonoBehaviour
     [SerializeField]
     private float runBlendValue = 2f;
 
-
-    // =========================================================
-    // JUMP ANIMATION
-    // =========================================================
-
     [Header("Jump Animation")]
 
     [SerializeField]
     private float jumpAnimationDelay = 0.05f;
 
-
-    // =========================================================
-    // COMBAT READY
-    // =========================================================
-
     [Header("Combat Ready")]
 
     [SerializeField]
-    [Tooltip("Сколько времени персонаж держит оружие в боеготовности после последнего выстрела")]
     private float combatReadyDuration = 1.2f;
-
-
-    // =========================================================
-    // PRIVATE
-    // =========================================================
 
     private IInputService inputService;
 
@@ -122,23 +91,12 @@ public class PlayerAnimationController : MonoBehaviour
 
     private Coroutine combatReadyCoroutine;
 
-
-    // =========================================================
-    // CONSTRUCT
-    // =========================================================
-
     [Inject]
     private void Construct(
         IInputService inputService)
     {
         this.inputService = inputService;
     }
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         if (health == null)
@@ -189,11 +147,6 @@ public class PlayerAnimationController : MonoBehaviour
         UpdateJumpAnimation();
     }
 
-
-    // =========================================================
-    // HEALTH
-    // =========================================================
-
     private void OnHealthChanged(
         float currentHealth,
         float maxHealth)
@@ -211,11 +164,6 @@ public class PlayerAnimationController : MonoBehaviour
         previousHealth =
             currentHealth;
     }
-
-
-    // =========================================================
-    // MOVEMENT
-    // =========================================================
 
     private void UpdateLocomotion()
     {
@@ -287,11 +235,6 @@ public class PlayerAnimationController : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // CROUCH
-    // =========================================================
-
     private void UpdateCrouchAnimation()
     {
         bool isCrouching =
@@ -302,11 +245,6 @@ public class PlayerAnimationController : MonoBehaviour
             isCrouching
         );
     }
-
-
-    // =========================================================
-    // JUMP
-    // =========================================================
 
     private void UpdateJumpAnimation()
     {
@@ -336,11 +274,6 @@ public class PlayerAnimationController : MonoBehaviour
             false
         );
     }
-
-
-    // =========================================================
-    // SHOOT
-    // =========================================================
 
     public void PlayShoot()
     {
@@ -388,10 +321,6 @@ public class PlayerAnimationController : MonoBehaviour
         if (animator == null)
             return;
 
-
-        // Если уже идёт отсчёт боеготовности —
-        // отменяем старый таймер.
-
         if (combatReadyCoroutine != null)
         {
             StopCoroutine(
@@ -401,32 +330,16 @@ public class PlayerAnimationController : MonoBehaviour
             combatReadyCoroutine = null;
         }
 
-
-        // Важно:
-        // очищаем все старые триггеры выстрела,
-        // чтобы они не сработали позже после выхода
-        // из CombatHold.
-
         ResetShootTriggers();
-
-
-        // Включаем боеготовность.
 
         animator.SetBool(
             CombatReadyHash,
             true
         );
 
-
-        // Запускаем только нужную
-        // анимацию выстрела.
-
         animator.SetTrigger(
             shootHash
         );
-
-
-        // Запускаем новый таймер.
 
         combatReadyCoroutine =
             StartCoroutine(
@@ -441,15 +354,7 @@ public class PlayerAnimationController : MonoBehaviour
             combatReadyDuration
         );
 
-
-        // На всякий случай очищаем все
-        // ожидающие триггеры выстрела перед выходом
-        // из CombatHold.
-
         ResetShootTriggers();
-
-
-        // Выключаем боеготовность.
 
         animator.SetBool(
             CombatReadyHash,
@@ -458,11 +363,6 @@ public class PlayerAnimationController : MonoBehaviour
 
         combatReadyCoroutine = null;
     }
-
-
-    // =========================================================
-    // RESET SHOOT TRIGGERS
-    // =========================================================
 
     private void ResetShootTriggers()
     {
@@ -490,11 +390,6 @@ public class PlayerAnimationController : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // STOP COMBAT READY
-    // =========================================================
-
     private void StopCombatReady()
     {
         if (combatReadyCoroutine != null)
@@ -508,8 +403,6 @@ public class PlayerAnimationController : MonoBehaviour
 
         if (animator != null)
         {
-            // Очищаем все возможные ожидающие
-            // анимации выстрела.
 
             ResetShootTriggers();
 
@@ -520,11 +413,6 @@ public class PlayerAnimationController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // KATANA
-    // =========================================================
-
     public void PlayKatanaAttack()
     {
         StopCombatReady();
@@ -534,11 +422,6 @@ public class PlayerAnimationController : MonoBehaviour
         );
     }
 
-
-    // =========================================================
-    // RELOAD
-    // =========================================================
-
     public void PlayReload()
     {
         StopCombatReady();
@@ -547,11 +430,6 @@ public class PlayerAnimationController : MonoBehaviour
             ReloadHash
         );
     }
-
-
-    // =========================================================
-    // WEAPON SWITCH
-    // =========================================================
 
     public void PlayWeaponSwitch()
     {

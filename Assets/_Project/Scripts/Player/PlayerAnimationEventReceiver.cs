@@ -11,9 +11,6 @@ public class PlayerAnimationEventReceiver : MonoBehaviour
 
         if (weaponController == null)
         {
-            Debug.LogError(
-                $"{name}: WeaponController not found in parent hierarchy."
-            );
         }
     }
 

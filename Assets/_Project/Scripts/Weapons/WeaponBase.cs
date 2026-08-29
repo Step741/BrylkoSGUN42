@@ -1,82 +1,77 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour, IWeapon
 {
     [Header("Weapon")]
+
     [SerializeField]
     protected WeaponConfig config;
+
 
     protected int currentAmmo;
     protected int reserveAmmo;
 
+    private Coroutine reloadCoroutine;
 
-    // =========================
-    // AMMO STATE
-    // =========================
+    public bool IsReloading { get; private set; }
 
     public bool CanShoot =>
-        currentAmmo > 0;
+        currentAmmo > 0 &&
+        !IsReloading;
+
 
     public bool CanReload =>
+        !IsReloading &&
         config != null &&
         currentAmmo < config.MagazineSize &&
         (InfiniteAmmo || reserveAmmo > 0);
 
+
     public int CurrentAmmo =>
         currentAmmo;
 
+
     public int ReserveAmmo =>
         reserveAmmo;
+
 
     public int MaxReserveAmmo =>
         config != null
             ? config.MaxReserveAmmo
             : 0;
 
+
     public int MagazineSize =>
         config != null
             ? config.MagazineSize
             : 0;
 
+
     public bool InfiniteAmmo =>
         config != null &&
         config.InfiniteAmmo;
 
-
-    // =========================
-    // EVENT
-    // =========================
-
     public event Action<int, int> AmmoChanged;
-
-
-    // =========================
-    // INITIALIZATION
-    // =========================
 
     protected virtual void Awake()
     {
         if (config == null)
         {
-            Debug.LogError(
-                $"{name}: WeaponConfig is missing.",
-                this
-            );
-
             return;
         }
 
-        currentAmmo = config.MagazineSize;
-        reserveAmmo = config.ReserveAmmo;
+
+        currentAmmo =
+            config.MagazineSize;
+
+        reserveAmmo =
+            config.ReserveAmmo;
+
 
         NotifyAmmoChanged();
     }
-
-
-    // =========================
-    // AMMO NOTIFICATION
-    // =========================
 
     protected void NotifyAmmoChanged()
     {
@@ -86,17 +81,16 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
         );
     }
 
-
-    // =========================
-    // SET AMMO
-    // =========================
-
     protected void SetAmmo(
         int magazineAmmo,
         int reserveAmmo)
     {
         currentAmmo =
-            Mathf.Max(0, magazineAmmo);
+            Mathf.Max(
+                0,
+                magazineAmmo
+            );
+
 
         this.reserveAmmo =
             Mathf.Clamp(
@@ -107,15 +101,12 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
                     : reserveAmmo
             );
 
+
         NotifyAmmoChanged();
     }
 
-
-    // =========================
-    // ADD RESERVE AMMO
-    // =========================
-
-    public void AddReserveAmmo(int amount)
+    public void AddReserveAmmo(
+        int amount)
     {
         if (amount <= 0)
             return;
@@ -123,10 +114,12 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
         if (InfiniteAmmo)
             return;
 
+
         int maxReserve =
             config != null
                 ? config.MaxReserveAmmo
                 : int.MaxValue;
+
 
         reserveAmmo =
             Mathf.Min(
@@ -134,42 +127,111 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
                 maxReserve
             );
 
+
         NotifyAmmoChanged();
-
-        Debug.Log(
-            $"[{name}] Ammo added: +{amount}. " +
-            $"Reserve: {reserveAmmo}/{maxReserve}"
-        );
     }
-
-
-    // =========================
-    // WEAPON ACTIONS
-    // =========================
 
     public abstract bool Shoot();
 
     public abstract void Reload();
 
+    protected void StartReload(
+        Action onComplete)
+    {
+        if (IsReloading)
+            return;
 
-    // =========================
-    // EQUIP
-    // =========================
+        if (!CanReload)
+            return;
+
+
+        reloadCoroutine =
+            StartCoroutine(
+                ReloadRoutine(
+                    onComplete
+                )
+            );
+    }
+
+
+    private IEnumerator ReloadRoutine(
+        Action onComplete)
+    {
+        IsReloading = true;
+
+
+        float reloadDuration =
+            config != null
+                ? config.ReloadDuration
+                : 0f;
+
+
+        if (reloadDuration > 0f)
+        {
+            yield return new WaitForSeconds(
+                reloadDuration
+            );
+        }
+
+
+        if (!isActiveAndEnabled)
+        {
+            IsReloading = false;
+
+            reloadCoroutine = null;
+
+            yield break;
+        }
+
+
+        onComplete?.Invoke();
+
+
+        IsReloading = false;
+
+        reloadCoroutine = null;
+    }
+
+
+    public void CancelReload()
+    {
+        if (
+            reloadCoroutine != null
+        )
+        {
+            StopCoroutine(
+                reloadCoroutine
+            );
+
+            reloadCoroutine = null;
+        }
+
+
+        IsReloading = false;
+    }
 
     public virtual void Equip()
     {
-        gameObject.SetActive(true);
+        gameObject.SetActive(
+            true
+        );
+
 
         NotifyAmmoChanged();
     }
 
-
-    // =========================
-    // UNEQUIP
-    // =========================
-
     public virtual void Unequip()
     {
-        gameObject.SetActive(false);
+        CancelReload();
+
+
+        gameObject.SetActive(
+            false
+        );
+    }
+
+    protected virtual void OnDisable()
+    {
+        CancelReload();
     }
 }

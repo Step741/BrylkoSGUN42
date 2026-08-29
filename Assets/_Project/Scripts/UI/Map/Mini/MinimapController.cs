@@ -21,7 +21,6 @@ public class MinimapController : MonoBehaviour
     [Header("Minimap Camera Settings")]
 
     [SerializeField]
-    [Tooltip("Размер области обзора миникарты. Работает только для Orthographic Camera.")]
     [Min(0.1f)]
     private float minimapViewSize = 20f;
 
@@ -38,11 +37,6 @@ public class MinimapController : MonoBehaviour
             MinimapMarker,
             GameObject
         >();
-
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -63,11 +57,6 @@ public class MinimapController : MonoBehaviour
         UpdateMarkers();
     }
 
-
-    // =========================================================
-    // CAMERA SETTINGS
-    // =========================================================
-
     private void ApplyCameraSettings()
     {
         if (minimapCamera == null)
@@ -83,11 +72,6 @@ public class MinimapController : MonoBehaviour
         minimapCamera.orthographicSize =
             minimapViewSize;
     }
-
-
-    // =========================================================
-    // REGISTER
-    // =========================================================
 
     public static void Register(
         MinimapMarker marker
@@ -169,11 +153,6 @@ public class MinimapController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // UPDATE
-    // =========================================================
-
     private void UpdateMarkers()
     {
         for (int i = markers.Count - 1; i >= 0; i--)
@@ -217,11 +196,6 @@ public class MinimapController : MonoBehaviour
         }
     }
 
-
-    // =========================================================
-    // POSITION
-    // =========================================================
-
     private void UpdateMarkerPosition(
         MinimapMarker marker,
         GameObject uiMarker
@@ -251,32 +225,20 @@ public class MinimapController : MonoBehaviour
                 marker.transform.position
             );
 
-
-        // =====================================================
-        // OBJECT BEHIND CAMERA
-        // =====================================================
-
         if (viewportPosition.z < 0f)
         {
-            // Если объект нельзя показывать за пределами миникарты,
-            // сразу скрываем маркер.
             if (!marker.ShowOutsideRadius)
             {
                 uiMarker.SetActive(false);
                 return;
             }
 
-
-            // Показывать за пределами можно только через Clamp.
             if (!marker.ClampToEdge)
             {
                 uiMarker.SetActive(false);
                 return;
             }
 
-
-            // Инвертируем направление,
-            // чтобы определить правильную сторону края.
             viewportPosition.x =
                 1f - viewportPosition.x;
 
@@ -284,45 +246,25 @@ public class MinimapController : MonoBehaviour
                 1f - viewportPosition.y;
         }
 
-
-        // =====================================================
-        // CHECK OUTSIDE
-        // =====================================================
-
         bool outside =
             viewportPosition.x < 0f ||
             viewportPosition.x > 1f ||
             viewportPosition.y < 0f ||
             viewportPosition.y > 1f;
 
-
-        // =====================================================
-        // OBJECT OUTSIDE MINIMAP
-        // =====================================================
-
         if (outside)
         {
-            // ShowOutsideRadius определяет,
-            // разрешено ли вообще показывать объект вне области.
             if (!marker.ShowOutsideRadius)
             {
                 uiMarker.SetActive(false);
                 return;
             }
 
-
-            // Если показывать разрешено, но Clamp выключен,
-            // не выводим UI за пределы миникарты.
             if (!marker.ClampToEdge)
             {
                 uiMarker.SetActive(false);
                 return;
             }
-
-
-            // -------------------------------------------------
-            // DIRECTION FROM CENTER
-            // -------------------------------------------------
 
             Vector2 direction =
                 new Vector2(
@@ -340,11 +282,6 @@ public class MinimapController : MonoBehaviour
             {
                 direction.Normalize();
             }
-
-
-            // -------------------------------------------------
-            // POSITION ON EDGE
-            // -------------------------------------------------
 
             float halfWidth =
                 minimapRect.rect.width * 0.5f - 14f;
@@ -375,11 +312,6 @@ public class MinimapController : MonoBehaviour
             markerRect.anchoredPosition =
                 direction * scale;
 
-
-            // -------------------------------------------------
-            // SHOW EDGE ARROW
-            // -------------------------------------------------
-
             if (markerUI != null)
             {
                 markerUI.ShowEdgeArrow(direction);
@@ -390,11 +322,6 @@ public class MinimapController : MonoBehaviour
 
             return;
         }
-
-
-        // =====================================================
-        // OBJECT INSIDE MINIMAP
-        // =====================================================
 
         float x =
             (viewportPosition.x - 0.5f) *
@@ -412,8 +339,6 @@ public class MinimapController : MonoBehaviour
                 y
             );
 
-
-        // Показываем обычную иконку.
         if (markerUI != null)
         {
             markerUI.ShowInside();

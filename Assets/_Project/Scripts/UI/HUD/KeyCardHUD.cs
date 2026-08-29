@@ -32,11 +32,6 @@ public class KeyCardHUD : MonoBehaviour
     private Tween fadeTween;
     private Tween scaleTween;
 
-
-    // =========================================================
-    // UNITY
-    // =========================================================
-
     private void Awake()
     {
         if (keyCardIcon != null)
@@ -87,11 +82,6 @@ public class KeyCardHUD : MonoBehaviour
         KillTweens();
     }
 
-
-    // =========================================================
-    // KEY CARD STATE
-    // =========================================================
-
     private void OnKeyCardChanged(
         bool hasKeyCard
     )
@@ -105,11 +95,6 @@ public class KeyCardHUD : MonoBehaviour
             Hide();
         }
     }
-
-
-    // =========================================================
-    // SHOW
-    // =========================================================
 
     private void Show()
     {
@@ -185,11 +170,6 @@ public class KeyCardHUD : MonoBehaviour
                 );
     }
 
-
-    // =========================================================
-    // HIDE
-    // =========================================================
-
     private void Hide()
     {
         if (
@@ -262,11 +242,7 @@ public class KeyCardHUD : MonoBehaviour
                 );
     }
 
-
-    // =========================================================
-    // CLEANUP
-    // =========================================================
-
+    //CLEANUP
     private void KillTweens()
     {
         fadeTween?.Kill();

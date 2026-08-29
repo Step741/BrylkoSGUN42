@@ -23,20 +23,12 @@ public class ShooterAlertState : EnemyState
     {
         if (shooter == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterAlertState: EnemyShooter is missing."
-            );
-
             return;
         }
 
 
         if (enemy.Vision == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterAlertState: EnemyVision is missing."
-            );
-
             return;
         }
 
@@ -45,11 +37,6 @@ public class ShooterAlertState : EnemyState
         {
             enemySoundController.PlayAlert();
         }
-
-
-        Debug.Log(
-            $"[{enemy.name}] State: Alert"
-        );
     }
 
 

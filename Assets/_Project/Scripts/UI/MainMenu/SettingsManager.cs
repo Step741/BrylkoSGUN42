@@ -6,11 +6,12 @@ using TMPro;
 public class SettingsManager : MonoBehaviour
 {
     [Header("Audio Mixer")]
+
     [SerializeField]
     private AudioMixer audioMixer;
 
-
     [Header("Volume Sliders")]
+
     [SerializeField]
     private Slider masterVolume;
 
@@ -26,23 +27,18 @@ public class SettingsManager : MonoBehaviour
     [SerializeField]
     private Slider ambientVolume;
 
-
     [Header("Mouse Settings")]
+
     [SerializeField]
     private Slider mouseSensitivity;
 
-
     [Header("Invert Y Axis")]
+
     [SerializeField]
     private Button invertYButton;
 
     [SerializeField]
     private TMP_Text invertYButtonText;
-
-
-    // =========================
-    // PLAYER PREFS KEYS
-    // =========================
 
     private const string SettingsInitializedKey =
         "SettingsInitialized";
@@ -71,10 +67,20 @@ public class SettingsManager : MonoBehaviour
     private const string InvertYAxisKey =
         "InvertYAxis";
 
+    private const float DefaultMasterVolume =
+        1f;
 
-    // =========================
-    // MOUSE SENSITIVITY SETTINGS
-    // =========================
+    private const float DefaultMusicVolume =
+        0.6f;
+
+    private const float DefaultSFXVolume =
+        1f;
+
+    private const float DefaultUIVolume =
+        1f;
+
+    private const float DefaultAmbientVolume =
+        0.5f;
 
     private const float MinMouseSensitivity =
         0.1f;
@@ -84,11 +90,6 @@ public class SettingsManager : MonoBehaviour
 
     private const float DefaultMouseSensitivity =
         2f;
-
-
-    // =========================
-    // UNITY
-    // =========================
 
     private void Awake()
     {
@@ -121,11 +122,6 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-
-    // =========================
-    // FIRST RUN
-    // =========================
-
     private void InitializeSettings()
     {
         bool settingsAlreadyExist =
@@ -138,40 +134,34 @@ public class SettingsManager : MonoBehaviour
         if (settingsAlreadyExist)
             return;
 
-
-        // -------------------------
-        // AUDIO DEFAULTS
-        // -------------------------
-
         PlayerPrefs.SetFloat(
             MasterVolumeKey,
-            1f
+            DefaultMasterVolume
         );
+
 
         PlayerPrefs.SetFloat(
             MusicVolumeKey,
-            1f
+            DefaultMusicVolume
         );
+
 
         PlayerPrefs.SetFloat(
             SFXVolumeKey,
-            1f
+            DefaultSFXVolume
         );
+
 
         PlayerPrefs.SetFloat(
             UIVolumeKey,
-            1f
+            DefaultUIVolume
         );
+
 
         PlayerPrefs.SetFloat(
             AmbientVolumeKey,
-            1f
+            DefaultAmbientVolume
         );
-
-
-        // -------------------------
-        // MOUSE DEFAULTS
-        // -------------------------
 
         PlayerPrefs.SetFloat(
             MouseSensitivityKey,
@@ -183,23 +173,14 @@ public class SettingsManager : MonoBehaviour
             0
         );
 
-
-        // -------------------------
-        // INITIALIZATION FLAG
-        // -------------------------
-
         PlayerPrefs.SetInt(
             SettingsInitializedKey,
             1
         );
 
+
         PlayerPrefs.Save();
     }
-
-
-    // =========================
-    // UPDATE OLD MOUSE SETTINGS
-    // =========================
 
     private void UpdateMouseSensitivitySettings()
     {
@@ -210,9 +191,6 @@ public class SettingsManager : MonoBehaviour
             );
 
 
-        // Одноразово заменяем старое
-        // сохранённое значение чувствительности
-        // на новое значение по умолчанию.
         if (currentVersion < 1)
         {
             PlayerPrefs.SetFloat(
@@ -229,11 +207,6 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-
-    // =========================
-    // VOLUME
-    // =========================
-
     public void SetMasterVolume(
         float volume)
     {
@@ -247,7 +220,6 @@ public class SettingsManager : MonoBehaviour
             volume
         );
     }
-
 
     public void SetMusicVolume(
         float volume)
@@ -263,7 +235,6 @@ public class SettingsManager : MonoBehaviour
         );
     }
 
-
     public void SetSFXVolume(
         float volume)
     {
@@ -277,7 +248,6 @@ public class SettingsManager : MonoBehaviour
             volume
         );
     }
-
 
     public void SetUIVolume(
         float volume)
@@ -293,7 +263,6 @@ public class SettingsManager : MonoBehaviour
         );
     }
 
-
     public void SetAmbientVolume(
         float volume)
     {
@@ -307,11 +276,6 @@ public class SettingsManager : MonoBehaviour
             volume
         );
     }
-
-
-    // =========================
-    // MOUSE SENSITIVITY
-    // =========================
 
     public void SetMouseSensitivity(
         float sensitivity)
@@ -327,13 +291,6 @@ public class SettingsManager : MonoBehaviour
             MouseSensitivityKey,
             sensitivity
         );
-
-        Debug.Log(
-        "SAVED MOUSE SENSITIVITY: " +
-        PlayerPrefs.GetFloat(
-            MouseSensitivityKey
-        )
-    );
     }
 
 
@@ -349,11 +306,6 @@ public class SettingsManager : MonoBehaviour
                 MaxMouseSensitivity
             );
     }
-
-
-    // =========================
-    // INVERT Y AXIS
-    // =========================
 
     public void ToggleInvertYAxis()
     {
@@ -386,10 +338,11 @@ public class SettingsManager : MonoBehaviour
 
     public bool GetInvertYAxis()
     {
-        return PlayerPrefs.GetInt(
-            InvertYAxisKey,
-            0
-        ) == 1;
+        return
+            PlayerPrefs.GetInt(
+                InvertYAxisKey,
+                0
+            ) == 1;
     }
 
 
@@ -406,55 +359,43 @@ public class SettingsManager : MonoBehaviour
                 : "OFF";
     }
 
-
-    // =========================
-    // LOAD SETTINGS
-    // =========================
-
     private void LoadSettings()
     {
         float master =
             PlayerPrefs.GetFloat(
                 MasterVolumeKey,
-                1f
+                DefaultMasterVolume
             );
 
         float music =
             PlayerPrefs.GetFloat(
                 MusicVolumeKey,
-                1f
+                DefaultMusicVolume
             );
 
         float sfx =
             PlayerPrefs.GetFloat(
                 SFXVolumeKey,
-                1f
+                DefaultSFXVolume
             );
 
         float ui =
             PlayerPrefs.GetFloat(
                 UIVolumeKey,
-                1f
+                DefaultUIVolume
             );
 
         float ambient =
             PlayerPrefs.GetFloat(
                 AmbientVolumeKey,
-                1f
+                DefaultAmbientVolume
             );
-
 
         float sensitivity =
             GetMouseSensitivity();
 
-
         bool invertY =
             GetInvertYAxis();
-
-
-        // -------------------------
-        // APPLY AUDIO
-        // -------------------------
 
         SetMixerVolume(
             "MasterVolume",
@@ -480,11 +421,6 @@ public class SettingsManager : MonoBehaviour
             "AmbientVolume",
             ambient
         );
-
-
-        // -------------------------
-        // APPLY UI
-        // -------------------------
 
         if (masterVolume != null)
         {
@@ -533,11 +469,6 @@ public class SettingsManager : MonoBehaviour
         );
     }
 
-
-    // =========================
-    // MIXER VOLUME
-    // =========================
-
     private void SetMixerVolume(
         string parameterName,
         float volume)
@@ -568,11 +499,6 @@ public class SettingsManager : MonoBehaviour
             mixerValue
         );
     }
-
-
-    // =========================
-    // SAVE FLOAT
-    // =========================
 
     private void SaveFloat(
         string key,

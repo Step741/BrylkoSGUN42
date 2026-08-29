@@ -17,11 +17,6 @@ public class ShooterTakeCoverState : EnemyState
     {
         if (shooter == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterTakeCoverState: " +
-                "EnemyShooter is missing."
-            );
-
             return;
         }
 
@@ -30,10 +25,6 @@ public class ShooterTakeCoverState : EnemyState
 
         if (coverPoint == null)
         {
-            Debug.LogWarning(
-                $"[{enemy.name}] No valid cover point found."
-            );
-
             enemy.StateMachine.ChangeState(
                 new ShooterCombatState(enemy)
             );
@@ -44,11 +35,6 @@ public class ShooterTakeCoverState : EnemyState
         reloadTimer = shooter.ReloadTime;
 
         shooter.MoveToCover(coverPoint);
-
-        Debug.Log(
-            $"[{enemy.name}] State: TakeCover -> " +
-            $"moving to {coverPoint.name}"
-        );
     }
 
     public override void Tick()
@@ -59,13 +45,8 @@ public class ShooterTakeCoverState : EnemyState
         if (shooter.Health == null)
             return;
 
-        // Смерть уже обрабатывается EnemyDeathController.
         if (shooter.Health.IsDead)
             return;
-
-        // ==========================================
-        // Двигаемся к укрытию.
-        // ==========================================
 
         if (!shooter.HasReachedCover(coverPoint))
         {
@@ -73,21 +54,12 @@ public class ShooterTakeCoverState : EnemyState
             return;
         }
 
-        // ==========================================
-        // Мы за укрытием.
-        // Имитация перезарядки.
-        // ==========================================
-
         shooter.StopMoving();
 
         reloadTimer -= Time.deltaTime;
 
         if (reloadTimer <= 0f)
         {
-            Debug.Log(
-                $"[{enemy.name}] Reload complete."
-            );
-
             enemy.StateMachine.ChangeState(
                 new ShooterCombatState(enemy)
             );

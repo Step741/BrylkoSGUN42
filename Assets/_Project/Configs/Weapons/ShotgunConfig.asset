@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: ShotgunConfig
   m_EditorClassIdentifier: 
   weaponName: GrenadeLauncher
-  damage: 10
+  damage: 12
   fireRate: 1.2
   magazineSize: 6
   maxReserveAmmo: 24
   reserveAmmo: 6
   infiniteAmmo: 0
+  reloadDuration: 3
   range: 35
   spread: 7
   maxSpread: 7

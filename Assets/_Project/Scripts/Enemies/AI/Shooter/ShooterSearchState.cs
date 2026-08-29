@@ -19,10 +19,6 @@ public class ShooterSearchState : EnemyState
     {
         if (shooter == null)
         {
-            Debug.LogError(
-                $"[{enemy.name}] ShooterSearchState: EnemyShooter is missing."
-            );
-
             return;
         }
 
@@ -38,10 +34,6 @@ public class ShooterSearchState : EnemyState
                 shooter.LastKnownPlayerPosition
             );
         }
-
-        Debug.Log(
-            $"[{enemy.name}] State: Search"
-        );
     }
 
     public override void Tick()
@@ -62,7 +54,7 @@ public class ShooterSearchState : EnemyState
             return;
         }
 
-        // Идём к последней известной позиции.
+        //Идёт к последней известной позиции
         if (!reachedLastKnownPosition)
         {
             if (shooter.HasReachedPosition(
@@ -75,7 +67,7 @@ public class ShooterSearchState : EnemyState
             return;
         }
 
-        // Осматриваемся.
+        //Осматривается
         searchTimer += Time.deltaTime;
 
         if (searchTimer >= SearchTime)
