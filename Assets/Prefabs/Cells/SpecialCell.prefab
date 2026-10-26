@@ -5,12 +5,37 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2390258755935728552, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300212, guid: 31e24ed712cbf3b4595a8dbc9b18aa9c, type: 3}
+      objectReference: {fileID: 21300000, guid: 8e5f1ccafb55340459f1b51b1ddeb9ff, type: 3}
+    - target: {fileID: 4516828117567144470, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4516828117567144470, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4516828117567144470, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4516828117567144470, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_SpriteTilingProperty.border.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4516828117567144470, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4516828117567144470, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7847390406643421238, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -60,4 +85,7 @@ PrefabInstance:
       value: SpecialCell
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
