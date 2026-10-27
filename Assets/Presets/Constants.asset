@@ -16,7 +16,7 @@ MonoBehaviour:
   <UnitDamage>k__BackingField: 1
   <IceDebuffMoveSpeedMult>k__BackingField: 0.8
   <IceDebuffDuration>k__BackingField: 2
-  <IceDebuffMaxStack>k__BackingField: 5
+  <IceDebuffMaxStack>k__BackingField: 3
   <FireDebuffDamageMult>k__BackingField: 0.03
-  <FireDebuffDuration>k__BackingField: 1
-  <FireDebuffMaxStack>k__BackingField: 6
+  <FireDebuffDuration>k__BackingField: 2
+  <FireDebuffMaxStack>k__BackingField: 3
