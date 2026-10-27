@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 783385357, guid: 975d0180777d749ceacbb5aad1b8ebd9, type: 3}
+    - target: {fileID: 4515023838564742346, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7847390406643421238, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -59,6 +63,14 @@ PrefabInstance:
     - target: {fileID: 8374042159141885519, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
       propertyPath: m_Name
       value: PathCell
+      objectReference: {fileID: 0}
+    - target: {fileID: 8374042159141885519, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8374042159141885519, guid: 839c6a8f2b8a1044db5cc31d9091dcb7, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

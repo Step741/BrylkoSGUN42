@@ -43,7 +43,8 @@ GameObject:
   - component: {fileID: 4882984276440051701}
   - component: {fileID: -2648399139957855462}
   - component: {fileID: 2837240327265897810}
-  - component: {fileID: -6699276825449779315}
+  - component: {fileID: -1945690725145894467}
+  - component: {fileID: 5264057491412060133}
   m_Layer: 0
   m_Name: Archer
   m_TagString: Untagged
@@ -60,7 +61,7 @@ Transform:
   m_GameObject: {fileID: 6990258103531399417}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.769, y: -3.242, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -107,7 +108,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: 7257567913506708742, guid: 72c22f22ea5e4488390ba536cd5ab98d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -132,16 +133,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _moveSpeed: 6
-  _attackRange: 5
-  _attackDelay: 1
-  _damage: 1
+  _attackRange: 2.5
+  _attackDelay: 1.5
+  _damage: 2
   _attackElemental: 0
   _projectilePrefab: {fileID: -9034887279484243427, guid: 8689fed07068306428d10d770d9d6790, type: 3}
-  _firePoint: {fileID: 7071246580160271135}
-  _scanRadius: 10
+  _firePoint: {fileID: 3071645420789994337}
+  _scanRadius: 3
   _enemyLayer:
     serializedVersion: 2
     m_Bits: 64
+  _obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &2837240327265897810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,25 +165,65 @@ MonoBehaviour:
   - {fileID: 8418572898541717210, guid: a2db8ff0b36884d3680f752d33764b12, type: 3}
   - {fileID: 4917221495796577052, guid: a2db8ff0b36884d3680f752d33764b12, type: 3}
   - {fileID: 1313344751431586703, guid: a2db8ff0b36884d3680f752d33764b12, type: 3}
---- !u!195 &-6699276825449779315
-NavMeshAgent:
+--- !u!50 &-1945690725145894467
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6990258103531399417}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4
+--- !u!58 &5264057491412060133
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6990258103531399417}
   m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 1.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 3
-  m_BaseOffset: 1.5
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
