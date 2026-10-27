@@ -1,3 +1,4 @@
+using System.Collections;
 using Netologia.Systems;
 using Netologia.TowerDefence.Settings;
 using UnityEngine;
@@ -5,16 +6,20 @@ using Zenject;
 
 namespace Netologia.TowerDefence
 {
-    [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D))]
+    [RequireComponent(typeof(Rigidbody2D), typeof(CircleCollider2D), typeof(Animator))]
     public class ArcherUnit : MonoBehaviour
     {
         private ProjectileSystem _projectileSystem;
         private Constants _constants;
         private BarracksBuilding _myBarracks;
         private Rigidbody2D _rb;
+        private Animator _animator;
 
         private Unit _targetEnemy;
         private float _reloadTimer;
+        private bool _isChasing = true;
+
+        private Coroutine _attackCoroutine;
 
         [Header("Настройки движения")]
         [SerializeField, Range(1f, 20f), Tooltip("Скорость бега лучника")]
@@ -26,6 +31,9 @@ namespace Netologia.TowerDefence
         [SerializeField] private float _damage = 5f;
         [SerializeField] private ElementalType _attackElemental = ElementalType.Physic;
 
+        [Tooltip("Задержка вылета стрелы в секундах от начала анимации")]
+        [SerializeField] private float _arrowSpawnDelay = 0.15f;
+
         [Header("Ссылки на префабы")]
         [SerializeField] private Projectile _projectilePrefab;
         [SerializeField] private Transform _firePoint;
@@ -33,7 +41,7 @@ namespace Netologia.TowerDefence
         [Header("Настройки сканирования и слоев")]
         [SerializeField] private float _scanRadius = 10f;
         [SerializeField] private LayerMask _enemyLayer;
-        [SerializeField] private LayerMask _obstacleLayer; // Сюда выбери слои Башен и Тропы
+        [SerializeField] private LayerMask _obstacleLayer;
 
         [Inject]
         public void Construct(ProjectileSystem projectileSystem, Constants constants)
@@ -50,6 +58,8 @@ namespace Netologia.TowerDefence
         private void Start()
         {
             _rb = GetComponent<Rigidbody2D>();
+            _animator = GetComponent<Animator>();
+            _rb.freezeRotation = true;
         }
 
         private void Update()
@@ -67,62 +77,101 @@ namespace Netologia.TowerDefence
             {
                 float distanceToEnemy = Vector2.Distance(transform.position, _targetEnemy.transform.position);
 
-                if (distanceToEnemy > _attackRange)
+                if (distanceToEnemy <= _attackRange && _reloadTimer <= 0f)
                 {
-                    MoveWithObstacleAvoidance();
+                    Attack();
+                }
+            }
+
+            bool isMoving = _rb.velocity.sqrMagnitude > 0.01f;
+            _animator.SetBool("IsRunning", isMoving);
+        }
+
+        private void FixedUpdate()
+        {
+            if (!TimeManager.IsGame)
+            {
+                _rb.velocity = Vector2.zero;
+                return;
+            }
+
+            if (_targetEnemy != null)
+            {
+                float distanceToEnemy = Vector2.Distance(transform.position, _targetEnemy.transform.position);
+
+                if (_isChasing)
+                {
+                    if (distanceToEnemy <= _attackRange)
+                    {
+                        _isChasing = false;
+                    }
                 }
                 else
                 {
-                    // Дошли — стоим и атакуем
-                    _rb.velocity = Vector2.zero;
-
-                    if (_reloadTimer <= 0f)
+                    float startChasingThreshold = _attackRange + 0.4f;
+                    if (distanceToEnemy > startChasingThreshold)
                     {
-                        Attack();
+                        _isChasing = true;
                     }
+                }
+
+                if (_isChasing)
+                {
+                    MoveWithObstacleAvoidanceFixed();
+                }
+                else
+                {
+                    _rb.velocity = Vector2.zero;
                 }
             }
             else
             {
-                // 1.6: Если противников нет — стоим на месте
+                _isChasing = false;
                 _rb.velocity = Vector2.zero;
             }
         }
 
-        private void MoveWithObstacleAvoidance()
+        private void MoveWithObstacleAvoidanceFixed()
         {
             Vector2 targetPos = _targetEnemy.transform.position;
             Vector2 currentPos = transform.position;
             Vector2 desiredDirection = (targetPos - currentPos).normalized;
 
-            // Алгоритм контекстного обхода препятствий (умный луч):
-            // Проверяем путь напрямую, а также два луча под углами 45 градусов влево и вправо
             Vector2 finalDirection = desiredDirection;
-            float checkDistance = 0.8f;
 
-            bool hitCenter = Physics2D.Raycast(currentPos, desiredDirection, checkDistance, _obstacleLayer);
+            float checkDistance = 0.8f;
+            float startOffset = 0.25f;
+
+            Vector2 raycastStart = currentPos + desiredDirection * startOffset;
+
+            bool hitCenter = Physics2D.Raycast(raycastStart, desiredDirection, checkDistance, _obstacleLayer);
 
             if (hitCenter)
             {
                 Vector2 leftDir = Quaternion.Euler(0, 0, 45) * desiredDirection;
                 Vector2 rightDir = Quaternion.Euler(0, 0, -45) * desiredDirection;
 
-                bool hitLeft = Physics2D.Raycast(currentPos, leftDir, checkDistance, _obstacleLayer);
-                bool hitRight = Physics2D.Raycast(currentPos, rightDir, checkDistance, _obstacleLayer);
+                Vector2 raycastStartLeft = currentPos + leftDir * startOffset;
+                Vector2 raycastStartRight = currentPos + rightDir * startOffset;
+
+                bool hitLeft = Physics2D.Raycast(raycastStartLeft, leftDir, checkDistance, _obstacleLayer);
+                bool hitRight = Physics2D.Raycast(raycastStartRight, rightDir, checkDistance, _obstacleLayer);
 
                 if (!hitLeft) finalDirection = leftDir;
                 else if (!hitRight) finalDirection = rightDir;
-                else finalDirection = -desiredDirection * 0.5f; // Если зажат со всех сторон — чуть отходим
+                else finalDirection = -desiredDirection * 0.5f;
             }
 
-            // Двигаем физическое тело
             _rb.velocity = finalDirection * _moveSpeed;
 
-            // Поворот спрайта по горизонтали
             if (desiredDirection.x != 0)
             {
                 float angle = desiredDirection.x > 0 ? 0f : 180f;
-                transform.rotation = Quaternion.Euler(0, angle, 0);
+
+                if (Mathf.Abs(transform.rotation.eulerAngles.y - angle) > 1f)
+                {
+                    transform.rotation = Quaternion.Euler(0, angle, 0);
+                }
             }
         }
 
@@ -154,14 +203,36 @@ namespace Netologia.TowerDefence
 
             if (_projectilePrefab != null && _firePoint != null && _targetEnemy != null)
             {
-                var projectile = _projectileSystem[_projectilePrefab].Get;
-                projectile.PrepareData(_firePoint.position, _targetEnemy, _damage, _attackElemental);
+                _animator.SetTrigger("Shoot");
+
+                if (_attackCoroutine != null) StopCoroutine(_attackCoroutine);
+
+                _attackCoroutine = StartCoroutine(SpawnArrowWithDelay(_targetEnemy));
             }
+        }
+
+        private IEnumerator SpawnArrowWithDelay(Unit currentTarget)
+        {
+            yield return new WaitForSeconds(_arrowSpawnDelay);
+
+            if (this != null && _projectileSystem != null && currentTarget != null && currentTarget.CurrentHealth > 0 && _projectilePrefab != null && _firePoint != null)
+            {
+                var projectile = _projectileSystem[_projectilePrefab].Get;
+                projectile.PrepareData(_firePoint.position, currentTarget, _damage, _attackElemental);
+            }
+
+            _attackCoroutine = null;
         }
 
         private void OnDestroy()
         {
-            if (_myBarracks != null)
+            if (_attackCoroutine != null)
+            {
+                StopCoroutine(_attackCoroutine);
+                _attackCoroutine = null;
+            }
+
+            if (_myBarracks != null && _myBarracks.gameObject != null)
             {
                 _myBarracks.OnArcherDestroyed();
             }

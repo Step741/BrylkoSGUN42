@@ -21,6 +21,18 @@ namespace Netologia.Systems
                         continue;
 
                     var position = tower.transform.position;
+
+                    //Поверка на выход из радиуса
+                    if (tower.HasTarget && tower.Target != null)
+                    {
+                        float distanceToTarget = UnityEngine.Vector2.Distance(position, tower.Target.transform.position);
+
+                        if (distanceToTarget > tower.Range)
+                        {
+                            tower.Target = null;
+                        }
+                    }
+
                     if (!tower.HasTarget)
                         tower.Target = _units.FindTarget(position, tower.Range);
 

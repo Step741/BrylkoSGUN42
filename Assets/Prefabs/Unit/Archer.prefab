@@ -42,10 +42,10 @@ GameObject:
   - component: {fileID: 7071246580160271135}
   - component: {fileID: 4882984276440051701}
   - component: {fileID: -2648399139957855462}
-  - component: {fileID: 2837240327265897810}
   - component: {fileID: -1945690725145894467}
   - component: {fileID: 5264057491412060133}
-  m_Layer: 0
+  - component: {fileID: -7136650555565636192}
+  m_Layer: 8
   m_Name: Archer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,11 +132,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87debb9dbe976eb4ea860c70db1bc63e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSpeed: 6
+  _moveSpeed: 2
   _attackRange: 2.5
-  _attackDelay: 1.5
-  _damage: 2
+  _attackDelay: 2
+  _damage: 3
   _attackElemental: 0
+  _arrowSpawnDelay: 0.5
   _projectilePrefab: {fileID: -9034887279484243427, guid: 8689fed07068306428d10d770d9d6790, type: 3}
   _firePoint: {fileID: 3071645420789994337}
   _scanRadius: 3
@@ -146,25 +147,6 @@ MonoBehaviour:
   _obstacleLayer:
     serializedVersion: 2
     m_Bits: 128
---- !u!114 &2837240327265897810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6990258103531399417}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 800e223297bc46998ba94fa6b67e9150, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _renderer: {fileID: 4882984276440051701}
-  _spriteSwitchDelay: 0.2
-  _sprites:
-  - {fileID: 8882666270506729424, guid: a2db8ff0b36884d3680f752d33764b12, type: 3}
-  - {fileID: 8418572898541717210, guid: a2db8ff0b36884d3680f752d33764b12, type: 3}
-  - {fileID: 4917221495796577052, guid: a2db8ff0b36884d3680f752d33764b12, type: 3}
-  - {fileID: 1313344751431586703, guid: a2db8ff0b36884d3680f752d33764b12, type: 3}
 --- !u!50 &-1945690725145894467
 Rigidbody2D:
   serializedVersion: 4
@@ -188,7 +170,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -227,3 +209,24 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!95 &-7136650555565636192
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6990258103531399417}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e69e54e6f75584bf382ddbe934f532b6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

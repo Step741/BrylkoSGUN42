@@ -6,7 +6,7 @@ namespace Netologia.TowerDefence
     public class BarracksBuilding : MonoBehaviour
     {
         private DiContainer _container;
-        private float _nextSpawnTime;
+        private float _spawnTimer = 0f;
         private int _activeArchersCount = 0;
 
         [Header("Настройки спавна")]
@@ -23,22 +23,23 @@ namespace Netologia.TowerDefence
 
         private void Start()
         {
-            _nextSpawnTime = TimeManager.Time + _spawnInterval;
+            _spawnTimer = 0f;
         }
 
         private void Update()
         {
             if (!TimeManager.IsGame) return;
 
-            //Проверяет время и текущее количество активных лучников
-            if (TimeManager.Time >= _nextSpawnTime)
+            _spawnTimer += Time.deltaTime;
+
+            if (_spawnTimer >= _spawnInterval)
             {
                 if (_activeArchersCount < _maxArchers)
                 {
                     SpawnArcher();
                 }
 
-                _nextSpawnTime = TimeManager.Time + _spawnInterval;
+                _spawnTimer -= _spawnInterval;
             }
         }
 
@@ -53,9 +54,11 @@ namespace Netologia.TowerDefence
                     null
                 );
 
-                archer.Initialize(this);
-
-                _activeArchersCount++;
+                if (archer != null)
+                {
+                    archer.Initialize(this);
+                    _activeArchersCount++;
+                }
             }
         }
 
