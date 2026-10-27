@@ -113,10 +113,26 @@ namespace Netologia.TowerDefence
 			_hasSound = AttackSound != null;
 		}
 
-		private void UpdateRangeBackground()
-			=> _rangeBack.transform.localScale = Vector3.one * 0.67f * Range;
-		
-		private void OnDrawGizmos()
+        private void UpdateRangeBackground()
+        {
+            if (_rangeBack == null) return;
+
+            //Сбрасывает масштаб в единицу, чтобы узнать исходный размер спрайта
+            _rangeBack.transform.localScale = Vector3.one;
+
+            //Получает текущий физический диаметр по оси X в мировых координатах
+            float currentWidth = _rangeBack.bounds.size.x;
+
+            if (currentWidth <= 0) return;
+
+            float targetDiameter = Range * 2f;
+
+            float scaleFactor = targetDiameter / currentWidth;
+
+            _rangeBack.transform.localScale = Vector3.one * scaleFactor;
+        }
+
+        private void OnDrawGizmos()
 		{
 			if(_level < 0 || _level >= Progress.Length) return;
 
